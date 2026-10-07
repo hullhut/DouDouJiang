@@ -511,8 +511,8 @@ async function loadRoomData() {
     const data = await res.json();
     
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
-        document.body.innerHTML = `
-            <div class="locked-screen" style="text-align: center; margin-top: 100px;">
+        document.querySelector('.container').innerHTML = `
+            <div class="locked-screen" style="text-align: center; margin: 100px auto 0 auto; max-width: 400px; padding: 40px; background: #FFF9E6; border: 4px solid #D2B48C; border-radius: 20px; box-sizing: border-box;">
                   <h2 style="color: #8D5A28; font-size: 30px;">🔒 房间已加密</h2>
                   <p style="color: #555; font-weight: bold; margin-bottom: 20px;">请输入密码以访问计分板</p>
                   <div style="display:flex; justify-content:center; gap:10px;">

@@ -70,11 +70,21 @@ export async function onRequest(context) {
                 `SELECT * FROM games WHERE room_code = ? ORDER BY created_at ASC`
             ).bind(roomCode).all();
 
-            if (room && room.state) {
-                try {
-                    room.state = JSON.parse(room.state);
-                } catch(e) {}
+            // Fetch state from room_states table
+            let roomState = null;
+            try {
+                const stateRow = await env.DB.prepare(`SELECT state FROM room_states WHERE room_code = ?`).bind(roomCode).first();
+                if (stateRow && stateRow.state) {
+                    roomState = JSON.parse(stateRow.state);
+                }
+            } catch (e) {
+                // If table doesn't exist, ignore
             }
+            
+            if (roomState) {
+                room.state = roomState;
+            }
+
             return new Response(JSON.stringify({ success: true, room, games: results }), {
                 headers: { 'Content-Type': 'application/json' }
             });

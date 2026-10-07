@@ -16,23 +16,26 @@ export async function onRequest(context) {
                 return new Response(JSON.stringify({ error: 'Invalid room code' }), { status: 400 });
             }
 
-            // Ensure room exists
+            // Create states table if it doesn't exist
+            try {
+                await env.DB.prepare(`CREATE TABLE IF NOT EXISTS room_states (room_code TEXT PRIMARY KEY, state TEXT)`).run();
+            } catch (e) {
+                // Ignore create table errors
+            }
+
+            // Ensure room exists in rooms table
             const room = await env.DB.prepare(`SELECT * FROM rooms WHERE room_code = ?`).bind(roomCode).first();
             if (!room) {
                 await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, null).run();
             }
 
-            // Ensure state column exists
-            try {
-                await env.DB.prepare(`SELECT state FROM rooms LIMIT 1`).first();
-            } catch (e) {
-                // Column doesn't exist, add it
-                await env.DB.prepare(`ALTER TABLE rooms ADD COLUMN state TEXT`).run();
+            const stateStr = JSON.stringify(state);
+            const existingState = await env.DB.prepare(`SELECT * FROM room_states WHERE room_code = ?`).bind(roomCode).first();
+            if (existingState) {
+                await env.DB.prepare(`UPDATE room_states SET state = ? WHERE room_code = ?`).bind(stateStr, roomCode).run();
+            } else {
+                await env.DB.prepare(`INSERT INTO room_states (room_code, state) VALUES (?, ?)`).bind(roomCode, stateStr).run();
             }
-
-            await env.DB.prepare(`UPDATE rooms SET state = ? WHERE room_code = ?`)
-                .bind(JSON.stringify(state), roomCode)
-                .run();
 
             return new Response(JSON.stringify({ success: true }), {
                 headers: { 'Content-Type': 'application/json' }
