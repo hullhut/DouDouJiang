@@ -8,14 +8,18 @@ const i18n = {
     en: {
         title: "Family Mahjong<br>Score Tracker",
         startGame: "Start Game ▶",
+        clearAll: "Clear All",
+        confirmClearAll: "Sure?",
         roundTitle: "Players & Scores - Round {n}",
         aliasPlaceholder: "Player Alias",
         scorePlaceholder: "Score",
         unitText: "Unit (Yuan)",
         endGame: "End Game",
         confirmEnd: "Confirm?",
-        clearRound: "Clear",
+        clearRound: "Reset Round",
         confirmClear: "Sure?",
+        modifyRound: "Modify",
+        confirmModify: "Confirm?",
         resultTitle: "💰 Round Settlement 💰",
         east: "East",
         south: "South",
@@ -25,14 +29,18 @@ const i18n = {
     zh: {
         title: "家庭麻将<br>计分器",
         startGame: "开始游戏 ▶",
+        clearAll: "全部清空",
+        confirmClearAll: "确认全清?",
         roundTitle: "玩家与分数 - 第 {n} 局",
         aliasPlaceholder: "玩家昵称",
         scorePlaceholder: "虎数",
         unitText: "计数单位 (元)",
         endGame: "结束游戏",
         confirmEnd: "确认结算?",
-        clearRound: "清空",
-        confirmClear: "确认清空?",
+        clearRound: "重置本局",
+        confirmClear: "确认重置?",
+        modifyRound: "修改本局",
+        confirmModify: "确认修改?",
         resultTitle: "💰 本局结算结果 💰",
         east: "东",
         south: "南",
@@ -49,6 +57,15 @@ function toggleLanguage() {
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
     startGameBtn.innerHTML = i18n[currentLang].startGame;
+    
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    if (clearAllBtn) {
+        if (clearAllBtn.dataset.confirm === "true") {
+            clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
+        } else {
+            clearAllBtn.innerHTML = i18n[currentLang].clearAll;
+        }
+    }
     
     // Update dynamic texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
@@ -87,6 +104,16 @@ function toggleLanguage() {
                 clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
             } else {
                 clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+            }
+        }
+        
+        // Modify Round button
+        const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+        if (modifyBtn) {
+            if (modifyBtn.dataset.confirm === "true") {
+                modifyBtn.innerHTML = `✏️ ${i18n[currentLang].confirmModify}`;
+            } else {
+                modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
             }
         }
         
@@ -259,9 +286,46 @@ function createGameRound() {
         }
     };
     
+    const modifyBtn = document.createElement('button');
+    modifyBtn.className = 'modify-round-btn hidden';
+    modifyBtn.dataset.confirm = "false";
+    modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
+
+    modifyBtn.onclick = () => {
+        if (modifyBtn.dataset.confirm === "true") {
+            modifyBtn.dataset.confirm = "false";
+            modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
+            modifyBtn.style.backgroundColor = "";
+            
+            // Unlock inputs
+            roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
+            
+            // Hide result and modify button, show end button
+            roundDiv.querySelector('.round-result').classList.add('hidden');
+            modifyBtn.classList.add('hidden');
+            endBtn.classList.remove('hidden');
+            
+            const checkbox = endBtn.querySelector('input[type="checkbox"]');
+            if(checkbox) checkbox.checked = false;
+        } else {
+            modifyBtn.dataset.confirm = "true";
+            modifyBtn.innerHTML = `✏️ ${i18n[currentLang].confirmModify}`;
+            modifyBtn.style.backgroundColor = "#e67e22";
+            
+            setTimeout(() => {
+                if (modifyBtn.dataset.confirm === "true") {
+                    modifyBtn.dataset.confirm = "false";
+                    modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
+                    modifyBtn.style.backgroundColor = "";
+                }
+            }, 3000);
+        }
+    };
+    
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'footer-actions';
     actionsDiv.appendChild(clearBtn);
+    actionsDiv.appendChild(modifyBtn);
     actionsDiv.appendChild(endBtn);
     
     footer.appendChild(unitDiv);
@@ -332,7 +396,47 @@ function calculateRoundScore(roundDiv, endBtn) {
     const inputs = roundDiv.querySelectorAll('input, button');
     inputs.forEach(el => el.disabled = true);
     
+    // Re-enable language toggle and global clear
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) langToggle.disabled = false;
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    if (clearAllBtn) clearAllBtn.disabled = false;
+    
     endBtn.style.backgroundColor = ""; // reset color
+    endBtn.classList.add('hidden');
+    
+    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    if (modifyBtn) {
+        modifyBtn.disabled = false;
+        modifyBtn.classList.remove('hidden');
+    }
+    const clearBtn = roundDiv.querySelector('.clear-round-btn');
+    if (clearBtn) clearBtn.disabled = false;
 }
 
 startGameBtn.addEventListener('click', createGameRound);
+const clearAllBtn = document.getElementById('clearAllBtn');
+if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', () => {
+        if (clearAllBtn.dataset.confirm === "true") {
+            gameRoundsContainer.innerHTML = '';
+            roundCount = 0;
+            
+            clearAllBtn.dataset.confirm = "false";
+            clearAllBtn.innerHTML = i18n[currentLang].clearAll;
+            clearAllBtn.style.backgroundColor = ";
+        } else {
+            clearAllBtn.dataset.confirm = "true";
+            clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
+            clearAllBtn.style.backgroundColor = "#922b21";
+            
+            setTimeout(() => {
+                if (clearAllBtn.dataset.confirm === "true") {
+                    clearAllBtn.dataset.confirm = "false";
+                    clearAllBtn.innerHTML = i18n[currentLang].clearAll;
+                    clearAllBtn.style.backgroundColor = ";
+                }
+            }, 3000);
+        }
+    });
+}

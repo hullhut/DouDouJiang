@@ -1,0 +1,23 @@
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS rooms;
+CREATE TABLE rooms (
+  room_code TEXT PRIMARY KEY,
+  password TEXT,
+  owner_id INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS games;
+CREATE TABLE games (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  room_code TEXT NOT NULL,
+  game_data TEXT NOT NULL, -- JSON string of the round
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(room_code) REFERENCES rooms(room_code)
+);

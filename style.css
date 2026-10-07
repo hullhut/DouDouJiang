@@ -77,12 +77,17 @@ h1 {
     line-height: 1.3;
 }
 
-#startGameBtn {
-    background: linear-gradient(180deg, #FFD700 0%, #FF8C00 100%);
+.header-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#startGameBtn, #clearAllBtn {
     color: white;
-    border: 3px solid #FFF;
-    padding: 12px 30px;
-    font-size: 22px;
+    padding: 12px 25px;
+    font-size: 20px;
     font-weight: bold;
     border-radius: 30px;
     cursor: pointer;
@@ -92,9 +97,18 @@ h1 {
     align-items: center;
     gap: 10px;
     transition: transform 0.1s;
+    border: 3px solid #FFF;
 }
 
-#startGameBtn:active {
+#startGameBtn {
+    background: linear-gradient(180deg, #FFD700 0%, #FF8C00 100%);
+}
+
+#clearAllBtn {
+    background: linear-gradient(180deg, #E74C3C 0%, #C0392B 100%);
+}
+
+#startGameBtn:active, #clearAllBtn:active {
     transform: translateY(3px);
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
@@ -189,8 +203,14 @@ h1 {
 }
 
 .tiger-input {
-    width: 65px;
+    width: 60px;
     text-align: center;
+    padding: 6px 4px; /* Reduce horizontal padding to fit text */
+}
+
+.tiger-input::placeholder {
+    font-size: 13px;
+    font-weight: normal;
 }
 
 .add-btn {
@@ -265,7 +285,7 @@ h1 {
     align-items: center;
 }
 
-.end-game-btn, .clear-round-btn {
+.end-game-btn, .clear-round-btn, .modify-round-btn {
     color: white;
     border-radius: 12px;
     padding: 10px 15px;
@@ -289,17 +309,23 @@ h1 {
     box-shadow: 0 4px 0 #D68910;
 }
 
+.modify-round-btn {
+    background: #3498DB;
+    border: 2px solid #2980B9;
+    box-shadow: 0 4px 0 #2980B9;
+}
+
 .end-game-btn input[type="checkbox"] {
     margin-right: 8px;
     transform: scale(1.2);
 }
 
-.end-game-btn:active:not(:disabled), .clear-round-btn:active:not(:disabled) {
+.end-game-btn:active:not(:disabled), .clear-round-btn:active:not(:disabled), .modify-round-btn:active:not(:disabled) {
     transform: translateY(4px);
     box-shadow: 0 0 0 transparent;
 }
 
-.end-game-btn:disabled, .clear-round-btn:disabled {
+.end-game-btn:disabled, .clear-round-btn:disabled, .modify-round-btn:disabled {
     background: #BDC3C7;
     border-color: #95A5A6;
     box-shadow: 0 4px 0 #95A5A6;
