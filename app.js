@@ -424,7 +424,7 @@ if (clearAllBtn) {
             
             clearAllBtn.dataset.confirm = "false";
             clearAllBtn.innerHTML = i18n[currentLang].clearAll;
-            clearAllBtn.style.backgroundColor = ";
+            clearAllBtn.style.backgroundColor = "";
         } else {
             clearAllBtn.dataset.confirm = "true";
             clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
@@ -434,7 +434,7 @@ if (clearAllBtn) {
                 if (clearAllBtn.dataset.confirm === "true") {
                     clearAllBtn.dataset.confirm = "false";
                     clearAllBtn.innerHTML = i18n[currentLang].clearAll;
-                    clearAllBtn.style.backgroundColor = ";
+                    clearAllBtn.style.backgroundColor = "";
                 }
             }, 3000);
         }
