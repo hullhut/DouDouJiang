@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=18">
+    <link rel="stylesheet" href="/style.css?v=19">
 </head>
 <body>
     <div class="container">
@@ -20,22 +20,37 @@
         
         <!-- Header Banner Container (Defaulting to Theme 3 which user liked) -->
         <header class="header-title theme-minimal" id="headerBanner">
+            <img src="/images/dogs-banner.jpg" class="theme-banner-img" id="themeBannerImg" alt="麻将萌犬" style="display:none;">
             <div class="header-inner">
                 <div class="dog-badge-row">
-                    <span class="dog-icon" id="leftDog">🐶</span>
+                    <img class="dog-avatar-icon" id="leftDog" src="/images/dog-golden.jpg" alt="金毛">
                     <span class="mahjong-badge">🀄</span>
                     <h1 id="mainTitle" data-i18n="title">麻将计分器</h1>
-                    <span class="dog-icon" id="rightDog">🐕</span>
+                    <img class="dog-avatar-icon" id="rightDog" src="/images/dog-collie.jpg" alt="边牧">
                 </div>
-                <!-- Dog Avatar / Picture Options -->
+                <!-- Dog Avatar / Picture Options in Cartoon Illustrated Style -->
                 <div class="dog-selector-bar" id="dogSelectorBar">
                     <span class="selector-label" id="dogSelectLabel">换萌犬:</span>
-                    <button class="dog-pill active" data-left="🐶" data-right="🐕">🐶 柯基</button>
-                    <button class="dog-pill" data-left="🐕" data-right="🐕">🐕 柴犬</button>
-                    <button class="dog-pill" data-left="🐩" data-right="🐩">🐩 贵宾</button>
-                    <button class="dog-pill" data-left="🦮" data-right="🦮">🦮 金毛</button>
-                    <button class="dog-pill" data-left="🐕‍🦺" data-right="🐕‍🦺">🐕‍🦺 边牧</button>
-                    <button class="dog-pill" data-left="🐾" data-right="🐾">🐾 爪爪</button>
+                    <button class="dog-pill active" data-left="/images/dog-golden.jpg" data-right="/images/dog-collie.jpg" data-name="duo">
+                        <img src="/images/dogs-original.jpg" class="dog-pill-thumb" alt="金毛+边牧">
+                        <span class="pill-text" data-i18n="duo">金毛+边牧</span>
+                    </button>
+                    <button class="dog-pill" data-left="/images/dog-golden.jpg" data-right="/images/dog-golden.jpg" data-name="golden">
+                        <img src="/images/dog-golden.jpg" class="dog-pill-thumb" alt="金毛">
+                        <span class="pill-text" data-i18n="golden">金毛</span>
+                    </button>
+                    <button class="dog-pill" data-left="/images/dog-collie.jpg" data-right="/images/dog-collie.jpg" data-name="collie">
+                        <img src="/images/dog-collie.jpg" class="dog-pill-thumb" alt="边牧">
+                        <span class="pill-text" data-i18n="collie">边牧</span>
+                    </button>
+                    <button class="dog-pill" data-left="/images/dog-corgi.jpg" data-right="/images/dog-corgi.jpg" data-name="corgi">
+                        <img src="/images/dog-corgi.jpg" class="dog-pill-thumb" alt="柯基">
+                        <span class="pill-text" data-i18n="corgi">柯基</span>
+                    </button>
+                    <button class="dog-pill" data-left="/images/dog-shiba.jpg" data-right="/images/dog-shiba.jpg" data-name="shiba">
+                        <img src="/images/dog-shiba.jpg" class="dog-pill-thumb" alt="柴犬">
+                        <span class="pill-text" data-i18n="shiba">柴犬</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -55,6 +70,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=18"></script>
+    <script src="/app.js?v=19"></script>
 </body>
 </html>

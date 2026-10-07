@@ -132,27 +132,46 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     flex-wrap: nowrap;
 }
 
-.dog-icon {
-    font-size: 24px;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Illustrated Cartoon Dog Avatars flanking the title */
+.dog-avatar-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #FFF;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+    object-fit: cover;
+    flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     user-select: none;
+    cursor: pointer;
+    background: #FFF;
 }
-.dog-icon:hover {
-    transform: scale(1.2) rotate(-8deg);
+.dog-avatar-icon:hover {
+    transform: scale(1.15) rotate(6deg);
+}
+.dog-avatar-icon:active, .dog-avatar-icon.bouncing {
+    animation: dogBounce 0.4s ease;
+}
+
+@keyframes dogBounce {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.22) rotate(-8deg); }
+    70% { transform: scale(1.15) rotate(8deg); }
 }
 
 .mahjong-badge {
     font-size: 22px;
     user-select: none;
+    flex-shrink: 0;
 }
 
 h1 {
-    font-size: clamp(16px, 4.8vw, 24px);
+    font-size: clamp(16px, 4.6vw, 24px);
     font-weight: 900;
     margin: 2px 0;
     line-height: 1.2;
@@ -160,15 +179,26 @@ h1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 70px);
+    max-width: calc(100% - 90px);
 }
 
-/* Dog Selector Bar (Options for dogs) */
+/* Theme 2 Illustration Banner */
+.theme-banner-img {
+    width: 100%;
+    max-height: 125px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 2px solid #E6BA7A;
+    box-shadow: 0 4px 10px rgba(141, 90, 40, 0.18);
+}
+
+/* Dog Selector Bar (Options for dogs in illustrated cartoon style) */
 .dog-selector-bar {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 5px;
     flex-wrap: wrap;
     margin-top: 8px;
     padding-top: 6px;
@@ -184,16 +214,28 @@ h1 {
 }
 
 .dog-pill {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
     border: 1.5px solid #D6EAF8;
-    border-radius: 12px;
-    padding: 2px 6px;
+    border-radius: 16px;
+    padding: 2px 8px;
     font-size: 11px;
     font-weight: bold;
     color: #34495E;
     cursor: pointer;
     transition: all 0.15s ease;
     user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dog-pill-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
 }
 
 .dog-pill:hover {
@@ -205,8 +247,11 @@ h1 {
     background: #3498DB;
     border-color: #2980B9;
     color: #FFF;
-    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.25);
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
     transform: scale(1.04);
+}
+.dog-pill.active .dog-pill-thumb {
+    border-color: #FFF;
 }
 
 /* Beautiful Glossy Action Buttons */

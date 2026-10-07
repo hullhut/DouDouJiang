@@ -47,7 +47,12 @@ const i18n = {
         theme1: "Theme 1: Arcade 3D",
         theme2: "Theme 2: Cute Pet Card",
         theme3: "Theme 3: Soft Glass",
-        dogSelectLabel: "Pet Avatar:"
+        dogSelectLabel: "Pet Avatar:",
+        golden: "Golden",
+        collie: "Collie",
+        corgi: "Corgi",
+        shiba: "Shiba",
+        duo: "Golden+Collie"
     },
     zh: {
         title: "麻将计分器",
@@ -88,7 +93,12 @@ const i18n = {
         theme1: "方案1: 街机3D",
         theme2: "方案2: 萌宠插画",
         theme3: "方案3: 柔和质感",
-        dogSelectLabel: "换萌犬:"
+        dogSelectLabel: "换萌犬:",
+        golden: "金毛",
+        collie: "边牧",
+        corgi: "柯基",
+        shiba: "柴犬",
+        duo: "金毛+边牧"
     }
 };
 
@@ -105,6 +115,10 @@ function initThemeSwitcher() {
             e.target.classList.add('active');
             
             headerBanner.className = 'header-title theme-' + theme;
+            const bannerImg = document.getElementById('themeBannerImg');
+            if (bannerImg) {
+                bannerImg.style.display = (theme === 'card') ? 'block' : 'none';
+            }
             localStorage.setItem('header_theme', theme);
         }
     });
@@ -117,34 +131,57 @@ function initThemeSwitcher() {
     });
 }
 
-// --- Dog Avatar Selector Options ---
+// --- Dog Avatar Selector Options (Cartoon Illustrated Pups) ---
 function initDogSelector() {
     const dogBar = document.getElementById('dogSelectorBar');
     if (!dogBar) return;
+
+    const leftDog = document.getElementById('leftDog');
+    const rightDog = document.getElementById('rightDog');
+
+    [leftDog, rightDog].forEach(dogImg => {
+        if (dogImg) {
+            dogImg.addEventListener('click', () => {
+                dogImg.classList.add('bouncing');
+                setTimeout(() => dogImg.classList.remove('bouncing'), 400);
+            });
+        }
+    });
 
     dogBar.addEventListener('click', (e) => {
         const btn = e.target.closest('.dog-pill');
         if (btn) {
             const left = btn.dataset.left;
             const right = btn.dataset.right;
-            if (leftDog) leftDog.innerText = left;
-            if (rightDog) rightDog.innerText = right;
+            if (leftDog && left) leftDog.src = left;
+            if (rightDog && right) rightDog.src = right;
 
             dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
 
+            if (leftDog) {
+                leftDog.classList.add('bouncing');
+                setTimeout(() => leftDog.classList.remove('bouncing'), 400);
+            }
+            if (rightDog) {
+                rightDog.classList.add('bouncing');
+                setTimeout(() => rightDog.classList.remove('bouncing'), 400);
+            }
+
             localStorage.setItem('header_dog_left', left);
             localStorage.setItem('header_dog_right', right);
+            localStorage.setItem('header_dog_name', btn.dataset.name || '');
         }
     });
 
     const savedLeft = localStorage.getItem('header_dog_left');
     const savedRight = localStorage.getItem('header_dog_right');
+    const savedName = localStorage.getItem('header_dog_name');
     if (savedLeft && savedRight) {
-        if (leftDog) leftDog.innerText = savedLeft;
-        if (rightDog) rightDog.innerText = savedRight;
+        if (leftDog) leftDog.src = savedLeft;
+        if (rightDog) rightDog.src = savedRight;
         dogBar.querySelectorAll('.dog-pill').forEach(btn => {
-            if (btn.dataset.left === savedLeft && btn.dataset.right === savedRight) {
+            if (btn.dataset.name === savedName || (btn.dataset.left === savedLeft && btn.dataset.right === savedRight)) {
                 dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
             }
@@ -200,6 +237,13 @@ function toggleLanguage() {
     if (pill3) pill3.innerText = i18n[currentLang].theme3;
     const dogSelectLabel = document.getElementById('dogSelectLabel');
     if (dogSelectLabel) dogSelectLabel.innerText = i18n[currentLang].dogSelectLabel;
+
+    document.querySelectorAll('.dog-pill .pill-text').forEach(span => {
+        const key = span.dataset.i18n;
+        if (key && i18n[currentLang][key]) {
+            span.innerText = i18n[currentLang][key];
+        }
+    });
     
     // Update dynamic round texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
