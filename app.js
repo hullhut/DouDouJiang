@@ -102,13 +102,13 @@ langToggle.addEventListener('click', toggleLanguage);
 
 // --- Game Logic ---
 let roundCount = 0;
-const directions = ['东', '南', '西', '北'];
-const enDirs = ['East', 'South', 'West', 'North'];
+const directions = ['东', '西', '南', '北'];
+const enDirs = ['East', 'West', 'South', 'North'];
 
 let aliases = {
     '东': 'Mom',
-    '南': 'Dad',
     '西': 'Ben',
+    '南': 'Dad',
     '北': 'Li'
 };
 
