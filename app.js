@@ -1,10 +1,101 @@
 const gameRoundsContainer = document.getElementById('gameRoundsContainer');
 const startGameBtn = document.getElementById('startGameBtn');
+const langToggle = document.getElementById('langToggle');
+const mainTitle = document.getElementById('mainTitle');
 
+// --- I18N (Internationalization) ---
+const i18n = {
+    en: {
+        title: "Family Mahjong<br>Score Tracker",
+        startGame: "Start Game ▶",
+        roundTitle: "Players & Scores - Round {n}",
+        aliasPlaceholder: "Player Alias",
+        scorePlaceholder: "Score",
+        unitText: "Unit (Yuan)",
+        endGame: "End Game",
+        confirmEnd: "Confirm?",
+        resultTitle: "💰 Round Settlement 💰",
+        east: "East",
+        south: "South",
+        west: "West",
+        north: "North"
+    },
+    zh: {
+        title: "家庭麻将<br>计分器",
+        startGame: "开始游戏 ▶",
+        roundTitle: "玩家与分数 - 第 {n} 局",
+        aliasPlaceholder: "玩家昵称",
+        scorePlaceholder: "虎数",
+        unitText: "计数单位 (元)",
+        endGame: "结束游戏",
+        confirmEnd: "确认结算?",
+        resultTitle: "💰 本局结算结果 💰",
+        east: "东",
+        south: "南",
+        west: "西",
+        north: "北"
+    }
+};
+
+let currentLang = 'zh';
+
+function toggleLanguage() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    
+    // Update static texts
+    mainTitle.innerHTML = i18n[currentLang].title;
+    startGameBtn.innerHTML = i18n[currentLang].startGame;
+    
+    // Update dynamic texts
+    document.querySelectorAll('.game-round').forEach(roundDiv => {
+        // Round header
+        const roundId = roundDiv.id.replace('round-', '');
+        roundDiv.querySelector('.round-header').innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
+        
+        // Directions
+        const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
+        roundDiv.querySelectorAll('.player-row').forEach(row => {
+            const dir = row.dataset.dir;
+            const dirSpan = row.querySelector('.player-dir');
+            dirSpan.innerHTML = `${dirMap[dir]}<br><span>(${dir})</span>`;
+            
+            row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
+            row.querySelectorAll('.tiger-input').forEach(input => {
+                input.placeholder = i18n[currentLang].scorePlaceholder;
+            });
+        });
+
+        // Unit text
+        const unitTextNode = roundDiv.querySelector('.unit-text-label');
+        if (unitTextNode) {
+            unitTextNode.innerText = i18n[currentLang].unitText;
+        }
+
+        // End Game button
+        const endBtn = roundDiv.querySelector('.end-game-btn');
+        if (endBtn && !endBtn.disabled) {
+            if (endBtn.dataset.confirm === "true") {
+                endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
+            } else {
+                endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
+            }
+        }
+        
+        // Result Title if settled
+        const resultTitle = roundDiv.querySelector('.result-title');
+        if (resultTitle) {
+            resultTitle.innerText = i18n[currentLang].resultTitle;
+        }
+    });
+}
+
+langToggle.addEventListener('click', toggleLanguage);
+
+// --- Game Logic ---
 let roundCount = 0;
 const directions = ['东', '南', '西', '北'];
+const enDirs = ['East', 'South', 'West', 'North'];
 
-// 玩家别名缓存，方便下一局默认带出
 let aliases = {
     '东': 'Mom',
     '南': 'Dad',
@@ -23,7 +114,7 @@ function createGameRound() {
     // Header
     const header = document.createElement('div');
     header.className = 'round-header';
-    header.innerText = `Players & Scores - 第 ${roundId} 局`;
+    header.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
     roundDiv.appendChild(header);
 
     // Player Rows
@@ -32,13 +123,13 @@ function createGameRound() {
         row.className = `player-row row-${dir}`;
         row.dataset.dir = dir;
 
-        // 方向标签
+        const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
+        
         const dirSpan = document.createElement('div');
         dirSpan.className = 'player-dir';
-        dirSpan.innerHTML = `${dir}<br><span style="font-size:12px;">(${dir})</span>`;
+        dirSpan.innerHTML = `${dirMap[dir]}<br><span>(${dir})</span>`;
         row.appendChild(dirSpan);
 
-        // 玩家信息 (别名 + 虎数)
         const playerInfo = document.createElement('div');
         playerInfo.className = 'player-info';
 
@@ -46,9 +137,9 @@ function createGameRound() {
         aliasInput.type = 'text';
         aliasInput.className = 'player-alias';
         aliasInput.value = aliases[dir];
-        aliasInput.placeholder = 'Player Alias';
+        aliasInput.placeholder = i18n[currentLang].aliasPlaceholder;
         aliasInput.onchange = (e) => {
-            aliases[dir] = e.target.value; // 更新缓存
+            aliases[dir] = e.target.value; 
         };
         playerInfo.appendChild(aliasInput);
 
@@ -59,7 +150,7 @@ function createGameRound() {
             const input = document.createElement('input');
             input.type = 'number';
             input.className = 'tiger-input';
-            input.placeholder = 'Score';
+            input.placeholder = i18n[currentLang].scorePlaceholder;
             input.value = '';
             return input;
         };
@@ -69,7 +160,6 @@ function createGameRound() {
         
         row.appendChild(playerInfo);
 
-        // 加号按钮
         const addBtn = document.createElement('button');
         addBtn.className = 'add-btn';
         addBtn.innerText = '+';
@@ -81,36 +171,52 @@ function createGameRound() {
         roundDiv.appendChild(row);
     });
 
-    // 底部结算区域
+    // Footer
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
     const unitDiv = document.createElement('div');
     unitDiv.className = 'unit-input';
-    unitDiv.innerHTML = `<span class="unit-icon">¥</span> <input type="number" class="round-unit" value="100" min="1"> 元`;
+    unitDiv.innerHTML = `<span class="unit-icon">¥</span> <input type="number" class="round-unit" value="100" min="1"> <span class="unit-text-label">${i18n[currentLang].unitText}</span>`;
     
     const endBtn = document.createElement('button');
     endBtn.className = 'end-game-btn';
-    endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> End Game`;
-    endBtn.onclick = () => calculateRoundScore(roundDiv, endBtn);
+    endBtn.dataset.confirm = "false";
+    endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
+    
+    // Double confirmation logic
+    endBtn.onclick = () => {
+        if (endBtn.dataset.confirm === "true") {
+            calculateRoundScore(roundDiv, endBtn);
+        } else {
+            endBtn.dataset.confirm = "true";
+            endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
+            endBtn.style.backgroundColor = "#c0392b";
+            
+            // Reset state after 3 seconds if not clicked again
+            setTimeout(() => {
+                if (!endBtn.disabled) {
+                    endBtn.dataset.confirm = "false";
+                    endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
+                    endBtn.style.backgroundColor = "";
+                }
+            }, 3000);
+        }
+    };
     
     footer.appendChild(unitDiv);
     footer.appendChild(endBtn);
     roundDiv.appendChild(footer);
     
-    // 结算结果展示区
     const resultDiv = document.createElement('div');
     resultDiv.className = 'round-result hidden';
     roundDiv.appendChild(resultDiv);
 
     gameRoundsContainer.appendChild(roundDiv);
-    
-    // 自动滚动到新增的这局
     roundDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
 function calculateRoundScore(roundDiv, endBtn) {
-    // 选中 checkbox 模拟图片里的效果
     const checkbox = endBtn.querySelector('input[type="checkbox"]');
     if (checkbox) checkbox.checked = true;
 
@@ -130,7 +236,6 @@ function calculateRoundScore(roundDiv, endBtn) {
         totalTigers[dir] += sum;
     });
 
-    // 赢输三家计算
     let finalScores = { '东': 0, '南': 0, '西': 0, '北': 0 };
     
     directions.forEach(dir => {
@@ -143,9 +248,8 @@ function calculateRoundScore(roundDiv, endBtn) {
         finalScores[dir] = score * unit;
     });
 
-    // 展示结果
     const resultDiv = roundDiv.querySelector('.round-result');
-    resultDiv.innerHTML = '<h3 class="result-title">💰 本局结算结果 💰</h3>';
+    resultDiv.innerHTML = `<h3 class="result-title">${i18n[currentLang].resultTitle}</h3>`;
     
     directions.forEach(dir => {
         const score = finalScores[dir];
@@ -154,18 +258,21 @@ function calculateRoundScore(roundDiv, endBtn) {
         
         const row = roundDiv.querySelector(`.row-${dir}`);
         const alias = row.querySelector('.player-alias').value || aliases[dir];
+        const dirName = i18n[currentLang][dir === '东' ? 'east' : dir === '南' ? 'south' : dir === '西' ? 'west' : 'north'];
 
         const item = document.createElement('div');
         item.className = 'result-item';
-        item.innerHTML = `<span>${alias} (${dir})</span> <span class="${colorClass}">${sign}${score} 元</span>`;
+        item.innerHTML = `<span>${alias} (${dirName})</span> <span class="${colorClass}">${sign}${score}</span>`;
         resultDiv.appendChild(item);
     });
     
     resultDiv.classList.remove('hidden');
     
-    // 禁用当前局的输入和按钮，表示本局结束
+    // IMPORTANT: Only disable inputs WITHIN THIS SPECIFIC ROUND
     const inputs = roundDiv.querySelectorAll('input, button');
     inputs.forEach(el => el.disabled = true);
+    
+    endBtn.style.backgroundColor = ""; // reset color
 }
 
 startGameBtn.addEventListener('click', createGameRound);

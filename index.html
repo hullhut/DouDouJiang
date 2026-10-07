@@ -7,23 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <button id="langToggle">中 / En</button>
     <div id="app">
         <header>
             <div class="title-area">
                 <div class="dogs-container">
                     <span class="dog">🐶</span>
-                    <h1>Family Mahjong<br>Score Tracker</h1>
+                    <span class="mahjong-icon">🀄</span>
+                    <h1 id="mainTitle" data-i18n="title">家庭麻将<br>计分器</h1>
+                    <span class="mahjong-icon">🀅</span>
                     <span class="dog">🐕</span>
                 </div>
             </div>
-            <button id="startGameBtn">
-                Start Game <span class="play-icon">▶</span>
+            <button id="startGameBtn" data-i18n="startGame">
+                开始游戏 ▶
             </button>
         </header>
 
         <main>
             <div id="gameRoundsContainer">
-                <!-- 动态生成的游戏局控件将放在这里，初始为空 -->
+                <!-- Dynamic blocks -->
             </div>
         </main>
     </div>
