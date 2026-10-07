@@ -294,7 +294,9 @@ h1 {
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     transition: all 0.1s;
+    min-width: 120px;
 }
 
 .end-game-btn {
