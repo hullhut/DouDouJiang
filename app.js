@@ -2,11 +2,12 @@ const gameRoundsContainer = document.getElementById('gameRoundsContainer');
 const startGameBtn = document.getElementById('startGameBtn');
 const langToggle = document.getElementById('langToggle');
 const mainTitle = document.getElementById('mainTitle');
+const headerBanner = document.getElementById('headerBanner');
 
 // --- I18N (Internationalization) ---
 const i18n = {
     en: {
-        title: "🐶 🀄 Family Mahjong Tracker 🐕",
+        title: "🐶 🀄 Mahjong Score Tracker 🐕",
         startGame: "Start Game ▶",
         startAnother: "Start Another ▶",
         clearAll: "Clear All",
@@ -21,14 +22,31 @@ const i18n = {
         confirmClear: "Sure?",
         modifyRound: "Modify",
         confirmModify: "Confirm?",
-        resultTitle: "💰 Round Settlement 💰",
+        resultTitle: "💰 Round Results 💰",
         east: "East",
         south: "South",
         west: "West",
-        north: "North"
+        north: "North",
+        roomLabel: "🏠 Room: ",
+        shareLink: "🔗 Share Link",
+        pwdPlaceholder: "Set Room Password (Optional)",
+        lockRoom: "🔒 Lock Room",
+        lockedStatus: "🔒 Protected",
+        linkCopied: "Room link copied to clipboard!",
+        enterPwdAlert: "Please enter password",
+        pwdFailedAlert: "Failed to set password: ",
+        lockedTitle: "🔒 Protected Room",
+        lockedPrompt: "Please enter password to access score tracker",
+        unlockPlaceholder: "Enter password",
+        unlockBtn: "Unlock",
+        wrongPwd: "Incorrect password, please try again",
+        networkError: "Network error, please retry",
+        theme1: "Theme 1: Arcade 3D",
+        theme2: "Theme 2: Cute Pet Card",
+        theme3: "Theme 3: Soft Glass"
     },
     zh: {
-        title: "🐶 🀄 家庭麻将计分器 🐕",
+        title: "🐶 🀄 麻将计分器 🐕",
         startGame: "开始游戏 ▶",
         startAnother: "再开一局 ▶",
         clearAll: "全部清空",
@@ -47,17 +65,60 @@ const i18n = {
         east: "东",
         south: "南",
         west: "西",
-        north: "北"
+        north: "北",
+        roomLabel: "🏠 房间: ",
+        shareLink: "🔗 邀请牌友",
+        pwdPlaceholder: "设置房间密码(非必填)",
+        lockRoom: "🔒 锁定房间",
+        lockedStatus: "🔒 已加密",
+        linkCopied: "房间链接已复制！",
+        enterPwdAlert: "请输入密码",
+        pwdFailedAlert: "密码设置失败: ",
+        lockedTitle: "🔒 房间已加密",
+        lockedPrompt: "请输入密码以访问计分板",
+        unlockPlaceholder: "输入密码",
+        unlockBtn: "解锁",
+        wrongPwd: "密码错误，请重新输入",
+        networkError: "网络错误，请重试",
+        theme1: "方案1: 街机3D",
+        theme2: "方案2: 萌宠插画",
+        theme3: "方案3: 柔和质感"
     }
 };
 
 let currentLang = 'zh';
+
+// Theme Demo Switcher
+function initThemeSwitcher() {
+    const switcher = document.getElementById('themeSwitcher');
+    if (!switcher) return;
+    switcher.addEventListener('click', (e) => {
+        if (e.target.classList.contains('theme-pill')) {
+            const theme = e.target.dataset.theme;
+            switcher.querySelectorAll('.theme-pill').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            headerBanner.className = 'header-title theme-' + theme;
+            localStorage.setItem('header_theme', theme);
+        }
+    });
+
+    const savedTheme = localStorage.getItem('header_theme');
+    if (savedTheme) {
+        switcher.querySelectorAll('.theme-pill').forEach(btn => {
+            if (btn.dataset.theme === savedTheme) {
+                btn.click();
+            }
+        });
+    }
+}
 
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
+    document.title = i18n[currentLang].title;
     startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
     const clearAllBtn = document.getElementById('clearAllBtn');
@@ -68,8 +129,38 @@ function toggleLanguage() {
             clearAllBtn.innerHTML = i18n[currentLang].clearAll;
         }
     }
+
+    // Update Room Bar texts
+    const roomCodeBadge = document.getElementById('roomCodeBadge');
+    if (roomCodeBadge && currentRoomCode) {
+        roomCodeBadge.innerText = i18n[currentLang].roomLabel + currentRoomCode;
+    }
+    const inviteBtn = document.getElementById('inviteBtn');
+    if (inviteBtn) {
+        inviteBtn.innerText = i18n[currentLang].shareLink;
+    }
+    const setPwdInput = document.getElementById('setPwdInput');
+    if (setPwdInput) {
+        setPwdInput.placeholder = i18n[currentLang].pwdPlaceholder;
+    }
+    const lockRoomBtn = document.getElementById('lockRoomBtn');
+    if (lockRoomBtn) {
+        lockRoomBtn.innerText = i18n[currentLang].lockRoom;
+    }
+    const lockedStatusSpan = document.getElementById('lockedStatusSpan');
+    if (lockedStatusSpan) {
+        lockedStatusSpan.innerText = i18n[currentLang].lockedStatus;
+    }
+
+    // Update theme switcher pills
+    const pill1 = document.querySelector('.theme-pill[data-theme="arcade"]');
+    if (pill1) pill1.innerText = i18n[currentLang].theme1;
+    const pill2 = document.querySelector('.theme-pill[data-theme="card"]');
+    if (pill2) pill2.innerText = i18n[currentLang].theme2;
+    const pill3 = document.querySelector('.theme-pill[data-theme="minimal"]');
+    if (pill3) pill3.innerText = i18n[currentLang].theme3;
     
-    // Update dynamic texts
+    // Update dynamic round texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
         const roundId = roundDiv.id.replace('round-', '');
         roundDiv.querySelector('.round-header').innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
@@ -134,13 +225,25 @@ let aliases = {
     '北': 'Li'
 };
 
-// Global helper to create a tiger input
+// Global helper to create a strictly numeric tiger input
 function createTigerInput() {
     const input = document.createElement('input');
-    input.type = 'number';
+    input.type = 'text';
+    input.inputMode = 'decimal';
     input.className = 'tiger-input';
     input.placeholder = i18n[currentLang].scorePlaceholder;
     input.value = '';
+    
+    // Strict numeric restriction: only numbers and at most 1 decimal dot
+    input.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) {
+            val = parts[0] + '.' + parts.slice(1).join('');
+        }
+        e.target.value = val;
+    });
+
     return input;
 }
 
@@ -211,14 +314,25 @@ function createGameRound(autoScroll = true) {
         roundDiv.appendChild(row);
     });
 
-    // Footer
+    // Footer - Default unit changed to 0.5
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
     const unitDiv = document.createElement('div');
     unitDiv.className = 'unit-input';
-    unitDiv.innerHTML = `<span class="unit-icon">¥</span> <input type="number" class="round-unit" value="100" min="1"> <span class="unit-text-label">${i18n[currentLang].unitText}</span>`;
+    unitDiv.innerHTML = `<span class="unit-icon">¥</span> <input type="text" inputmode="decimal" class="round-unit" value="0.5"> <span class="unit-text-label">${i18n[currentLang].unitText}</span>`;
     
+    // Strict numeric restriction on unit input
+    const unitInp = unitDiv.querySelector('.round-unit');
+    unitInp.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/[^0-9.]/g, '');
+        const parts = val.split('.');
+        if (parts.length > 2) {
+            val = parts[0] + '.' + parts.slice(1).join('');
+        }
+        e.target.value = val;
+    });
+
     const endBtn = document.createElement('button');
     endBtn.className = 'end-game-btn';
     endBtn.dataset.confirm = "false";
@@ -338,7 +452,7 @@ function calculateRoundScore(roundDiv, endBtn) {
     if (checkbox) checkbox.checked = true;
 
     const unitInput = roundDiv.querySelector('.round-unit');
-    const unit = parseFloat(unitInput.value) || 0;
+    const unit = parseFloat(unitInput.value) || 0.5;
     
     let totalTigers = { '东': 0, '南': 0, '西': 0, '北': 0 };
 
@@ -362,7 +476,7 @@ function calculateRoundScore(roundDiv, endBtn) {
                 score -= totalTigers[otherDir]; 
             }
         });
-        finalScores[dir] = score * unit;
+        finalScores[dir] = Math.round(score * unit * 100) / 100;
     });
 
     const resultDiv = roundDiv.querySelector('.round-result');
@@ -455,14 +569,14 @@ async function checkRoom() {
     const roomInfo = document.createElement('div');
     roomInfo.className = 'room-settings-bar';
     roomInfo.innerHTML = `
-        <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px; width:100%;">
-            <div style="background:#FFF9E6; border:3px solid #D2B48C; border-radius:20px; padding:5px 15px; color:#8D5A28; font-weight:900;">
-                🏠 房间: ${currentRoomCode}
+        <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:8px; width:100%;">
+            <div id="roomCodeBadge" style="background:#FFF9E6; border:2.5px solid #D2B48C; border-radius:20px; padding:4px 12px; color:#8D5A28; font-weight:900;">
+                ${i18n[currentLang].roomLabel}${currentRoomCode}
             </div>
-            <button class="pwd-btn" onclick="copyLink()" style="background:#2ECC71; box-shadow:0 3px 0 #27AE60;">🔗 邀请牌友</button>
+            <button id="inviteBtn" class="pwd-btn" onclick="copyLink()" style="background:#2ECC71; box-shadow:0 3px 0 #27AE60;">${i18n[currentLang].shareLink}</button>
             <span id="pwdContainer" style="display:flex; gap:5px;">
-                <input type="password" id="setPwdInput" class="pwd-input" placeholder="设置房间密码(非必填)" style="border:3px solid #E0E0E0; border-radius:20px;">
-                <button class="pwd-btn" onclick="setPassword()" style="background:#9B59B6; box-shadow:0 3px 0 #8E44AD;">🔒 锁定房间</button>
+                <input type="password" id="setPwdInput" class="pwd-input" placeholder="${i18n[currentLang].pwdPlaceholder}" style="border:2px solid #E0E0E0; border-radius:20px;">
+                <button id="lockRoomBtn" class="pwd-btn" onclick="setPassword()" style="background:#9B59B6; box-shadow:0 3px 0 #8E44AD;">${i18n[currentLang].lockRoom}</button>
             </span>
         </div>
     `;
@@ -476,7 +590,7 @@ window.setPassword = async function() {
     const pwdInput = document.getElementById('setPwdInput');
     const pwd = pwdInput ? pwdInput.value : '';
     if (!pwd) {
-        alert('请输入密码');
+        alert(i18n[currentLang].enterPwdAlert);
         return;
     }
     const res = await fetch('/api/room', {
@@ -487,10 +601,10 @@ window.setPassword = async function() {
     const data = await res.json();
     if (data.success) {
         localStorage.setItem('room_pwd_' + currentRoomCode, pwd);
-        document.getElementById('pwdContainer').innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
+        document.getElementById('pwdContainer').innerHTML = `<span id="lockedStatusSpan" style="color:#2ecc71;font-weight:bold;">${i18n[currentLang].lockedStatus}</span>`;
         triggerSync();
     } else {
-        alert("密码设置失败: " + data.error);
+        alert(i18n[currentLang].pwdFailedAlert + data.error);
     }
 }
 
@@ -505,11 +619,11 @@ async function loadRoomData() {
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
         document.querySelector('.container').innerHTML = `
             <div class="locked-screen">
-                  <h2>🔒 房间已加密</h2>
-                  <p style="color: #555; font-weight: bold; margin-bottom: 20px;">请输入密码以访问计分板</p>
+                  <h2>${i18n[currentLang].lockedTitle}</h2>
+                  <p style="color: #555; font-weight: bold; margin-bottom: 20px;">${i18n[currentLang].lockedPrompt}</p>
                   <div style="display:flex; justify-content:center; gap:10px;">
-                      <input type="password" id="unlockPwd" class="pwd-input" style="width:180px; font-size:16px;" placeholder="输入密码" onkeyup="if(event.key==='Enter') unlockRoom()">
-                      <button class="primary-btn" style="margin:0; padding:8px 24px; font-size:16px; border:none; border-radius:30px; background:linear-gradient(180deg, #F39C12 0%, #E67E22 100%); color:white; font-weight:bold; cursor:pointer; box-shadow:0 5px 0 #D35400, 0 8px 12px rgba(0,0,0,0.2);" onclick="unlockRoom()">解锁</button>
+                      <input type="password" id="unlockPwd" class="pwd-input" style="width:180px; font-size:16px;" placeholder="${i18n[currentLang].unlockPlaceholder}" onkeyup="if(event.key==='Enter') unlockRoom()">
+                      <button class="primary-btn" style="margin:0; padding:8px 24px; font-size:16px; border:none; border-radius:30px; background:linear-gradient(180deg, #F39C12 0%, #E67E22 100%); color:white; font-weight:bold; cursor:pointer; box-shadow:0 5px 0 #D35400, 0 8px 12px rgba(0,0,0,0.2);" onclick="unlockRoom()">${i18n[currentLang].unlockBtn}</button>
                   </div>
                   <p id="unlockError" style="color:#E74C3C; margin-top:15px; font-weight:bold;"></p>
               </div>
@@ -520,7 +634,7 @@ async function loadRoomData() {
     if (data.success) {
         if (data.room && data.room.password) {
             const pwdContainer = document.getElementById('pwdContainer');
-            if(pwdContainer) pwdContainer.innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
+            if(pwdContainer) pwdContainer.innerHTML = `<span id="lockedStatusSpan" style="color:#2ecc71;font-weight:bold;">${i18n[currentLang].lockedStatus}</span>`;
         }
         if (data.room && data.room.state) {
             isSyncing = true;
@@ -541,7 +655,7 @@ window.unlockRoom = async function() {
         const res = await fetch(`/api/room?code=${currentRoomCode}&pwd=${encodeURIComponent(p)}`);
         const data = await res.json();
         if (data.error === 'Incorrect password') {
-            document.getElementById('unlockError').innerText = '密码错误，请重新输入';
+            document.getElementById('unlockError').innerText = i18n[currentLang].wrongPwd;
             return;
         }
         if (data.success) {
@@ -549,33 +663,13 @@ window.unlockRoom = async function() {
             location.reload();
         }
     } catch(e) {
-        document.getElementById('unlockError').innerText = '网络错误，请重试';
+        document.getElementById('unlockError').innerText = i18n[currentLang].networkError;
     }
 }
 
 function copyLink() {
     navigator.clipboard.writeText(window.location.href);
-    alert('房间链接已复制！');
-}
-
-checkRoom();
-
-function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
-    let scores = {};
-    dirs.forEach(dir => {
-        let score = (tigers[dir] || 0) * 3;
-        dirs.forEach(otherDir => {
-            if (dir !== otherDir) {
-                score -= (tigers[otherDir] || 0);
-            }
-        });
-        scores[dir] = score * unit;
-    });
-    return scores;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { calculateScores };
+    alert(i18n[currentLang].linkCopied);
 }
 
 // --- STATE SYNC LOGIC ---
@@ -594,7 +688,7 @@ function getGameState() {
     const rounds = [];
     document.querySelectorAll('.game-round').forEach(roundDiv => {
         const roundState = {
-            unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 100,
+            unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 0.5,
             players: {},
             isEnded: !roundDiv.querySelector('.end-game-btn') || roundDiv.querySelector('.end-game-btn').classList.contains('hidden')
         };
@@ -639,7 +733,7 @@ async function applyGameState(state) {
         if (!roundDiv) return;
         
         const unitInput = roundDiv.querySelector('.round-unit');
-        if (unitInput && roundState.unit) unitInput.value = roundState.unit;
+        if (unitInput) unitInput.value = (roundState.unit !== undefined ? roundState.unit : 0.5);
         
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
@@ -739,3 +833,25 @@ setInterval(async () => {
         }
     } catch(e) {}
 }, 2500);
+
+// Initialize everything
+initThemeSwitcher();
+checkRoom();
+
+function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
+    let scores = {};
+    dirs.forEach(dir => {
+        let score = (tigers[dir] || 0) * 3;
+        dirs.forEach(otherDir => {
+            if (dir !== otherDir) {
+                score -= (tigers[otherDir] || 0);
+            }
+        });
+        scores[dir] = Math.round(score * unit * 100) / 100;
+    });
+    return scores;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { calculateScores };
+}

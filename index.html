@@ -2,16 +2,28 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐶 🀄 家庭麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=16">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🐶 🀄 麻将计分器 🐕</title>
+    <link rel="stylesheet" href="/style.css?v=17">
 </head>
 <body>
     <div class="container">
-        <button id="langToggle">中 / En</button>
+        <!-- Top Nav Bar: keeps language toggle cleanly separated to prevent overlap -->
+        <div class="top-nav-bar">
+            <div class="header-theme-switcher" id="themeSwitcher">
+                <!-- Interactive Theme Demo Selector -->
+                <button class="theme-pill active" data-theme="arcade">方案1: 街机3D</button>
+                <button class="theme-pill" data-theme="card">方案2: 萌宠插画</button>
+                <button class="theme-pill" data-theme="minimal">方案3: 柔和质感</button>
+            </div>
+            <button id="langToggle">中 / En</button>
+        </div>
         
-        <header class="header-title">
-            <h1 id="mainTitle" data-i18n="title">🐶 🀄 家庭麻将计分器 🐕</h1>
+        <!-- Header Banner Container (Supports theme demos) -->
+        <header class="header-title theme-arcade" id="headerBanner">
+            <div class="header-inner">
+                <h1 id="mainTitle" data-i18n="title">🐶 🀄 麻将计分器 🐕</h1>
+            </div>
         </header>
 
         <div class="action-buttons header-buttons">
@@ -29,6 +41,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=16"></script>
+    <script src="/app.js?v=17"></script>
 </body>
 </html>
