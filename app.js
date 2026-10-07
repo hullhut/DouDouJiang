@@ -201,7 +201,7 @@ function createGameRound() {
         row.appendChild(playerInfo);
 
         const addBtn = document.createElement('button');
-        addBtn.className = 'add-btn';
+        addBtn.className = 'plus-btn';
         addBtn.innerText = '+';
         addBtn.onclick = () => {
             tigerList.appendChild(createTigerInput());
@@ -462,7 +462,7 @@ async function checkRoom() {
     
     const roomInfo = document.createElement('div');
     roomInfo.className = 'room-settings-bar';
-    roomInfo.innerHTML = \`
+    roomInfo.innerHTML = `
         <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px; width:100%;">
             <div style="background:#FFF9E6; border:3px solid #D2B48C; border-radius:20px; padding:5px 15px; color:#8D5A28; font-weight:900;">
                 🏠 房间: ${currentRoomCode}
@@ -473,7 +473,7 @@ async function checkRoom() {
                 <button class="pwd-btn" onclick="setPassword()" style="background:#9B59B6; box-shadow:0 3px 0 #8E44AD;">🔒 锁定房间</button>
             </span>
         </div>
-    \`;
+    `;
 
     headerBtns.insertAdjacentElement('afterend', roomInfo);
     

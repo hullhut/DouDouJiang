@@ -4,30 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Mahjong Score Tracker</title>
-    <link rel="stylesheet" href="/style.css?v=4">
+    <link rel="stylesheet" href="/style.css?v=5">
 </head>
 <body>
-    <button id="langToggle">中 / En</button>
-    <div id="app">
-        <header>
-            <div class="title-area">
-                <div class="dogs-container">
-                    <span class="dog">🐶</span>
-                    <span class="mahjong-icon">🀄</span>
-                    <h1 id="mainTitle" data-i18n="title">家庭麻将<br>计分器</h1>
-                    <span class="mahjong-icon">🀅</span>
-                    <span class="dog">🐕</span>
-                </div>
-            </div>
-            <div class="header-buttons">
-                <button id="startGameBtn" data-i18n="startGame">
-                    开始游戏 ▶
-                </button>
-                <button id="clearAllBtn" data-i18n="clearAll" data-confirm="false">
-                    全部清空
-                </button>
-            </div>
+    <div class="container">
+        <div style="text-align: right; margin-bottom: -20px; position: relative; z-index: 10;">
+            <button id="langToggle" style="background:transparent; border:none; cursor:pointer; font-weight:bold; color:#555;">中 / En</button>
+        </div>
+        
+        <header class="header-title">
+            <h1 id="mainTitle" data-i18n="title">🐶 🀄 家庭麻将<br>计分器 發 🐕</h1>
         </header>
+
+        <div class="action-buttons header-buttons">
+            <button id="startGameBtn" class="primary-btn" data-i18n="startGame">
+                开始游戏 ▶
+            </button>
+            <button id="clearAllBtn" class="clear-all-btn" data-i18n="clearAll" data-confirm="false">
+                全部清空
+            </button>
+        </div>
 
         <main>
             <div id="gameRoundsContainer">
@@ -35,6 +31,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=4"></script>
+    <script src="/app.js?v=5"></script>
 </body>
 </html>
