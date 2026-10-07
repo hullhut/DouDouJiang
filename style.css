@@ -367,3 +367,98 @@ h1 {
 
 .positive { color: #2ECC71; }
 .negative { color: #E74C3C; }
+
+/* Notepad Auth Styles */
+.room-settings-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin: 15px auto;
+    max-width: 500px;
+}
+
+.pwd-input {
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    padding: 8px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    width: 140px;
+}
+.pwd-input:focus {
+    border-color: #3498db;
+}
+
+.pwd-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+.pwd-btn:hover {
+    background: #2980b9;
+}
+
+.locked-screen {
+    text-align: center;
+    margin-top: 50px;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+.locked-screen h2 {
+    color: #e74c3c;
+}
+.locked-screen input {
+    margin-top: 20px;
+    font-size: 18px;
+    padding: 10px 20px;
+    width: 200px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+}
+.locked-screen button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin-left: 10px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* Beautiful Mahjong Tile for Directions */
+.real-mahjong-tile {
+    width: 35px;
+    height: 48px;
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+    box-shadow: 
+        inset -1px -2px 2px rgba(0,0,0,0.1),
+        2px 3px 0px #2f3640,
+        3px 4px 5px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-family: "KaiTi", "楷体", serif;
+    font-weight: bold;
+    margin-right: 15px;
+}
+.row-东 .real-mahjong-tile { color: #2980b9; }
+.row-南 .real-mahjong-tile { color: #e67e22; }
+.row-西 .real-mahjong-tile { color: #27ae60; }
+.row-北 .real-mahjong-tile { color: #8e44ad; }

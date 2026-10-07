@@ -163,7 +163,7 @@ function createGameRound() {
         dirContainer.className = 'player-dir-container';
 
         const tileIcon = document.createElement('div');
-        tileIcon.className = 'mahjong-tile';
+        tileIcon.className = 'real-mahjong-tile';
         const traditionalDir = { '东': '🀀', '西': '🀂', '南': '🀁', '北': '🀃' }[dir];
         tileIcon.innerText = traditionalDir;
 
@@ -444,82 +444,38 @@ if (clearAllBtn) {
 
 
 
-// --- Authentication & Room Sync Logic ---
+
+// --- Notepad Room Sync Logic ---
 let currentRoomCode = null;
-let currentUser = localStorage.getItem('mj_user') || null;
 
 async function checkRoom() {
     const path = window.location.pathname;
     if (path.startsWith('/mj/')) {
         currentRoomCode = path.substring(4);
     } else {
-        // If somehow not on /mj/, it shouldn't happen because functions/index.js redirects
-        return;
+        return; // Handled by index.js redirect
     }
     
     const headerBtns = document.querySelector('.header-buttons');
     
-    // Top right user auth (optional)
-    const authDiv = document.createElement('div');
-    authDiv.id = 'authDiv';
-    authDiv.style.marginTop = '10px';
-    if (currentUser) {
-        authDiv.innerHTML = `👤 <b>${currentUser}</b> <button onclick="logout()">注销</button>`;
-    } else {
-        authDiv.innerHTML = `
-            <input type="text" id="username" placeholder="账号" style="width:70px;">
-            <input type="password" id="password" placeholder="密码" style="width:70px;">
-            <button onclick="auth('login')">登录</button>
-            <button onclick="auth('register')">注册</button>
-        `;
-    }
-    headerBtns.appendChild(authDiv);
-
-    // Room info
+    // Clean, beautiful Room Info Bar
     const roomInfo = document.createElement('div');
-    roomInfo.id = 'roomInfoPanel';
-    roomInfo.style.textAlign = 'center';
-    roomInfo.style.marginBottom = '15px';
-    roomInfo.innerHTML = `🏠 房间: <b>${currentRoomCode}</b> 
-        <button onclick="copyLink()">🔗 复制链接</button>
-        <button id="lockBtn" onclick="setPassword()" style="display:none;">🔓 设置密码</button>
+    roomInfo.className = 'room-settings-bar';
+    roomInfo.innerHTML = `
+        <span>🏠 房间: <b>${currentRoomCode}</b></span>
+        <button class="pwd-btn" onclick="copyLink()">🔗 复制链接</button>
+        <span id="pwdContainer">
+            <input type="password" id="setPwdInput" class="pwd-input" placeholder="设置访问密码(可选)">
+            <button class="pwd-btn" onclick="setPassword()">保存</button>
+        </span>
     `;
     headerBtns.insertAdjacentElement('afterend', roomInfo);
     
     loadRoomData();
 }
 
-window.auth = async function(action) {
-    const user = document.getElementById('username').value;
-    const pass = document.getElementById('password').value;
-    if(!user || !pass) return alert('请输入账号和密码');
-    
-    const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ action, username: user, password: pass })
-    });
-    const data = await res.json();
-    if(data.success) {
-        if(action === 'login') {
-            localStorage.setItem('mj_user', data.token);
-            location.reload();
-        } else {
-            alert('注册成功，请登录');
-        }
-    } else {
-        alert(data.error);
-    }
-}
-
-window.logout = function() {
-    localStorage.removeItem('mj_user');
-    location.reload();
-}
-
 window.setPassword = async function() {
-    const pwd = prompt("为当前房间设置访问密码 (留空取消):");
-    if (!pwd) return;
+    const pwd = document.getElementById('setPwdInput').value;
     const res = await fetch('/api/room', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -527,8 +483,7 @@ window.setPassword = async function() {
     });
     const data = await res.json();
     if (data.success) {
-        alert("密码设置成功！");
-        document.getElementById('lockBtn').innerHTML = '🔒 已加密';
+        document.getElementById('pwdContainer').innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
     } else {
         alert("密码设置失败: " + data.error);
     }
@@ -543,38 +498,43 @@ async function loadRoomData() {
     const data = await res.json();
     
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
-        const p = prompt("该房间已加密，请输入访问密码:");
-        if (p) {
-            localStorage.setItem('room_pwd_' + currentRoomCode, p);
-            loadRoomData();
-        } else {
-            document.body.innerHTML = '<h2 style="text-align:center;margin-top:50px;">🔒 需要密码访问</h2>';
-        }
+        document.body.innerHTML = `
+            <div class="locked-screen">
+                <h2>🔒 该房间已加密</h2>
+                <p>请输入密码以访问计分板</p>
+                <input type="password" id="unlockPwd" placeholder="输入密码">
+                <button onclick="unlockRoom()">解锁</button>
+                <p id="unlockError" style="color:red;margin-top:10px;"></p>
+            </div>
+        `;
         return;
     }
 
     if (data.success) {
-        // Show set password button if it's not locked
-        const lockBtn = document.getElementById('lockBtn');
-        lockBtn.style.display = 'inline-block';
         if (data.room && data.room.password) {
-            lockBtn.innerHTML = '🔒 已加密';
-            lockBtn.onclick = () => alert("该房间已被加密，无法修改密码。");
+            const pwdContainer = document.getElementById('pwdContainer');
+            if(pwdContainer) pwdContainer.innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
         }
-        
         console.log("Loaded games:", data.games);
-        // Next iteration: render games onto UI here
     } else {
         alert('无法加载房间: ' + data.error);
     }
 }
 
+window.unlockRoom = function() {
+    const p = document.getElementById('unlockPwd').value;
+    if(!p) return;
+    localStorage.setItem('room_pwd_' + currentRoomCode, p);
+    location.reload();
+}
+
 function copyLink() {
     navigator.clipboard.writeText(window.location.href);
-    alert('房间链接已复制！发送给朋友即可同步计分。');
+    alert('房间链接已复制！');
 }
 
 checkRoom();
+
 
 
 
