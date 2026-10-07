@@ -24,10 +24,7 @@ export async function onRequest(context) {
             }
 
             // Ensure room exists in rooms table
-            const room = await env.DB.prepare(`SELECT * FROM rooms WHERE room_code = ?`).bind(roomCode).first();
-            if (!room) {
-                await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, null).run();
-            }
+            await env.DB.prepare(`INSERT OR IGNORE INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, null).run();
 
             const stateStr = JSON.stringify(state);
             const existingState = await env.DB.prepare(`SELECT * FROM room_states WHERE room_code = ?`).bind(roomCode).first();

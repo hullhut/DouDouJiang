@@ -20,13 +20,8 @@ export async function onRequest(context) {
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
                 const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-                // Check if room exists
-                const room = await env.DB.prepare(`SELECT * FROM rooms WHERE room_code = ?`).bind(roomCode).first();
-                if (room) {
-                    await env.DB.prepare(`UPDATE rooms SET password = ? WHERE room_code = ?`).bind(passwordHash, roomCode).run();
-                } else {
-                    await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, passwordHash).run();
-                }
+                // Use UPSERT to prevent race conditions
+                await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?) ON CONFLICT(room_code) DO UPDATE SET password = excluded.password`).bind(roomCode, passwordHash).run();
 
                 return new Response(JSON.stringify({ success: true }));
             }
