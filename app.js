@@ -6,7 +6,7 @@ const mainTitle = document.getElementById('mainTitle');
 // --- I18N (Internationalization) ---
 const i18n = {
     en: {
-        title: "Family Mahjong<br>Score Tracker",
+        title: "Mahjong Score Tracker",
         startGame: "Start Game ▶",
         startAnother: "Start Another ▶",
         clearAll: "Clear All",
@@ -28,7 +28,7 @@ const i18n = {
         north: "North"
     },
     zh: {
-        title: "家庭麻将<br>计分器",
+        title: "麻将计分器",
         startGame: "开始游戏 ▶",
         startAnother: "再开一局 ▶",
         clearAll: "全部清空",

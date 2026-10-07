@@ -319,3 +319,23 @@ h1 {
     color: #e74c3c;
     text-shadow: none;
 }
+
+#langToggle {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #FFF;
+    border: 2px solid #3498DB;
+    color: #3498DB;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #2980B9, 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 100;
+    transition: all 0.1s;
+}
+#langToggle:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #2980B9, 0 0 0 rgba(0,0,0,0.1);
+}
