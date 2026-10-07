@@ -25,7 +25,7 @@ body {
     margin-bottom: 20px;
 }
 h1 {
-    font-size: 32px;
+    font-size: 30px;
     color: #FFF;
     text-shadow: 2px 2px 0px #4A90E2, -2px -2px 0px #4A90E2, 2px -2px 0px #4A90E2, -2px 2px 0px #4A90E2, 0px 4px 0px #2980B9;
     font-weight: 900;
@@ -237,27 +237,38 @@ h1 {
     border-color: #FFA800;
 }
 
-/* Plus Buttons */
+/* 3D Stereoscopic Plus Button */
 .plus-btn {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: #3498DB;
+    background: linear-gradient(180deg, #38B6FF 0%, #0084E6 100%);
     color: #FFF;
-    border: 3px solid #2980B9;
-    font-size: 24px;
-    font-weight: bold;
+    border: 3px solid #FFFFFF;
+    font-size: 26px;
+    font-weight: 900;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    box-shadow: 0 3px 0 #2980B9;
-    transition: transform 0.1s;
+    box-shadow: 0 5px 0 #005EA6, 0 7px 10px rgba(0, 0, 0, 0.25), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+    text-shadow: 0 2px 0 #005EA6;
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.1s;
     margin-left: 10px;
+    user-select: none;
+    line-height: 1;
+    padding-bottom: 3px;
 }
+
+.plus-btn:hover {
+    background: linear-gradient(180deg, #4dc0ff 0%, #0a8fed 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 0 #005EA6, 0 9px 12px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+}
+
 .plus-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 1px 0 #2980B9;
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #005EA6, 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Footer Actions */
