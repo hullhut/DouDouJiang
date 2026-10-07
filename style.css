@@ -114,7 +114,7 @@ h1 {
     padding: 6px 12px;
     font-size: 13px;
     outline: none;
-    width: 130px;
+    width: 160px;
     text-align: center;
 }
 .pwd-input:focus {
@@ -175,24 +175,26 @@ h1 {
 
 /* The NEW Simple Mahjong Tile */
 .real-mahjong-tile {
-    width: 32px;
-    height: 42px;
-    background: #FFF;
+    width: 36px;
+    height: 48px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
     border-radius: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 900;
     font-family: "KaiTi", "楷体", serif;
     margin-right: 15px;
-    border: 2px solid;
-    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+    border: 1px solid #ccc;
+    border-bottom: 5px solid;
+    border-right: 2px solid #ccc;
+    box-shadow: 2px 4px 6px rgba(0,0,0,0.25);
 }
-.row-东 .real-mahjong-tile { color: #4A90E2; border-color: #4A90E2; }
-.row-南 .real-mahjong-tile { color: #E67E22; border-color: #E67E22; }
-.row-西 .real-mahjong-tile { color: #2ECC71; border-color: #2ECC71; }
-.row-北 .real-mahjong-tile { color: #3498DB; border-color: #3498DB; }
+.row-东 .real-mahjong-tile { color: #2980B9; border-bottom-color: #2980B9; }
+.row-南 .real-mahjong-tile { color: #E67E22; border-bottom-color: #E67E22; }
+.row-西 .real-mahjong-tile { color: #27AE60; border-bottom-color: #27AE60; }
+.row-北 .real-mahjong-tile { color: #8E44AD; border-bottom-color: #8E44AD; }
 
 /* Inputs */
 .player-info {
@@ -269,7 +271,7 @@ h1 {
     font-weight: bold;
 }
 .unit-container span { color: #F1C40F; font-size: 18px; margin-right: 5px; }
-.unit-input {
+.round-unit {
     width: 50px;
     border: none;
     outline: none;
