@@ -598,15 +598,24 @@ function getGameState() {
         });
         rounds.push(roundState);
     });
-    return rounds;
+    return { aliases: aliases, rounds: rounds };
 }
 
-async function applyGameState(rounds) {
+async function applyGameState(state) {
+    let roundsToApply = [];
+    if (Array.isArray(state)) {
+        roundsToApply = state;
+    } else if (state && state.rounds) {
+        roundsToApply = state.rounds;
+        if (state.aliases) {
+            aliases = state.aliases;
+        }
+    }
     const container = document.getElementById('gameRoundsContainer');
     container.innerHTML = '';
     roundCount = 0;
     
-    rounds.forEach(roundState => {
+    roundsToApply.forEach(roundState => {
         createGameRound(); // increments roundCount and appends to container
         const roundDiv = container.lastElementChild;
         
