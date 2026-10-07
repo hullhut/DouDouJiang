@@ -70,6 +70,11 @@ export async function onRequest(context) {
                 `SELECT * FROM games WHERE room_code = ? ORDER BY created_at ASC`
             ).bind(roomCode).all();
 
+            if (room && room.state) {
+                try {
+                    room.state = JSON.parse(room.state);
+                } catch(e) {}
+            }
             return new Response(JSON.stringify({ success: true, room, games: results }), {
                 headers: { 'Content-Type': 'application/json' }
             });

@@ -512,13 +512,15 @@ async function loadRoomData() {
     
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
         document.body.innerHTML = `
-            <div class="locked-screen">
-                <h2>🔒 该房间已加密</h2>
-                <p>请输入密码以访问计分板</p>
-                <input type="password" id="unlockPwd" placeholder="输入密码">
-                <button onclick="unlockRoom()">解锁</button>
-                <p id="unlockError" style="color:red;margin-top:10px;"></p>
-            </div>
+            <div class="locked-screen" style="text-align: center; margin-top: 100px;">
+                  <h2 style="color: #8D5A28; font-size: 30px;">🔒 房间已加密</h2>
+                  <p style="color: #555; font-weight: bold; margin-bottom: 20px;">请输入密码以访问计分板</p>
+                  <div style="display:flex; justify-content:center; gap:10px;">
+                      <input type="password" id="unlockPwd" class="pwd-input" style="width:200px; font-size:18px;" placeholder="输入密码">
+                      <button class="primary-btn" style="margin:0; padding:10px 30px; font-size:18px; border:none; border-radius:30px; background:linear-gradient(180deg, #F39C12 0%, #E67E22 100%); color:white; font-weight:bold; cursor:pointer; box-shadow:0 6px 0 #D35400, 0 10px 15px rgba(0,0,0,0.2);" onclick="unlockRoom()">解锁</button>
+                  </div>
+                  <p id="unlockError" style="color:#E74C3C; margin-top:15px; font-weight:bold;"></p>
+              </div>
         `;
         return;
     }
@@ -529,6 +531,11 @@ async function loadRoomData() {
             if(pwdContainer) pwdContainer.innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
         }
         console.log("Loaded games:", data.games);
+        if (data.room && data.room.state) {
+            isSyncing = true;
+            applyGameState(data.room.state);
+            isSyncing = false;
+        }
     } else {
         alert('无法加载房间: ' + data.error);
     }
@@ -569,3 +576,113 @@ function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { calculateScores };
 }
+
+// --- STATE SYNC LOGIC ---
+
+function getGameState() {
+    const rounds = [];
+    document.querySelectorAll('.round-container').forEach(roundDiv => {
+        const roundState = {
+            unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 100,
+            players: {},
+            isEnded: !roundDiv.querySelector('.end-game-btn') || roundDiv.querySelector('.end-game-btn').classList.contains('hidden')
+        };
+        
+        roundDiv.querySelectorAll('.player-row').forEach(row => {
+            const dir = row.dataset.dir;
+            const tigers = [];
+            row.querySelectorAll('.tiger-input').forEach(input => {
+                if (input.value !== '') tigers.push(parseFloat(input.value));
+            });
+            roundState.players[dir] = tigers;
+        });
+        rounds.push(roundState);
+    });
+    return rounds;
+}
+
+async function applyGameState(rounds) {
+    const container = document.getElementById('gameRoundsContainer');
+    container.innerHTML = '';
+    roundCount = 0;
+    
+    rounds.forEach(roundState => {
+        createGameRound(); // increments roundCount and appends to container
+        const roundDiv = container.lastElementChild;
+        
+        roundDiv.querySelector('.round-unit').value = roundState.unit;
+        
+        roundDiv.querySelectorAll('.player-row').forEach(row => {
+            const dir = row.dataset.dir;
+            const tigers = roundState.players[dir] || [];
+            
+            const tigerList = row.querySelector('.tiger-input-container');
+            tigerList.innerHTML = ''; // clear default 1 input
+            
+            if (tigers.length === 0) {
+                tigerList.appendChild(createTigerInput());
+            } else {
+                tigers.forEach(val => {
+                    const input = createTigerInput();
+                    input.value = val;
+                    tigerList.appendChild(input);
+                });
+            }
+        });
+        
+        if (roundState.isEnded) {
+            const endBtn = roundDiv.querySelector('.end-game-btn');
+            if (endBtn) calculateRoundScore(roundDiv, endBtn);
+        }
+    });
+
+    document.getElementById('startGameBtn').innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
+}
+
+let isSyncing = false;
+async function pushStateToServer() {
+    if (isSyncing) return;
+    const state = getGameState();
+    fetch('/api/game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_state', roomCode: currentRoomCode, state: state })
+    }).catch(e => console.error(e));
+}
+
+// Auto-push state when any input changes
+document.addEventListener('change', (e) => {
+    if (e.target.tagName === 'INPUT') {
+        pushStateToServer();
+    }
+});
+document.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+        setTimeout(pushStateToServer, 100);
+    }
+});
+
+// Periodically pull state from server
+setInterval(async () => {
+    if (!currentRoomCode) return;
+    // Only pull if user is not actively typing
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    
+    try {
+        let url = '/api/room?code=' + currentRoomCode;
+        let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
+        if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.success && data.room && data.room.state) {
+            const remoteStateStr = JSON.stringify(data.room.state);
+            const localStateStr = JSON.stringify(getGameState());
+            if (remoteStateStr !== localStateStr) {
+                isSyncing = true;
+                applyGameState(data.room.state);
+                isSyncing = false;
+            }
+        }
+    } catch(e) {}
+}, 3000);
