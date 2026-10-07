@@ -1,7 +1,7 @@
 
 * {
     box-sizing: border-box;
-    font-family: "Quicksand", "Nunito", "Microsoft YaHei", sans-serif;
+    font-family: "Quicksand", "Nunito", "PingFang SC", "Microsoft YaHei", sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -11,7 +11,7 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    padding: 12px 10px 30px 10px;
+    padding: 10px 10px 30px 10px;
     position: relative;
 }
 
@@ -26,7 +26,7 @@ body {
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     width: 100%;
 }
 
@@ -42,7 +42,7 @@ body {
 .theme-pill {
     background: transparent;
     border: none;
-    padding: 4px 8px;
+    padding: 3px 7px;
     border-radius: 12px;
     font-size: 11px;
     font-weight: bold;
@@ -61,7 +61,7 @@ body {
     background: #FFF;
     border: 2px solid #3498DB;
     color: #3498DB;
-    padding: 4px 14px;
+    padding: 4px 12px;
     border-radius: 20px;
     font-weight: bold;
     font-size: 13px;
@@ -78,21 +78,25 @@ body {
 /* --- Header & Title Schemes (Demos) --- */
 .header-title {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     position: relative;
     border-radius: 20px;
     transition: all 0.3s ease;
 }
 
-/* Scheme 1: 街机3D卡通 (Clean arcade 3D with clouds drop-shadow) */
+/* Scheme 1: 街机3D卡通 */
 .header-title.theme-arcade {
     padding: 10px 5px;
     background: transparent;
 }
+.header-title.theme-arcade h1 {
+    color: #FFF;
+    text-shadow: 2px 2px 0px #4A90E2, -2px -2px 0px #4A90E2, 2px -2px 0px #4A90E2, -2px 2px 0px #4A90E2, 0px 4px 0px #2980B9;
+}
 
-/* Scheme 2: 萌宠插画卡片 (Cute card with subtle paw/tile pattern & rounded frame) */
+/* Scheme 2: 萌宠插画卡片 */
 .header-title.theme-card {
-    padding: 14px 10px;
+    padding: 12px 8px;
     background: linear-gradient(135deg, #FFF9E6 0%, #FFF0D4 100%);
     border: 3px solid #E6BA7A;
     box-shadow: 0 6px 12px rgba(141, 90, 40, 0.15), inset 0 2px 4px rgba(255,255,255,0.8);
@@ -100,46 +104,116 @@ body {
 .header-title.theme-card h1 {
     color: #8D5A28;
     text-shadow: 1px 1px 0px #FFF, 2px 2px 0px rgba(141, 90, 40, 0.2);
-    -webkit-text-stroke: 0;
 }
 
-/* Scheme 3: 柔和质感 (Frosted translucent blue glass badge) */
+/* Scheme 3: 柔和质感 (User favorite - Soft translucent frosted glass badge) */
 .header-title.theme-minimal {
     padding: 12px 10px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    border: 2px solid #FFF;
-    box-shadow: 0 8px 16px rgba(52, 152, 219, 0.15);
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2.5px solid #FFF;
+    box-shadow: 0 8px 18px rgba(52, 152, 219, 0.15), inset 0 1px 2px rgba(255,255,255,0.9);
 }
 .header-title.theme-minimal h1 {
     color: #2C3E50;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    -webkit-text-stroke: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.header-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.dog-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.dog-icon {
+    font-size: 24px;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+}
+.dog-icon:hover {
+    transform: scale(1.2) rotate(-8deg);
+}
+
+.mahjong-badge {
+    font-size: 22px;
+    user-select: none;
 }
 
 h1 {
-    font-size: 26px;
-    color: #FFF;
-    text-shadow: 2px 2px 0px #4A90E2, -2px -2px 0px #4A90E2, 2px -2px 0px #4A90E2, -2px 2px 0px #4A90E2, 0px 4px 0px #2980B9;
+    font-size: clamp(16px, 4.8vw, 24px);
     font-weight: 900;
-    margin: 5px 0;
-    line-height: 1.25;
-    letter-spacing: 1px;
-    word-break: keep-all;
+    margin: 2px 0;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 70px);
 }
 
-@media (max-width: 380px) {
-    h1 {
-        font-size: 23px;
-    }
+/* Dog Selector Bar (Options for dogs) */
+.dog-selector-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    width: 100%;
 }
 
-/* Beautiful Glossy Buttons */
+.selector-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #7F8C8D;
+    margin-right: 2px;
+}
+
+.dog-pill {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid #D6EAF8;
+    border-radius: 12px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #34495E;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.dog-pill:hover {
+    background: #EBF5FB;
+    border-color: #3498DB;
+}
+
+.dog-pill.active {
+    background: #3498DB;
+    border-color: #2980B9;
+    color: #FFF;
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.25);
+    transform: scale(1.04);
+}
+
+/* Beautiful Glossy Action Buttons */
 .action-buttons {
     display: flex;
     gap: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
     justify-content: center;
 }
 
@@ -177,7 +251,7 @@ h1 {
     box-shadow: 0 2px 0px #C0392B;
 }
 
-/* Room Settings Bar (Password UI) */
+/* Room Settings Bar */
 .room-settings-bar {
     display: flex;
     flex-wrap: wrap;
@@ -188,7 +262,7 @@ h1 {
     padding: 8px 12px;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    margin: 5px auto 16px auto;
+    margin: 4px auto 14px auto;
     font-size: 13px;
     font-weight: bold;
     color: #555;
@@ -231,7 +305,7 @@ h1 {
     border: 3.5px solid #D2B48C;
     border-radius: 20px;
     padding: 15px 12px;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
@@ -240,7 +314,7 @@ h1 {
     color: #8D5A28;
     font-size: 18px;
     font-weight: 900;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
     padding-bottom: 8px;
     border-bottom: 2px dashed #D2B48C;
 }
@@ -301,7 +375,8 @@ h1 {
     font-weight: bold;
     color: #333;
     outline: none;
-    padding: 0;
+    padding: 2px 0;
+    width: 100%;
 }
 .player-alias:focus {
     border-bottom: 2px solid #3498DB;
@@ -328,7 +403,7 @@ h1 {
     border-color: #FFA800;
 }
 
-/* 3D Stereoscopic Circular Plus Button - GUARANTEED CIRCULAR */
+/* 3D Stereoscopic Circular Plus Button */
 .plus-btn {
     width: 38px !important;
     height: 38px !important;
@@ -369,28 +444,31 @@ h1 {
     box-shadow: 0 1px 0 #005EA6, 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Footer Controls & Round Action Buttons */
+/* --- CENTERED FOOTER CONTROLS --- */
 .footer-controls {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+    justify-content: center;
+    gap: 12px;
     margin-top: 15px;
-    padding-top: 12px;
+    padding-top: 14px;
     border-top: 2px dashed #D2B48C;
+    width: 100%;
 }
 
 .unit-input {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     background: #FFF;
     border: 2px solid #4A90E2;
-    border-radius: 12px;
-    padding: 4px 10px;
+    border-radius: 14px;
+    padding: 4px 12px;
     font-weight: bold;
     color: #333;
     font-size: 13px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
 }
 .unit-icon {
     color: #F1C40F;
@@ -408,26 +486,28 @@ h1 {
     background: transparent;
 }
 
+/* Action buttons: 100% CENTERED! */
 .footer-actions {
     display: flex;
-    gap: 8px;
+    justify-content: center;
     align-items: center;
-    flex-wrap: nowrap;
+    gap: 12px;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
-/* SLEEK, NO-WRAP ROUND BUTTONS */
 .end-game-btn, .clear-round-btn, .modify-round-btn {
-    padding: 7px 12px;
-    font-size: 14px;
+    padding: 8px 18px;
+    font-size: 15px;
     font-weight: 900;
-    border-radius: 20px;
+    border-radius: 25px;
     border: 2px solid #FFF;
     white-space: nowrap !important;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 5px;
     transition: transform 0.1s;
     user-select: none;
     line-height: 1.2;
@@ -436,40 +516,41 @@ h1 {
 
 .end-game-btn {
     background: linear-gradient(180deg, #FF6B6B 0%, #E74C3C 100%);
-    box-shadow: 0 3px 0px #C0392B, 0 4px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 0px #C0392B, 0 4px 6px rgba(0,0,0,0.15);
     color: white;
 }
 .end-game-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 0px #C0392B;
+    box-shadow: 0 2px 0px #C0392B;
 }
 
 .clear-round-btn {
     background: linear-gradient(180deg, #FFD147 0%, #FFA800 100%);
-    box-shadow: 0 3px 0px #D35400, 0 4px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 0px #D35400, 0 4px 6px rgba(0,0,0,0.15);
     color: white;
 }
 .clear-round-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 0px #D35400;
+    box-shadow: 0 2px 0px #D35400;
 }
 
 .modify-round-btn {
     background: linear-gradient(180deg, #4FACFE 0%, #00F2FE 100%);
-    box-shadow: 0 3px 0px #0084E6, 0 4px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 0px #0084E6, 0 4px 6px rgba(0,0,0,0.15);
     color: white;
 }
 .modify-round-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 0px #0084E6;
+    box-shadow: 0 2px 0px #0084E6;
 }
 
 .round-result {
     margin-top: 15px;
     background: #FFF;
     border-radius: 15px;
-    padding: 12px;
+    padding: 14px;
     border: 2px solid #D2B48C;
+    width: 100%;
 }
 .result-item {
     display: flex;

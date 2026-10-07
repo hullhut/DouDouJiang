@@ -3,11 +3,14 @@ const startGameBtn = document.getElementById('startGameBtn');
 const langToggle = document.getElementById('langToggle');
 const mainTitle = document.getElementById('mainTitle');
 const headerBanner = document.getElementById('headerBanner');
+const leftDog = document.getElementById('leftDog');
+const rightDog = document.getElementById('rightDog');
 
 // --- I18N (Internationalization) ---
 const i18n = {
     en: {
-        title: "🐶 🀄 Mahjong Score Tracker 🐕",
+        title: "Mahjong Score Tracker",
+        docTitle: "🐶 🀄 Mahjong Score Tracker 🐕",
         startGame: "Start Game ▶",
         startAnother: "Start Another ▶",
         clearAll: "Clear All",
@@ -43,10 +46,12 @@ const i18n = {
         networkError: "Network error, please retry",
         theme1: "Theme 1: Arcade 3D",
         theme2: "Theme 2: Cute Pet Card",
-        theme3: "Theme 3: Soft Glass"
+        theme3: "Theme 3: Soft Glass",
+        dogSelectLabel: "Pet Avatar:"
     },
     zh: {
-        title: "🐶 🀄 麻将计分器 🐕",
+        title: "麻将计分器",
+        docTitle: "🐶 🀄 麻将计分器 🐕",
         startGame: "开始游戏 ▶",
         startAnother: "再开一局 ▶",
         clearAll: "全部清空",
@@ -82,13 +87,14 @@ const i18n = {
         networkError: "网络错误，请重试",
         theme1: "方案1: 街机3D",
         theme2: "方案2: 萌宠插画",
-        theme3: "方案3: 柔和质感"
+        theme3: "方案3: 柔和质感",
+        dogSelectLabel: "换萌犬:"
     }
 };
 
 let currentLang = 'zh';
 
-// Theme Demo Switcher
+// --- Theme Demo Switcher ---
 function initThemeSwitcher() {
     const switcher = document.getElementById('themeSwitcher');
     if (!switcher) return;
@@ -103,11 +109,44 @@ function initThemeSwitcher() {
         }
     });
 
-    const savedTheme = localStorage.getItem('header_theme');
-    if (savedTheme) {
-        switcher.querySelectorAll('.theme-pill').forEach(btn => {
-            if (btn.dataset.theme === savedTheme) {
-                btn.click();
+    const savedTheme = localStorage.getItem('header_theme') || 'minimal';
+    switcher.querySelectorAll('.theme-pill').forEach(btn => {
+        if (btn.dataset.theme === savedTheme) {
+            btn.click();
+        }
+    });
+}
+
+// --- Dog Avatar Selector Options ---
+function initDogSelector() {
+    const dogBar = document.getElementById('dogSelectorBar');
+    if (!dogBar) return;
+
+    dogBar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.dog-pill');
+        if (btn) {
+            const left = btn.dataset.left;
+            const right = btn.dataset.right;
+            if (leftDog) leftDog.innerText = left;
+            if (rightDog) rightDog.innerText = right;
+
+            dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+
+            localStorage.setItem('header_dog_left', left);
+            localStorage.setItem('header_dog_right', right);
+        }
+    });
+
+    const savedLeft = localStorage.getItem('header_dog_left');
+    const savedRight = localStorage.getItem('header_dog_right');
+    if (savedLeft && savedRight) {
+        if (leftDog) leftDog.innerText = savedLeft;
+        if (rightDog) rightDog.innerText = savedRight;
+        dogBar.querySelectorAll('.dog-pill').forEach(btn => {
+            if (btn.dataset.left === savedLeft && btn.dataset.right === savedRight) {
+                dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
             }
         });
     }
@@ -118,7 +157,7 @@ function toggleLanguage() {
     
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
-    document.title = i18n[currentLang].title;
+    document.title = i18n[currentLang].docTitle;
     startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
     const clearAllBtn = document.getElementById('clearAllBtn');
@@ -159,6 +198,8 @@ function toggleLanguage() {
     if (pill2) pill2.innerText = i18n[currentLang].theme2;
     const pill3 = document.querySelector('.theme-pill[data-theme="minimal"]');
     if (pill3) pill3.innerText = i18n[currentLang].theme3;
+    const dogSelectLabel = document.getElementById('dogSelectLabel');
+    if (dogSelectLabel) dogSelectLabel.innerText = i18n[currentLang].dogSelectLabel;
     
     // Update dynamic round texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
@@ -208,6 +249,16 @@ function toggleLanguage() {
         if (resultTitle) {
             resultTitle.innerText = i18n[currentLang].resultTitle;
         }
+
+        roundDiv.querySelectorAll('.result-item').forEach(item => {
+            const dir = item.dataset.dir;
+            const alias = item.dataset.alias;
+            if (dir && alias) {
+                const dirName = i18n[currentLang][dir === '东' ? 'east' : dir === '南' ? 'south' : dir === '西' ? 'west' : 'north'];
+                const playerSpan = item.querySelector('.result-player');
+                if (playerSpan) playerSpan.innerText = `${alias} (${dirName})`;
+            }
+        });
     });
 }
 
@@ -216,7 +267,6 @@ langToggle.addEventListener('click', toggleLanguage);
 // --- Game Logic ---
 let roundCount = 0;
 const directions = ['东', '西', '南', '北'];
-const enDirs = ['East', 'West', 'South', 'North'];
 
 let aliases = {
     '东': 'Mom',
@@ -289,10 +339,11 @@ function createGameRound(autoScroll = true) {
         aliasInput.className = 'player-alias';
         aliasInput.value = aliases[dir] || '';
         aliasInput.placeholder = i18n[currentLang].aliasPlaceholder;
-        aliasInput.oninput = (e) => {
-            aliases[dir] = e.target.value;
-            triggerSync();
-        };
+        aliasInput.setAttribute('autocomplete', 'off');
+        aliasInput.setAttribute('autocorrect', 'off');
+        aliasInput.setAttribute('autocapitalize', 'off');
+        aliasInput.setAttribute('spellcheck', 'false');
+        
         playerInfo.appendChild(aliasInput);
 
         const tigerList = document.createElement('div');
@@ -314,7 +365,7 @@ function createGameRound(autoScroll = true) {
         roundDiv.appendChild(row);
     });
 
-    // Footer - Default unit changed to 0.5
+    // Footer - Default unit changed to 0.5 and centered layout
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
@@ -493,7 +544,9 @@ function calculateRoundScore(roundDiv, endBtn) {
 
         const item = document.createElement('div');
         item.className = 'result-item';
-        item.innerHTML = `<span>${alias} (${dirName})</span> <span class="${colorClass}">${sign}${score}</span>`;
+        item.dataset.dir = dir;
+        item.dataset.alias = alias;
+        item.innerHTML = `<span class="result-player">${alias} (${dirName})</span> <span class="score-val ${colorClass}">${sign}${score}</span>`;
         resultDiv.appendChild(item);
     });
     
@@ -672,6 +725,57 @@ function copyLink() {
     alert(i18n[currentLang].linkCopied);
 }
 
+// --- CHINESE IME & USER ACTIVITY GUARDS ---
+let isComposing = false;
+let lastInteractionTime = 0;
+
+function recordActivity() {
+    lastInteractionTime = Date.now();
+}
+
+document.addEventListener('compositionstart', () => {
+    isComposing = true;
+    recordActivity();
+});
+
+document.addEventListener('compositionend', (e) => {
+    isComposing = false;
+    recordActivity();
+    if (e.target && e.target.classList.contains('player-alias')) {
+        const row = e.target.closest('.player-row');
+        if (row && row.dataset.dir) {
+            aliases[row.dataset.dir] = e.target.value;
+        }
+        triggerSync();
+    }
+});
+
+document.addEventListener('input', (e) => {
+    recordActivity();
+    if (isComposing) return; // Do not interrupt during Chinese Pinyin input!
+    
+    if (e.target.tagName === 'INPUT') {
+        if (e.target.classList.contains('player-alias')) {
+            const row = e.target.closest('.player-row');
+            if (row && row.dataset.dir) {
+                aliases[row.dataset.dir] = e.target.value;
+            }
+        }
+        triggerSync();
+    }
+});
+
+document.addEventListener('keydown', recordActivity);
+document.addEventListener('touchstart', recordActivity);
+document.addEventListener('click', recordActivity);
+
+document.addEventListener('change', (e) => {
+    recordActivity();
+    if (e.target.tagName === 'INPUT') {
+        triggerSync();
+    }
+});
+
 // --- STATE SYNC LOGIC ---
 
 let isSyncing = false;
@@ -791,28 +895,11 @@ async function pushStateToServer() {
     }
 }
 
-// Auto-push state when any input changes or receives typing
-document.addEventListener('input', (e) => {
-    if (e.target.tagName === 'INPUT') {
-        if (e.target.classList.contains('player-alias')) {
-            const row = e.target.closest('.player-row');
-            if (row && row.dataset.dir) {
-                aliases[row.dataset.dir] = e.target.value;
-            }
-        }
-        triggerSync();
-    }
-});
-
-document.addEventListener('change', (e) => {
-    if (e.target.tagName === 'INPUT') {
-        triggerSync();
-    }
-});
-
-// Periodically pull state from server
+// Periodically pull state from server (Guarded against user typing and Chinese IME)
 setInterval(async () => {
     if (!currentRoomCode || isSyncing) return;
+    if (isComposing) return;
+    if (Date.now() - lastInteractionTime < 4000) return;
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     
     try {
@@ -832,10 +919,11 @@ setInterval(async () => {
             }
         }
     } catch(e) {}
-}, 2500);
+}, 3000);
 
 // Initialize everything
 initThemeSwitcher();
+initDogSelector();
 checkRoom();
 
 function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {

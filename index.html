@@ -4,25 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=17">
+    <link rel="stylesheet" href="/style.css?v=18">
 </head>
 <body>
     <div class="container">
-        <!-- Top Nav Bar: keeps language toggle cleanly separated to prevent overlap -->
+        <!-- Top Nav Bar: Theme Demos + Language Toggle -->
         <div class="top-nav-bar">
             <div class="header-theme-switcher" id="themeSwitcher">
-                <!-- Interactive Theme Demo Selector -->
-                <button class="theme-pill active" data-theme="arcade">方案1: 街机3D</button>
+                <button class="theme-pill" data-theme="arcade">方案1: 街机3D</button>
                 <button class="theme-pill" data-theme="card">方案2: 萌宠插画</button>
-                <button class="theme-pill" data-theme="minimal">方案3: 柔和质感</button>
+                <button class="theme-pill active" data-theme="minimal">方案3: 柔和质感</button>
             </div>
             <button id="langToggle">中 / En</button>
         </div>
         
-        <!-- Header Banner Container (Supports theme demos) -->
-        <header class="header-title theme-arcade" id="headerBanner">
+        <!-- Header Banner Container (Defaulting to Theme 3 which user liked) -->
+        <header class="header-title theme-minimal" id="headerBanner">
             <div class="header-inner">
-                <h1 id="mainTitle" data-i18n="title">🐶 🀄 麻将计分器 🐕</h1>
+                <div class="dog-badge-row">
+                    <span class="dog-icon" id="leftDog">🐶</span>
+                    <span class="mahjong-badge">🀄</span>
+                    <h1 id="mainTitle" data-i18n="title">麻将计分器</h1>
+                    <span class="dog-icon" id="rightDog">🐕</span>
+                </div>
+                <!-- Dog Avatar / Picture Options -->
+                <div class="dog-selector-bar" id="dogSelectorBar">
+                    <span class="selector-label" id="dogSelectLabel">换萌犬:</span>
+                    <button class="dog-pill active" data-left="🐶" data-right="🐕">🐶 柯基</button>
+                    <button class="dog-pill" data-left="🐕" data-right="🐕">🐕 柴犬</button>
+                    <button class="dog-pill" data-left="🐩" data-right="🐩">🐩 贵宾</button>
+                    <button class="dog-pill" data-left="🦮" data-right="🦮">🦮 金毛</button>
+                    <button class="dog-pill" data-left="🐕‍🦺" data-right="🐕‍🦺">🐕‍🦺 边牧</button>
+                    <button class="dog-pill" data-left="🐾" data-right="🐾">🐾 爪爪</button>
+                </div>
             </div>
         </header>
 
@@ -41,6 +55,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=17"></script>
+    <script src="/app.js?v=18"></script>
 </body>
 </html>
