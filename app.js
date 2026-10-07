@@ -164,7 +164,7 @@ function createGameRound() {
 
         const tileIcon = document.createElement('div');
         tileIcon.className = 'mahjong-tile';
-        const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
+        const traditionalDir = { '东': '🀀', '西': '🀂', '南': '🀁', '北': '🀃' }[dir];
         tileIcon.innerText = traditionalDir;
 
         dirContainer.appendChild(tileIcon);
@@ -424,7 +424,7 @@ if (clearAllBtn) {
             
             clearAllBtn.dataset.confirm = "false";
             clearAllBtn.innerHTML = i18n[currentLang].clearAll;
-            clearAllBtn.style.backgroundColor = ";
+            clearAllBtn.style.backgroundColor = "";
         } else {
             clearAllBtn.dataset.confirm = "true";
             clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
@@ -434,9 +434,163 @@ if (clearAllBtn) {
                 if (clearAllBtn.dataset.confirm === "true") {
                     clearAllBtn.dataset.confirm = "false";
                     clearAllBtn.innerHTML = i18n[currentLang].clearAll;
-                    clearAllBtn.style.backgroundColor = ";
+                    clearAllBtn.style.backgroundColor = "";
                 }
             }, 3000);
         }
     });
+}
+
+
+
+// --- Authentication & Room Sync Logic ---
+let currentRoomCode = null;
+let currentUser = localStorage.getItem('mj_user') || null;
+
+async function checkRoom() {
+    const path = window.location.pathname;
+    const headerBtns = document.querySelector('.header-buttons');
+    
+    // Auth UI
+    const authDiv = document.createElement('div');
+    authDiv.id = 'authDiv';
+    authDiv.style.marginTop = '10px';
+    if (currentUser) {
+        authDiv.innerHTML = `Welcome, <b>${currentUser}</b>! <button onclick="logout()">Logout</button>`;
+    } else {
+        authDiv.innerHTML = `
+            <input type="text" id="username" placeholder="Username" style="width:100px;">
+            <input type="password" id="password" placeholder="Password" style="width:100px;">
+            <button onclick="auth('login')">Login</button>
+            <button onclick="auth('register')">Register</button>
+        `;
+    }
+    headerBtns.appendChild(authDiv);
+
+    if (path.startsWith('/mj/')) {
+        currentRoomCode = path.substring(4); // remove '/mj/'
+        
+        // Hide Create Room button, show room info
+        const roomInfo = document.createElement('div');
+        roomInfo.style.textAlign = 'center';
+        roomInfo.style.marginBottom = '15px';
+        roomInfo.innerHTML = `🏠 房间: <b>${currentRoomCode}</b> <button onclick="copyLink()">复制链接</button>`;
+        headerBtns.insertAdjacentElement('afterend', roomInfo);
+        
+        // Check if room requires password
+        loadRoomData();
+    } else {
+        // Show Create Room button
+        const createRoomBtn = document.createElement('button');
+        createRoomBtn.id = 'createRoomBtn';
+        createRoomBtn.innerHTML = '🏠 创建专属计分房间';
+        createRoomBtn.style.padding = '10px 20px';
+        createRoomBtn.style.fontSize = '18px';
+        createRoomBtn.style.backgroundColor = '#8e44ad';
+        createRoomBtn.style.color = 'white';
+        createRoomBtn.style.border = '2px solid white';
+        createRoomBtn.style.borderRadius = '20px';
+        createRoomBtn.style.marginTop = '10px';
+        createRoomBtn.style.cursor = 'pointer';
+        
+        createRoomBtn.onclick = async () => {
+            const pwd = prompt("设置房间密码 (访问加密，留空则不加密):");
+            createRoomBtn.innerText = '创建中...';
+            const res = await fetch('/api/room', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'create', password: pwd })
+            });
+            const data = await res.json();
+            if(data.success) {
+                window.location.href = '/mj/' + data.roomCode;
+            } else {
+                alert('创建失败: ' + (data.error || 'Unknown error'));
+                createRoomBtn.innerText = '🏠 创建专属计分房间';
+            }
+        };
+        headerBtns.appendChild(createRoomBtn);
+    }
+}
+
+window.auth = async function(action) {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if(!user || !pass) return alert('请输入账号和密码');
+    
+    const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ action, username: user, password: pass })
+    });
+    const data = await res.json();
+    if(data.success) {
+        if(action === 'login') {
+            localStorage.setItem('mj_user', data.token);
+            location.reload();
+        } else {
+            alert('注册成功，请登录');
+        }
+    } else {
+        alert(data.error);
+    }
+}
+
+window.logout = function() {
+    localStorage.removeItem('mj_user');
+    location.reload();
+}
+
+async function loadRoomData() {
+    let url = '/api/room?code=' + currentRoomCode;
+    let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
+    if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
+
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (data.error === 'Password required' || data.error === 'Incorrect password') {
+        const p = prompt("该房间已加密，请输入访问密码:");
+        if (p) {
+            localStorage.setItem('room_pwd_' + currentRoomCode, p);
+            loadRoomData();
+        } else {
+            document.body.innerHTML = '<h2 style="text-align:center;margin-top:50px;">需要密码访问</h2>';
+        }
+        return;
+    }
+
+    if(data.success) {
+        console.log("Loaded games:", data.games);
+        // Here we would hydrate the UI with past games
+    } else {
+        alert('无法加载房间: ' + data.error);
+    }
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href);
+    alert('房间链接已复制！发送给朋友即可同步计分。');
+}
+
+checkRoom();
+
+
+
+function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
+    let scores = {};
+    dirs.forEach(dir => {
+        let score = (tigers[dir] || 0) * 3;
+        dirs.forEach(otherDir => {
+            if (dir !== otherDir) {
+                score -= (tigers[otherDir] || 0);
+            }
+        });
+        scores[dir] = score * unit;
+    });
+    return scores;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { calculateScores };
 }
