@@ -164,7 +164,7 @@ function createGameRound() {
 
         const tileIcon = document.createElement('div');
         tileIcon.className = 'real-mahjong-tile';
-        const traditionalDir = { '东': '🀀', '西': '🀂', '南': '🀁', '北': '🀃' }[dir];
+        const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
         tileIcon.innerText = traditionalDir;
 
         dirContainer.appendChild(tileIcon);
@@ -459,16 +459,22 @@ async function checkRoom() {
     const headerBtns = document.querySelector('.header-buttons');
     
     // Clean, beautiful Room Info Bar
+    
     const roomInfo = document.createElement('div');
     roomInfo.className = 'room-settings-bar';
-    roomInfo.innerHTML = `
-        <span>🏠 房间: <b>${currentRoomCode}</b></span>
-        <button class="pwd-btn" onclick="copyLink()">🔗 复制链接</button>
-        <span id="pwdContainer">
-            <input type="password" id="setPwdInput" class="pwd-input" placeholder="设置访问密码(可选)">
-            <button class="pwd-btn" onclick="setPassword()">保存</button>
-        </span>
-    `;
+    roomInfo.innerHTML = \`
+        <div style="display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:10px; width:100%;">
+            <div style="background:#FFF9E6; border:3px solid #D2B48C; border-radius:20px; padding:5px 15px; color:#8D5A28; font-weight:900;">
+                🏠 房间: ${currentRoomCode}
+            </div>
+            <button class="pwd-btn" onclick="copyLink()" style="background:#2ECC71; box-shadow:0 3px 0 #27AE60;">🔗 邀请牌友</button>
+            <span id="pwdContainer" style="display:flex; gap:5px;">
+                <input type="password" id="setPwdInput" class="pwd-input" placeholder="设置房间密码(非必填)" style="border:3px solid #E0E0E0; border-radius:20px;">
+                <button class="pwd-btn" onclick="setPassword()" style="background:#9B59B6; box-shadow:0 3px 0 #8E44AD;">🔒 锁定房间</button>
+            </span>
+        </div>
+    \`;
+
     headerBtns.insertAdjacentElement('afterend', roomInfo);
     
     loadRoomData();
