@@ -16,23 +16,22 @@ export async function onRequest(context) {
                 return new Response(JSON.stringify({ error: 'Invalid room code' }), { status: 400 });
             }
 
-            // Create states table if it doesn't exist
+            // Create tables if they don't exist
+            try {
+                await env.DB.prepare(`CREATE TABLE IF NOT EXISTS rooms (room_code TEXT PRIMARY KEY, password TEXT)`).run();
+            } catch (e) {}
             try {
                 await env.DB.prepare(`CREATE TABLE IF NOT EXISTS room_states (room_code TEXT PRIMARY KEY, state TEXT)`).run();
-            } catch (e) {
-                // Ignore create table errors
-            }
+            } catch (e) {}
 
             // Ensure room exists in rooms table
             await env.DB.prepare(`INSERT OR IGNORE INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, null).run();
 
+            // UPSERT state
             const stateStr = JSON.stringify(state);
-            const existingState = await env.DB.prepare(`SELECT * FROM room_states WHERE room_code = ?`).bind(roomCode).first();
-            if (existingState) {
-                await env.DB.prepare(`UPDATE room_states SET state = ? WHERE room_code = ?`).bind(stateStr, roomCode).run();
-            } else {
-                await env.DB.prepare(`INSERT INTO room_states (room_code, state) VALUES (?, ?)`).bind(roomCode, stateStr).run();
-            }
+            await env.DB.prepare(
+                `INSERT INTO room_states (room_code, state) VALUES (?, ?) ON CONFLICT(room_code) DO UPDATE SET state = excluded.state`
+            ).bind(roomCode, stateStr).run();
 
             return new Response(JSON.stringify({ success: true }), {
                 headers: { 'Content-Type': 'application/json' }

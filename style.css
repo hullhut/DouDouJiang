@@ -5,12 +5,13 @@
 }
 
 body {
-    background: #BFE9FC; background-image: radial-gradient(circle at 50% 10%, #FFFFFF 0%, #A2DBF8 40%, #76C8F2 100%);
+    background: linear-gradient(180deg, #A1D9FC 0%, #D8F2E3 100%);
     min-height: 100vh;
     margin: 0;
     display: flex;
     justify-content: center;
     padding: 20px;
+    position: relative;
 }
 
 .container {
@@ -173,7 +174,7 @@ h1 {
 .row-西 { border-color: #2ECC71; background-color: #EAFaf1; }
 .row-北 { border-color: #3498DB; background-color: #EAF4FC; }
 
-/* The NEW Simple Mahjong Tile */
+/* The Simple 3D Mahjong Tile */
 .real-mahjong-tile {
     width: 36px;
     height: 48px;
@@ -211,8 +212,10 @@ h1 {
     color: #333;
     outline: none;
 }
-.tiger-input-container {
-    flex: 1;
+.player-alias:focus {
+    border-bottom: 2px solid #3498DB;
+}
+.tiger-list {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -229,6 +232,9 @@ h1 {
     color: #555;
     outline: none;
     text-align: center;
+}
+.tiger-input:focus {
+    border-color: #FFA800;
 }
 
 /* Plus Buttons */
@@ -264,17 +270,21 @@ h1 {
     border-top: 2px dashed #D2B48C;
 }
 
-.unit-container {
+.unit-input {
     display: flex;
     align-items: center;
     background: #FFF;
-    border: 3px solid #4A90E2;
+    border: 2px solid #4A90E2;
     border-radius: 12px;
-    padding: 5px 15px;
-    color: #333;
+    padding: 5px 12px;
     font-weight: bold;
+    color: #333;
 }
-.unit-container span { color: #F1C40F; font-size: 18px; margin-right: 5px; }
+.unit-icon {
+    color: #F1C40F;
+    font-size: 18px;
+    margin-right: 6px;
+}
 .round-unit {
     width: 50px;
     border: none;
@@ -308,15 +318,16 @@ h1 {
 /* Locked Screen */
 .locked-screen {
     text-align: center;
-    margin-top: 50px;
-    padding: 40px;
+    margin: 80px auto 0 auto;
+    max-width: 400px;
+    padding: 35px;
     background: #FFF9E6;
     border: 4px solid #D2B48C;
     border-radius: 20px;
     box-shadow: 0 8px 15px rgba(0,0,0,0.1);
 }
 .locked-screen h2 {
-    color: #e74c3c;
+    color: #8D5A28;
     text-shadow: none;
 }
 

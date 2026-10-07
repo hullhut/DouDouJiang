@@ -4,6 +4,17 @@ export async function onRequest(context) {
     const method = request.method;
 
     try {
+        // Ensure tables exist
+        try {
+            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS rooms (room_code TEXT PRIMARY KEY, password TEXT)`).run();
+        } catch (e) {}
+        try {
+            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS room_states (room_code TEXT PRIMARY KEY, state TEXT)`).run();
+        } catch (e) {}
+        try {
+            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY AUTOINCREMENT, room_code TEXT, game_data TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`).run();
+        } catch (e) {}
+
         if (method === 'POST') {
             const data = await request.json();
             
@@ -23,7 +34,9 @@ export async function onRequest(context) {
                 // Use UPSERT to prevent race conditions
                 await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?) ON CONFLICT(room_code) DO UPDATE SET password = excluded.password`).bind(roomCode, passwordHash).run();
 
-                return new Response(JSON.stringify({ success: true }));
+                return new Response(JSON.stringify({ success: true }), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
             }
         }
 
@@ -39,9 +52,23 @@ export async function onRequest(context) {
                 `SELECT * FROM rooms WHERE room_code = ?`
             ).bind(roomCode).first();
 
+            // Fetch state from room_states table
+            let roomState = null;
+            try {
+                const stateRow = await env.DB.prepare(`SELECT state FROM room_states WHERE room_code = ?`).bind(roomCode).first();
+                if (stateRow && stateRow.state) {
+                    roomState = JSON.parse(stateRow.state);
+                }
+            } catch (e) {}
+
             if (!room) {
                 // Notepad style: room doesn't exist yet, it's just empty and unpassworded
-                return new Response(JSON.stringify({ success: true, isNew: true, games: [] }), {
+                return new Response(JSON.stringify({
+                    success: true,
+                    isNew: true,
+                    room: roomState ? { room_code: roomCode, state: roomState } : null,
+                    games: []
+                }), {
                     headers: { 'Content-Type': 'application/json' }
                 });
             }
@@ -65,22 +92,11 @@ export async function onRequest(context) {
                 `SELECT * FROM games WHERE room_code = ? ORDER BY created_at ASC`
             ).bind(roomCode).all();
 
-            // Fetch state from room_states table
-            let roomState = null;
-            try {
-                const stateRow = await env.DB.prepare(`SELECT state FROM room_states WHERE room_code = ?`).bind(roomCode).first();
-                if (stateRow && stateRow.state) {
-                    roomState = JSON.parse(stateRow.state);
-                }
-            } catch (e) {
-                // If table doesn't exist, ignore
-            }
-            
             if (roomState) {
                 room.state = roomState;
             }
 
-            return new Response(JSON.stringify({ success: true, room, games: results }), {
+            return new Response(JSON.stringify({ success: true, room, games: results || [] }), {
                 headers: { 'Content-Type': 'application/json' }
             });
         }

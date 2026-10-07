@@ -71,11 +71,9 @@ function toggleLanguage() {
     
     // Update dynamic texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
-        // Round header
         const roundId = roundDiv.id.replace('round-', '');
         roundDiv.querySelector('.round-header').innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
         
-        // Directions update for placeholder
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
             row.querySelectorAll('.tiger-input').forEach(input => {
@@ -83,13 +81,11 @@ function toggleLanguage() {
             });
         });
 
-        // Unit text
         const unitTextNode = roundDiv.querySelector('.unit-text-label');
         if (unitTextNode) {
             unitTextNode.innerText = i18n[currentLang].unitText;
         }
 
-        // End Game button
         const endBtn = roundDiv.querySelector('.end-game-btn');
         if (endBtn && !endBtn.disabled) {
             if (endBtn.dataset.confirm === "true") {
@@ -99,7 +95,6 @@ function toggleLanguage() {
             }
         }
         
-        // Clear Round button
         const clearBtn = roundDiv.querySelector('.clear-round-btn');
         if (clearBtn) {
             if (clearBtn.dataset.confirm === "true") {
@@ -109,7 +104,6 @@ function toggleLanguage() {
             }
         }
         
-        // Modify Round button
         const modifyBtn = roundDiv.querySelector('.modify-round-btn');
         if (modifyBtn) {
             if (modifyBtn.dataset.confirm === "true") {
@@ -119,7 +113,6 @@ function toggleLanguage() {
             }
         }
         
-        // Result Title if settled
         const resultTitle = roundDiv.querySelector('.result-title');
         if (resultTitle) {
             resultTitle.innerText = i18n[currentLang].resultTitle;
@@ -131,7 +124,6 @@ langToggle.addEventListener('click', toggleLanguage);
 
 // --- Game Logic ---
 let roundCount = 0;
-            startGameBtn.innerHTML = i18n[currentLang].startGame;
 const directions = ['东', '西', '南', '北'];
 const enDirs = ['East', 'West', 'South', 'North'];
 
@@ -142,8 +134,17 @@ let aliases = {
     '北': 'Li'
 };
 
-function createGameRound() {
-    // Check if we should change button text
+// Global helper to create a tiger input
+function createTigerInput() {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.className = 'tiger-input';
+    input.placeholder = i18n[currentLang].scorePlaceholder;
+    input.value = '';
+    return input;
+}
+
+function createGameRound(autoScroll = true) {
     if (roundCount === 0) {
         document.getElementById('startGameBtn').innerHTML = i18n[currentLang].startAnother;
     }
@@ -183,25 +184,16 @@ function createGameRound() {
         const aliasInput = document.createElement('input');
         aliasInput.type = 'text';
         aliasInput.className = 'player-alias';
-        aliasInput.value = aliases[dir];
+        aliasInput.value = aliases[dir] || '';
         aliasInput.placeholder = i18n[currentLang].aliasPlaceholder;
-        aliasInput.onchange = (e) => {
-            aliases[dir] = e.target.value; 
+        aliasInput.oninput = (e) => {
+            aliases[dir] = e.target.value;
+            triggerSync();
         };
         playerInfo.appendChild(aliasInput);
 
         const tigerList = document.createElement('div');
         tigerList.className = 'tiger-list';
-        
-        const createTigerInput = () => {
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.className = 'tiger-input';
-            input.placeholder = i18n[currentLang].scorePlaceholder;
-            input.value = '';
-            return input;
-        };
-        
         tigerList.appendChild(createTigerInput());
         playerInfo.appendChild(tigerList);
         
@@ -212,6 +204,7 @@ function createGameRound() {
         addBtn.innerText = '+';
         addBtn.onclick = () => {
             tigerList.appendChild(createTigerInput());
+            triggerSync();
         };
         row.appendChild(addBtn);
 
@@ -231,16 +224,15 @@ function createGameRound() {
     endBtn.dataset.confirm = "false";
     endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
     
-    // Double confirmation logic
     endBtn.onclick = () => {
         if (endBtn.dataset.confirm === "true") {
             calculateRoundScore(roundDiv, endBtn);
+            triggerSync();
         } else {
             endBtn.dataset.confirm = "true";
             endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
             endBtn.style.backgroundColor = "#c0392b";
             
-            // Reset state after 3 seconds if not clicked again
             setTimeout(() => {
                 if (!endBtn.disabled) {
                     endBtn.dataset.confirm = "false";
@@ -262,22 +254,15 @@ function createGameRound() {
             clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
             clearBtn.style.backgroundColor = "";
             
-            // Clear logic
             roundDiv.querySelectorAll('.tiger-list').forEach(list => {
                 list.innerHTML = '';
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.className = 'tiger-input';
-                input.placeholder = i18n[currentLang].scorePlaceholder;
-                input.value = '';
-                list.appendChild(input);
+                list.appendChild(createTigerInput());
             });
-            // Re-enable everything if it was disabled
             roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
             const checkbox = endBtn.querySelector('input[type="checkbox"]');
             if(checkbox) checkbox.checked = false;
-            // Hide result
             roundDiv.querySelector('.round-result').classList.add('hidden');
+            triggerSync();
         } else {
             clearBtn.dataset.confirm = "true";
             clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
@@ -304,16 +289,15 @@ function createGameRound() {
             modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
             modifyBtn.style.backgroundColor = "";
             
-            // Unlock inputs
             roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
             
-            // Hide result and modify button, show end button
             roundDiv.querySelector('.round-result').classList.add('hidden');
             modifyBtn.classList.add('hidden');
             endBtn.classList.remove('hidden');
             
             const checkbox = endBtn.querySelector('input[type="checkbox"]');
             if(checkbox) checkbox.checked = false;
+            triggerSync();
         } else {
             modifyBtn.dataset.confirm = "true";
             modifyBtn.innerHTML = `✏️ ${i18n[currentLang].confirmModify}`;
@@ -344,7 +328,9 @@ function createGameRound() {
     roundDiv.appendChild(resultDiv);
 
     gameRoundsContainer.appendChild(roundDiv);
-    roundDiv.scrollIntoView({ behavior: 'smooth' });
+    if (autoScroll) {
+        roundDiv.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function calculateRoundScore(roundDiv, endBtn) {
@@ -399,17 +385,15 @@ function calculateRoundScore(roundDiv, endBtn) {
     
     resultDiv.classList.remove('hidden');
     
-    // IMPORTANT: Only disable inputs WITHIN THIS SPECIFIC ROUND
     const inputs = roundDiv.querySelectorAll('input, button');
     inputs.forEach(el => el.disabled = true);
     
-    // Re-enable language toggle and global clear
-    const langToggle = document.getElementById('langToggle');
-    if (langToggle) langToggle.disabled = false;
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    if (clearAllBtn) clearAllBtn.disabled = false;
+    const langToggleBtn = document.getElementById('langToggle');
+    if (langToggleBtn) langToggleBtn.disabled = false;
+    const clearAllBtnElem = document.getElementById('clearAllBtn');
+    if (clearAllBtnElem) clearAllBtnElem.disabled = false;
     
-    endBtn.style.backgroundColor = ""; // reset color
+    endBtn.style.backgroundColor = "";
     endBtn.classList.add('hidden');
     
     const modifyBtn = roundDiv.querySelector('.modify-round-btn');
@@ -421,17 +405,24 @@ function calculateRoundScore(roundDiv, endBtn) {
     if (clearBtn) clearBtn.disabled = false;
 }
 
-startGameBtn.addEventListener('click', createGameRound);
+startGameBtn.addEventListener('click', () => {
+    createGameRound(true);
+    triggerSync();
+});
+
 const clearAllBtn = document.getElementById('clearAllBtn');
 if (clearAllBtn) {
     clearAllBtn.addEventListener('click', () => {
         if (clearAllBtn.dataset.confirm === "true") {
             gameRoundsContainer.innerHTML = '';
             roundCount = 0;
+            startGameBtn.innerHTML = i18n[currentLang].startGame;
             
             clearAllBtn.dataset.confirm = "false";
             clearAllBtn.innerHTML = i18n[currentLang].clearAll;
             clearAllBtn.style.backgroundColor = "";
+            
+            triggerSync();
         } else {
             clearAllBtn.dataset.confirm = "true";
             clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
@@ -448,10 +439,6 @@ if (clearAllBtn) {
     });
 }
 
-
-
-
-
 // --- Notepad Room Sync Logic ---
 let currentRoomCode = null;
 
@@ -460,12 +447,10 @@ async function checkRoom() {
     if (path.startsWith('/mj/')) {
         currentRoomCode = path.substring(4);
     } else {
-        return; // Handled by index.js redirect
+        return;
     }
     
     const headerBtns = document.querySelector('.header-buttons');
-    
-    // Clean, beautiful Room Info Bar
     
     const roomInfo = document.createElement('div');
     roomInfo.className = 'room-settings-bar';
@@ -488,7 +473,12 @@ async function checkRoom() {
 }
 
 window.setPassword = async function() {
-    const pwd = document.getElementById('setPwdInput').value;
+    const pwdInput = document.getElementById('setPwdInput');
+    const pwd = pwdInput ? pwdInput.value : '';
+    if (!pwd) {
+        alert('请输入密码');
+        return;
+    }
     const res = await fetch('/api/room', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -496,7 +486,9 @@ window.setPassword = async function() {
     });
     const data = await res.json();
     if (data.success) {
+        localStorage.setItem('room_pwd_' + currentRoomCode, pwd);
         document.getElementById('pwdContainer').innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
+        triggerSync();
     } else {
         alert("密码设置失败: " + data.error);
     }
@@ -512,12 +504,12 @@ async function loadRoomData() {
     
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
         document.querySelector('.container').innerHTML = `
-            <div class="locked-screen" style="text-align: center; margin: 100px auto 0 auto; max-width: 400px; padding: 40px; background: #FFF9E6; border: 4px solid #D2B48C; border-radius: 20px; box-sizing: border-box;">
-                  <h2 style="color: #8D5A28; font-size: 30px;">🔒 房间已加密</h2>
+            <div class="locked-screen">
+                  <h2>🔒 房间已加密</h2>
                   <p style="color: #555; font-weight: bold; margin-bottom: 20px;">请输入密码以访问计分板</p>
                   <div style="display:flex; justify-content:center; gap:10px;">
-                      <input type="password" id="unlockPwd" class="pwd-input" style="width:200px; font-size:18px;" placeholder="输入密码">
-                      <button class="primary-btn" style="margin:0; padding:10px 30px; font-size:18px; border:none; border-radius:30px; background:linear-gradient(180deg, #F39C12 0%, #E67E22 100%); color:white; font-weight:bold; cursor:pointer; box-shadow:0 6px 0 #D35400, 0 10px 15px rgba(0,0,0,0.2);" onclick="unlockRoom()">解锁</button>
+                      <input type="password" id="unlockPwd" class="pwd-input" style="width:180px; font-size:16px;" placeholder="输入密码" onkeyup="if(event.key==='Enter') unlockRoom()">
+                      <button class="primary-btn" style="margin:0; padding:8px 24px; font-size:16px; border:none; border-radius:30px; background:linear-gradient(180deg, #F39C12 0%, #E67E22 100%); color:white; font-weight:bold; cursor:pointer; box-shadow:0 5px 0 #D35400, 0 8px 12px rgba(0,0,0,0.2);" onclick="unlockRoom()">解锁</button>
                   </div>
                   <p id="unlockError" style="color:#E74C3C; margin-top:15px; font-weight:bold;"></p>
               </div>
@@ -530,7 +522,6 @@ async function loadRoomData() {
             const pwdContainer = document.getElementById('pwdContainer');
             if(pwdContainer) pwdContainer.innerHTML = '<span style="color:#2ecc71;font-weight:bold;">🔒 已加密</span>';
         }
-        console.log("Loaded games:", data.games);
         if (data.room && data.room.state) {
             isSyncing = true;
             applyGameState(data.room.state);
@@ -541,11 +532,25 @@ async function loadRoomData() {
     }
 }
 
-window.unlockRoom = function() {
-    const p = document.getElementById('unlockPwd').value;
+window.unlockRoom = async function() {
+    const pwdInput = document.getElementById('unlockPwd');
+    const p = pwdInput ? pwdInput.value : '';
     if(!p) return;
-    localStorage.setItem('room_pwd_' + currentRoomCode, p);
-    location.reload();
+    
+    try {
+        const res = await fetch(`/api/room?code=${currentRoomCode}&pwd=${encodeURIComponent(p)}`);
+        const data = await res.json();
+        if (data.error === 'Incorrect password') {
+            document.getElementById('unlockError').innerText = '密码错误，请重新输入';
+            return;
+        }
+        if (data.success) {
+            localStorage.setItem('room_pwd_' + currentRoomCode, p);
+            location.reload();
+        }
+    } catch(e) {
+        document.getElementById('unlockError').innerText = '网络错误，请重试';
+    }
 }
 
 function copyLink() {
@@ -554,10 +559,6 @@ function copyLink() {
 }
 
 checkRoom();
-
-
-
-
 
 function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
     let scores = {};
@@ -579,9 +580,19 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // --- STATE SYNC LOGIC ---
 
+let isSyncing = false;
+let syncDebounceTimer = null;
+
+function triggerSync() {
+    clearTimeout(syncDebounceTimer);
+    syncDebounceTimer = setTimeout(() => {
+        pushStateToServer();
+    }, 250);
+}
+
 function getGameState() {
     const rounds = [];
-    document.querySelectorAll('.round-container').forEach(roundDiv => {
+    document.querySelectorAll('.game-round').forEach(roundDiv => {
         const roundState = {
             unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 100,
             players: {},
@@ -590,11 +601,18 @@ function getGameState() {
         
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
+            const aliasInput = row.querySelector('.player-alias');
+            if (aliasInput && aliasInput.value) {
+                aliases[dir] = aliasInput.value;
+            }
             const tigers = [];
             row.querySelectorAll('.tiger-input').forEach(input => {
                 if (input.value !== '') tigers.push(parseFloat(input.value));
             });
-            roundState.players[dir] = tigers;
+            roundState.players[dir] = {
+                alias: aliasInput ? aliasInput.value : (aliases[dir] || ''),
+                tigers: tigers
+            };
         });
         rounds.push(roundState);
     });
@@ -608,7 +626,7 @@ async function applyGameState(state) {
     } else if (state && state.rounds) {
         roundsToApply = state.rounds;
         if (state.aliases) {
-            aliases = state.aliases;
+            aliases = Object.assign(aliases, state.aliases);
         }
     }
     const container = document.getElementById('gameRoundsContainer');
@@ -616,26 +634,43 @@ async function applyGameState(state) {
     roundCount = 0;
     
     roundsToApply.forEach(roundState => {
-        createGameRound(); // increments roundCount and appends to container
+        createGameRound(false);
         const roundDiv = container.lastElementChild;
+        if (!roundDiv) return;
         
-        roundDiv.querySelector('.round-unit').value = roundState.unit;
+        const unitInput = roundDiv.querySelector('.round-unit');
+        if (unitInput && roundState.unit) unitInput.value = roundState.unit;
         
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
-            const tigers = roundState.players[dir] || [];
+            const playerData = roundState.players ? roundState.players[dir] : null;
+            let tigers = [];
+            let rowAlias = aliases[dir] || '';
             
-            const tigerList = row.querySelector('.tiger-input-container');
-            tigerList.innerHTML = ''; // clear default 1 input
+            if (Array.isArray(playerData)) {
+                tigers = playerData;
+            } else if (playerData && typeof playerData === 'object') {
+                tigers = playerData.tigers || [];
+                if (playerData.alias) rowAlias = playerData.alias;
+            }
             
-            if (tigers.length === 0) {
-                tigerList.appendChild(createTigerInput());
-            } else {
-                tigers.forEach(val => {
-                    const input = createTigerInput();
-                    input.value = val;
-                    tigerList.appendChild(input);
-                });
+            const aliasInput = row.querySelector('.player-alias');
+            if (aliasInput && rowAlias) {
+                aliasInput.value = rowAlias;
+            }
+            
+            const tigerList = row.querySelector('.tiger-list');
+            if (tigerList) {
+                tigerList.innerHTML = '';
+                if (tigers.length === 0) {
+                    tigerList.appendChild(createTigerInput());
+                } else {
+                    tigers.forEach(val => {
+                        const input = createTigerInput();
+                        input.value = val;
+                        tigerList.appendChild(input);
+                    });
+                }
             }
         });
         
@@ -648,33 +683,42 @@ async function applyGameState(state) {
     document.getElementById('startGameBtn').innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
 }
 
-let isSyncing = false;
 async function pushStateToServer() {
-    if (isSyncing) return;
+    if (isSyncing || !currentRoomCode) return;
     const state = getGameState();
-    fetch('/api/game', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'save_state', roomCode: currentRoomCode, state: state })
-    }).catch(e => console.error(e));
+    try {
+        await fetch('/api/game', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'save_state', roomCode: currentRoomCode, state: state })
+        });
+    } catch(e) {
+        console.error('Push state failed:', e);
+    }
 }
 
-// Auto-push state when any input changes
-document.addEventListener('change', (e) => {
+// Auto-push state when any input changes or receives typing
+document.addEventListener('input', (e) => {
     if (e.target.tagName === 'INPUT') {
-        pushStateToServer();
+        if (e.target.classList.contains('player-alias')) {
+            const row = e.target.closest('.player-row');
+            if (row && row.dataset.dir) {
+                aliases[row.dataset.dir] = e.target.value;
+            }
+        }
+        triggerSync();
     }
 });
-document.addEventListener('click', (e) => {
-    if (e.target.tagName === 'BUTTON') {
-        setTimeout(pushStateToServer, 100);
+
+document.addEventListener('change', (e) => {
+    if (e.target.tagName === 'INPUT') {
+        triggerSync();
     }
 });
 
 // Periodically pull state from server
 setInterval(async () => {
-    if (!currentRoomCode) return;
-    // Only pull if user is not actively typing
+    if (!currentRoomCode || isSyncing) return;
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     
     try {
@@ -694,4 +738,4 @@ setInterval(async () => {
             }
         }
     } catch(e) {}
-}, 3000);
+}, 2500);
