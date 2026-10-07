@@ -8,6 +8,7 @@ const i18n = {
     en: {
         title: "Family Mahjong<br>Score Tracker",
         startGame: "Start Game ▶",
+        startAnother: "Start Another ▶",
         clearAll: "Clear All",
         confirmClearAll: "Sure?",
         roundTitle: "Players & Scores - Round {n}",
@@ -29,6 +30,7 @@ const i18n = {
     zh: {
         title: "家庭麻将<br>计分器",
         startGame: "开始游戏 ▶",
+        startAnother: "再开一局 ▶",
         clearAll: "全部清空",
         confirmClearAll: "确认全清?",
         roundTitle: "玩家与分数 - 第 {n} 局",
@@ -56,7 +58,7 @@ function toggleLanguage() {
     
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
-    startGameBtn.innerHTML = i18n[currentLang].startGame;
+    startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
     const clearAllBtn = document.getElementById('clearAllBtn');
     if (clearAllBtn) {
@@ -129,6 +131,7 @@ langToggle.addEventListener('click', toggleLanguage);
 
 // --- Game Logic ---
 let roundCount = 0;
+            startGameBtn.innerHTML = i18n[currentLang].startGame;
 const directions = ['东', '西', '南', '北'];
 const enDirs = ['East', 'West', 'South', 'North'];
 
@@ -140,6 +143,10 @@ let aliases = {
 };
 
 function createGameRound() {
+    // Check if we should change button text
+    if (roundCount === 0) {
+        document.getElementById('startGameBtn').innerHTML = i18n[currentLang].startAnother;
+    }
     roundCount++;
     const roundId = roundCount;
     

@@ -212,19 +212,22 @@ h1 {
     outline: none;
 }
 .tiger-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 120px;
+}
+.tiger-input {
     background: #FFF;
     border: 2px solid #E0E0E0;
     border-radius: 10px;
-    padding: 5px 10px;
-    width: 100px;
-}
-.tiger-input {
-    border: none;
-    outline: none;
+    padding: 8px 10px;
     width: 100%;
+    box-sizing: border-box;
     font-size: 16px;
     font-weight: bold;
     color: #555;
+    outline: none;
 }
 
 /* Plus Buttons */
