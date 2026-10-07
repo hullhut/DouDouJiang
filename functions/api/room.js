@@ -7,27 +7,28 @@ export async function onRequest(context) {
         if (method === 'POST') {
             const data = await request.json();
             
-            if (data.action === 'create') {
-                const dateStr = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 8);
-                const randomCode = Math.random().toString(36).substring(2, 10);
-                const roomCode = `${dateStr}/${randomCode}`;
-                let passwordHash = null;
-
-                if (data.password) {
-                    const encoder = new TextEncoder();
-                    const dataBuffer = encoder.encode(data.password);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            // Set or update room password (Notepad style)
+            if (data.action === 'set_password') {
+                const { roomCode, password } = data;
+                if (!roomCode || !password) {
+                    return new Response(JSON.stringify({ error: 'Missing code or password' }), { status: 400 });
                 }
 
-                await env.DB.prepare(
-                    `INSERT INTO rooms (room_code, password) VALUES (?, ?)`
-                ).bind(roomCode, passwordHash).run();
+                const encoder = new TextEncoder();
+                const dataBuffer = encoder.encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-                return new Response(JSON.stringify({ success: true, roomCode }), {
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                // Check if room exists
+                const room = await env.DB.prepare(`SELECT * FROM rooms WHERE room_code = ?`).bind(roomCode).first();
+                if (room) {
+                    await env.DB.prepare(`UPDATE rooms SET password = ? WHERE room_code = ?`).bind(passwordHash, roomCode).run();
+                } else {
+                    await env.DB.prepare(`INSERT INTO rooms (room_code, password) VALUES (?, ?)`).bind(roomCode, passwordHash).run();
+                }
+
+                return new Response(JSON.stringify({ success: true }));
             }
         }
 
@@ -44,7 +45,10 @@ export async function onRequest(context) {
             ).bind(roomCode).first();
 
             if (!room) {
-                return new Response(JSON.stringify({ error: 'Room not found' }), { status: 404 });
+                // Notepad style: room doesn't exist yet, it's just empty and unpassworded
+                return new Response(JSON.stringify({ success: true, isNew: true, games: [] }), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
             }
 
             if (room.password) {

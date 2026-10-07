@@ -443,74 +443,50 @@ if (clearAllBtn) {
 
 
 
+
 // --- Authentication & Room Sync Logic ---
 let currentRoomCode = null;
 let currentUser = localStorage.getItem('mj_user') || null;
 
 async function checkRoom() {
     const path = window.location.pathname;
+    if (path.startsWith('/mj/')) {
+        currentRoomCode = path.substring(4);
+    } else {
+        // If somehow not on /mj/, it shouldn't happen because functions/index.js redirects
+        return;
+    }
+    
     const headerBtns = document.querySelector('.header-buttons');
     
-    // Auth UI
+    // Top right user auth (optional)
     const authDiv = document.createElement('div');
     authDiv.id = 'authDiv';
     authDiv.style.marginTop = '10px';
     if (currentUser) {
-        authDiv.innerHTML = `Welcome, <b>${currentUser}</b>! <button onclick="logout()">Logout</button>`;
+        authDiv.innerHTML = `👤 <b>${currentUser}</b> <button onclick="logout()">注销</button>`;
     } else {
         authDiv.innerHTML = `
-            <input type="text" id="username" placeholder="Username" style="width:100px;">
-            <input type="password" id="password" placeholder="Password" style="width:100px;">
-            <button onclick="auth('login')">Login</button>
-            <button onclick="auth('register')">Register</button>
+            <input type="text" id="username" placeholder="账号" style="width:70px;">
+            <input type="password" id="password" placeholder="密码" style="width:70px;">
+            <button onclick="auth('login')">登录</button>
+            <button onclick="auth('register')">注册</button>
         `;
     }
     headerBtns.appendChild(authDiv);
 
-    if (path.startsWith('/mj/')) {
-        currentRoomCode = path.substring(4); // remove '/mj/'
-        
-        // Hide Create Room button, show room info
-        const roomInfo = document.createElement('div');
-        roomInfo.style.textAlign = 'center';
-        roomInfo.style.marginBottom = '15px';
-        roomInfo.innerHTML = `🏠 房间: <b>${currentRoomCode}</b> <button onclick="copyLink()">复制链接</button>`;
-        headerBtns.insertAdjacentElement('afterend', roomInfo);
-        
-        // Check if room requires password
-        loadRoomData();
-    } else {
-        // Show Create Room button
-        const createRoomBtn = document.createElement('button');
-        createRoomBtn.id = 'createRoomBtn';
-        createRoomBtn.innerHTML = '🏠 创建专属计分房间';
-        createRoomBtn.style.padding = '10px 20px';
-        createRoomBtn.style.fontSize = '18px';
-        createRoomBtn.style.backgroundColor = '#8e44ad';
-        createRoomBtn.style.color = 'white';
-        createRoomBtn.style.border = '2px solid white';
-        createRoomBtn.style.borderRadius = '20px';
-        createRoomBtn.style.marginTop = '10px';
-        createRoomBtn.style.cursor = 'pointer';
-        
-        createRoomBtn.onclick = async () => {
-            const pwd = prompt("设置房间密码 (访问加密，留空则不加密):");
-            createRoomBtn.innerText = '创建中...';
-            const res = await fetch('/api/room', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'create', password: pwd })
-            });
-            const data = await res.json();
-            if(data.success) {
-                window.location.href = '/mj/' + data.roomCode;
-            } else {
-                alert('创建失败: ' + (data.error || 'Unknown error'));
-                createRoomBtn.innerText = '🏠 创建专属计分房间';
-            }
-        };
-        headerBtns.appendChild(createRoomBtn);
-    }
+    // Room info
+    const roomInfo = document.createElement('div');
+    roomInfo.id = 'roomInfoPanel';
+    roomInfo.style.textAlign = 'center';
+    roomInfo.style.marginBottom = '15px';
+    roomInfo.innerHTML = `🏠 房间: <b>${currentRoomCode}</b> 
+        <button onclick="copyLink()">🔗 复制链接</button>
+        <button id="lockBtn" onclick="setPassword()" style="display:none;">🔓 设置密码</button>
+    `;
+    headerBtns.insertAdjacentElement('afterend', roomInfo);
+    
+    loadRoomData();
 }
 
 window.auth = async function(action) {
@@ -541,6 +517,23 @@ window.logout = function() {
     location.reload();
 }
 
+window.setPassword = async function() {
+    const pwd = prompt("为当前房间设置访问密码 (留空取消):");
+    if (!pwd) return;
+    const res = await fetch('/api/room', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ action: 'set_password', roomCode: currentRoomCode, password: pwd })
+    });
+    const data = await res.json();
+    if (data.success) {
+        alert("密码设置成功！");
+        document.getElementById('lockBtn').innerHTML = '🔒 已加密';
+    } else {
+        alert("密码设置失败: " + data.error);
+    }
+}
+
 async function loadRoomData() {
     let url = '/api/room?code=' + currentRoomCode;
     let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
@@ -555,14 +548,22 @@ async function loadRoomData() {
             localStorage.setItem('room_pwd_' + currentRoomCode, p);
             loadRoomData();
         } else {
-            document.body.innerHTML = '<h2 style="text-align:center;margin-top:50px;">需要密码访问</h2>';
+            document.body.innerHTML = '<h2 style="text-align:center;margin-top:50px;">🔒 需要密码访问</h2>';
         }
         return;
     }
 
-    if(data.success) {
+    if (data.success) {
+        // Show set password button if it's not locked
+        const lockBtn = document.getElementById('lockBtn');
+        lockBtn.style.display = 'inline-block';
+        if (data.room && data.room.password) {
+            lockBtn.innerHTML = '🔒 已加密';
+            lockBtn.onclick = () => alert("该房间已被加密，无法修改密码。");
+        }
+        
         console.log("Loaded games:", data.games);
-        // Here we would hydrate the UI with past games
+        // Next iteration: render games onto UI here
     } else {
         alert('无法加载房间: ' + data.error);
     }
@@ -574,6 +575,7 @@ function copyLink() {
 }
 
 checkRoom();
+
 
 
 
