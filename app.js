@@ -14,6 +14,8 @@ const i18n = {
         unitText: "Unit (Yuan)",
         endGame: "End Game",
         confirmEnd: "Confirm?",
+        clearRound: "Clear",
+        confirmClear: "Sure?",
         resultTitle: "💰 Round Settlement 💰",
         east: "East",
         south: "South",
@@ -29,6 +31,8 @@ const i18n = {
         unitText: "计数单位 (元)",
         endGame: "结束游戏",
         confirmEnd: "确认结算?",
+        clearRound: "清空",
+        confirmClear: "确认清空?",
         resultTitle: "💰 本局结算结果 💰",
         east: "东",
         south: "南",
@@ -52,14 +56,8 @@ function toggleLanguage() {
         const roundId = roundDiv.id.replace('round-', '');
         roundDiv.querySelector('.round-header').innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
         
-        // Directions
-        const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
+        // Directions update for placeholder
         roundDiv.querySelectorAll('.player-row').forEach(row => {
-            const dir = row.dataset.dir;
-            const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
-            const labelDiv = row.querySelector('.player-dir-label');
-            labelDiv.innerHTML = `${dirMap[dir]}<br><span>(${traditionalDir})</span>`;
-            
             row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
             row.querySelectorAll('.tiger-input').forEach(input => {
                 input.placeholder = i18n[currentLang].scorePlaceholder;
@@ -79,6 +77,16 @@ function toggleLanguage() {
                 endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
             } else {
                 endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
+            }
+        }
+        
+        // Clear Round button
+        const clearBtn = roundDiv.querySelector('.clear-round-btn');
+        if (clearBtn) {
+            if (clearBtn.dataset.confirm === "true") {
+                clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
+            } else {
+                clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
             }
         }
         
@@ -124,8 +132,6 @@ function createGameRound() {
         row.className = `player-row row-${dir}`;
         row.dataset.dir = dir;
 
-        const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
-        
         const dirContainer = document.createElement('div');
         dirContainer.className = 'player-dir-container';
 
@@ -134,12 +140,7 @@ function createGameRound() {
         const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
         tileIcon.innerText = traditionalDir;
 
-        const labelDiv = document.createElement('div');
-        labelDiv.className = 'player-dir-label';
-        labelDiv.innerHTML = `${dirMap[dir]}<br><span>(${traditionalDir})</span>`;
-
         dirContainer.appendChild(tileIcon);
-        dirContainer.appendChild(labelDiv);
         row.appendChild(dirContainer);
 
         const playerInfo = document.createElement('div');
@@ -216,8 +217,55 @@ function createGameRound() {
         }
     };
     
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'clear-round-btn';
+    clearBtn.dataset.confirm = "false";
+    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+
+    clearBtn.onclick = () => {
+        if (clearBtn.dataset.confirm === "true") {
+            clearBtn.dataset.confirm = "false";
+            clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+            clearBtn.style.backgroundColor = "";
+            
+            // Clear logic
+            roundDiv.querySelectorAll('.tiger-list').forEach(list => {
+                list.innerHTML = '';
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'tiger-input';
+                input.placeholder = i18n[currentLang].scorePlaceholder;
+                input.value = '';
+                list.appendChild(input);
+            });
+            // Re-enable everything if it was disabled
+            roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
+            const checkbox = endBtn.querySelector('input[type="checkbox"]');
+            if(checkbox) checkbox.checked = false;
+            // Hide result
+            roundDiv.querySelector('.round-result').classList.add('hidden');
+        } else {
+            clearBtn.dataset.confirm = "true";
+            clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
+            clearBtn.style.backgroundColor = "#e67e22";
+            
+            setTimeout(() => {
+                if (clearBtn.dataset.confirm === "true") {
+                    clearBtn.dataset.confirm = "false";
+                    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+                    clearBtn.style.backgroundColor = "";
+                }
+            }, 3000);
+        }
+    };
+    
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'footer-actions';
+    actionsDiv.appendChild(clearBtn);
+    actionsDiv.appendChild(endBtn);
+    
     footer.appendChild(unitDiv);
-    footer.appendChild(endBtn);
+    footer.appendChild(actionsDiv);
     roundDiv.appendChild(footer);
     
     const resultDiv = document.createElement('div');
