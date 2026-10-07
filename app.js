@@ -56,8 +56,9 @@ function toggleLanguage() {
         const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
-            const dirSpan = row.querySelector('.player-dir');
-            dirSpan.innerHTML = `${dirMap[dir]}<br><span>(${dir})</span>`;
+            const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
+            const labelDiv = row.querySelector('.player-dir-label');
+            labelDiv.innerHTML = `${dirMap[dir]}<br><span>(${traditionalDir})</span>`;
             
             row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
             row.querySelectorAll('.tiger-input').forEach(input => {
@@ -125,10 +126,21 @@ function createGameRound() {
 
         const dirMap = { '东': i18n[currentLang].east, '南': i18n[currentLang].south, '西': i18n[currentLang].west, '北': i18n[currentLang].north };
         
-        const dirSpan = document.createElement('div');
-        dirSpan.className = 'player-dir';
-        dirSpan.innerHTML = `${dirMap[dir]}<br><span>(${dir})</span>`;
-        row.appendChild(dirSpan);
+        const dirContainer = document.createElement('div');
+        dirContainer.className = 'player-dir-container';
+
+        const tileIcon = document.createElement('div');
+        tileIcon.className = 'mahjong-tile';
+        const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
+        tileIcon.innerText = traditionalDir;
+
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'player-dir-label';
+        labelDiv.innerHTML = `${dirMap[dir]}<br><span>(${traditionalDir})</span>`;
+
+        dirContainer.appendChild(tileIcon);
+        dirContainer.appendChild(labelDiv);
+        row.appendChild(dirContainer);
 
         const playerInfo = document.createElement('div');
         playerInfo.className = 'player-info';

@@ -134,25 +134,47 @@ h1 {
 .row-西 { border-color: #2ECC71; background-color: #F0FFF4; }
 .row-北 { border-color: #3498DB; background-color: #EBF5FB; }
 
-.player-dir {
-    font-size: 20px;
+.player-dir-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 90px;
+}
+
+.mahjong-tile {
+    width: 36px;
+    height: 46px;
+    background: #FFF;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
     font-weight: bold;
-    width: 45px;
-    text-align: center;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), 2px 3px 0 rgba(0,0,0,0.15);
+    border-style: solid;
+    border-width: 2px 2px 4px 2px; /* Thicker bottom to look 3D */
+}
+
+.row-东 .mahjong-tile { border-color: #4A90E2; color: #4A90E2; }
+.row-南 .mahjong-tile { border-color: #E67E22; color: #E67E22; }
+.row-西 .mahjong-tile { border-color: #2ECC71; color: #2ECC71; }
+.row-北 .mahjong-tile { border-color: #3498DB; color: #3498DB; }
+
+.player-dir-label {
+    font-size: 16px;
+    font-weight: bold;
     display: flex;
     flex-direction: column;
     justify-content: center;
     line-height: 1.1;
+    color: #333;
 }
 
-.player-dir span {
+.player-dir-label span {
     font-size: 12px;
+    color: #777;
 }
-
-.row-东 .player-dir { color: #4A90E2; }
-.row-南 .player-dir { color: #E67E22; }
-.row-西 .player-dir { color: #2ECC71; }
-.row-北 .player-dir { color: #3498DB; }
 
 .player-info {
     display: flex;
