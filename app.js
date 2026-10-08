@@ -121,7 +121,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=28' : '/images/header-zh.png?v=28';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=29' : '/images/header-zh.png?v=29';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
