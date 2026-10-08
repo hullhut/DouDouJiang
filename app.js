@@ -86,10 +86,11 @@ const i18n = {
 
 let currentLang = 'zh';
 
-// --- Interactive Dog Figures Animation (Final Design) ---
+// --- Interactive Dog Figures Animation & Plaque (Final Design) ---
 function initDogs() {
     const leftDog = document.getElementById('stageDogLeft');
     const rightDog = document.getElementById('stageDogRight');
+    const plaqueImg = document.getElementById('stagePlaqueImg');
 
     [leftDog, rightDog].forEach(dogImg => {
         if (dogImg) {
@@ -99,6 +100,13 @@ function initDogs() {
             });
         }
     });
+
+    if (plaqueImg) {
+        plaqueImg.addEventListener('click', () => {
+            plaqueImg.style.transform = 'scale(1.1) rotate(2deg)';
+            setTimeout(() => { plaqueImg.style.transform = ''; }, 300);
+        });
+    }
 }
 
 function toggleLanguage() {
@@ -108,6 +116,17 @@ function toggleLanguage() {
     mainTitle.innerHTML = i18n[currentLang].title;
     document.title = i18n[currentLang].docTitle;
     startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
+
+    // Update plaque subtitle in English
+    const plaqueSubTitle = document.getElementById('plaqueSubTitle');
+    if (plaqueSubTitle) {
+        if (currentLang === 'en') {
+            plaqueSubTitle.style.display = 'inline-block';
+            plaqueSubTitle.innerText = 'Mahjong Score Tracker';
+        } else {
+            plaqueSubTitle.style.display = 'none';
+        }
+    }
     
     const clearAllBtn = document.getElementById('clearAllBtn');
     if (clearAllBtn) {
