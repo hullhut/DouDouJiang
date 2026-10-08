@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=22">
+    <link rel="stylesheet" href="/style.css?v=23">
 </head>
 <body>
     <div class="container">
@@ -13,28 +13,18 @@
             <button id="langToggle">中 / En</button>
         </div>
         
-        <!-- Header Banner Container (Final Design: Complete figures of both dogs flanking mahjong) -->
-        <header class="header-title" id="headerBanner">
-            <div class="header-stage">
-                <!-- Left Dog: Full Figure Brown Curly Poodle with Blue Harness -->
-                <div class="stage-dog-wrapper dog-left-wrapper">
-                    <img src="/images/poodle-full.png" id="stageDogLeft" class="stage-dog-img" alt="泰迪贵宾">
-                </div>
-
-                <!-- Center Stage: Festive Red-Gold Mahjong Plaque (Option 2) -->
-                <div class="stage-center">
-                    <div class="plaque-container">
-                        <img src="/images/mahjong-plaque.png" id="stagePlaqueImg" class="stage-plaque-img" alt="麻将计分器">
-                        <div id="plaqueSubTitle" class="plaque-subtitle" style="display: none;">Mahjong Score Tracker</div>
-                    </div>
-                    <h1 id="mainTitle" class="sr-only" data-i18n="title">麻将计分器</h1>
-                </div>
-
-                <!-- Right Dog: Full Figure White & Tan Fluffy Puppy -->
-                <div class="stage-dog-wrapper dog-right-wrapper">
-                    <img src="/images/fluffy-full.png" id="stageDogRight" class="stage-dog-img" alt="花色小狗">
-                </div>
+        <!-- Header Banner Container (Option 3: Complete Interactive Dog Figures Flanking Mahjong Rack) -->
+        <header class="header-banner-container" id="headerBanner">
+            <div class="banner-wrapper" id="bannerWrapper">
+                <img src="/images/header-option3-banner.jpg" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
+                <!-- Interactive Hotspots for Poodle, Fluffy Pup and Title -->
+                <div class="pet-hotspot hotspot-left-poodle" id="hotspotLeftPoodle" title="泰迪贵宾"></div>
+                <div class="pet-hotspot hotspot-right-fluffy" id="hotspotRightFluffy" title="花色小狗"></div>
+                <div class="pet-hotspot hotspot-center-title" id="hotspotCenterTitle" title="麻将计分器"></div>
+                <!-- English adaptive subtitle badge -->
+                <div id="plaqueSubTitle" class="option3-en-badge" style="display: none;">Mahjong Score Tracker</div>
             </div>
+            <h1 id="mainTitle" class="sr-only" data-i18n="title">麻将计分器</h1>
         </header>
 
         <div class="action-buttons header-buttons">
@@ -52,6 +42,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=22"></script>
+    <script src="/app.js?v=23"></script>
 </body>
 </html>

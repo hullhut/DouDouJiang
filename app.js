@@ -86,26 +86,32 @@ const i18n = {
 
 let currentLang = 'zh';
 
-// --- Interactive Dog Figures Animation & Plaque (Final Design) ---
+// --- Interactive Dog Figures & Title Animation (Option 3 Scheme) ---
 function initDogs() {
-    const leftDog = document.getElementById('stageDogLeft');
-    const rightDog = document.getElementById('stageDogRight');
-    const plaqueImg = document.getElementById('stagePlaqueImg');
+    const bannerWrapper = document.getElementById('bannerWrapper');
+    const leftPoodle = document.getElementById('hotspotLeftPoodle');
+    const rightFluffy = document.getElementById('hotspotRightFluffy');
+    const centerTitle = document.getElementById('hotspotCenterTitle');
 
-    [leftDog, rightDog].forEach(dogImg => {
-        if (dogImg) {
-            dogImg.addEventListener('click', () => {
-                dogImg.classList.add('bouncing');
-                setTimeout(() => dogImg.classList.remove('bouncing'), 400);
+    if (bannerWrapper) {
+        if (leftPoodle) {
+            leftPoodle.addEventListener('click', () => {
+                bannerWrapper.classList.add('bouncing-left');
+                setTimeout(() => bannerWrapper.classList.remove('bouncing-left'), 400);
             });
         }
-    });
-
-    if (plaqueImg) {
-        plaqueImg.addEventListener('click', () => {
-            plaqueImg.style.transform = 'scale(1.1) rotate(2deg)';
-            setTimeout(() => { plaqueImg.style.transform = ''; }, 300);
-        });
+        if (rightFluffy) {
+            rightFluffy.addEventListener('click', () => {
+                bannerWrapper.classList.add('bouncing-right');
+                setTimeout(() => bannerWrapper.classList.remove('bouncing-right'), 400);
+            });
+        }
+        if (centerTitle) {
+            centerTitle.addEventListener('click', () => {
+                bannerWrapper.classList.add('bouncing-center');
+                setTimeout(() => bannerWrapper.classList.remove('bouncing-center'), 300);
+            });
+        }
     }
 }
 
