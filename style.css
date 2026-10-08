@@ -20,48 +20,20 @@ body {
     width: 100%;
 }
 
-/* --- Top Navigation Bar --- */
+/* --- Top Navigation Bar: Language Toggle on the Right --- */
 .top-nav-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    gap: 8px;
     margin-bottom: 8px;
     width: 100%;
-}
-
-.header-theme-switcher {
-    display: flex;
-    gap: 4px;
-    background: rgba(255, 255, 255, 0.7);
-    padding: 3px 5px;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.9);
-}
-
-.theme-pill {
-    background: transparent;
-    border: none;
-    padding: 3px 7px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: bold;
-    color: #4A6B82;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.theme-pill.active {
-    background: #3498DB;
-    color: #FFF;
-    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
 }
 
 #langToggle {
     background: #FFF;
     border: 2px solid #3498DB;
     color: #3498DB;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 20px;
     font-weight: bold;
     font-size: 13px;
@@ -75,39 +47,12 @@ body {
     box-shadow: 0 1px 0 #2980B9;
 }
 
-/* --- Header & Title Schemes (Demos) --- */
+/* --- Final Header Design (Scheme 3 Soft Glass + Full Dog Figures) --- */
 .header-title {
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     position: relative;
     border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-/* Scheme 1: 街机3D卡通 */
-.header-title.theme-arcade {
-    padding: 10px 5px;
-    background: transparent;
-}
-.header-title.theme-arcade h1 {
-    color: #FFF;
-    text-shadow: 2px 2px 0px #4A90E2, -2px -2px 0px #4A90E2, 2px -2px 0px #4A90E2, -2px 2px 0px #4A90E2, 0px 4px 0px #2980B9;
-}
-
-/* Scheme 2: 萌宠插画卡片 */
-.header-title.theme-card {
-    padding: 12px 8px;
-    background: linear-gradient(135deg, #FFF9E6 0%, #FFF0D4 100%);
-    border: 3px solid #E6BA7A;
-    box-shadow: 0 6px 12px rgba(141, 90, 40, 0.15), inset 0 2px 4px rgba(255,255,255,0.8);
-}
-.header-title.theme-card h1 {
-    color: #8D5A28;
-    text-shadow: 1px 1px 0px #FFF, 2px 2px 0px rgba(141, 90, 40, 0.2);
-}
-
-/* Scheme 3: 柔和质感 (User favorite - Soft translucent frosted glass badge) */
-.header-title.theme-minimal {
     padding: 12px 10px;
     background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(10px);
@@ -115,7 +60,8 @@ body {
     border: 2.5px solid #FFF;
     box-shadow: 0 8px 18px rgba(52, 152, 219, 0.15), inset 0 1px 2px rgba(255,255,255,0.9);
 }
-.header-title.theme-minimal h1 {
+
+.header-title h1 {
     color: #2C3E50;
     text-shadow: 0 2px 4px rgba(0,0,0,0.12);
 }
@@ -231,78 +177,6 @@ h1 {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-}
-
-/* Theme 2 Illustration Banner */
-.theme-banner-img {
-    width: 100%;
-    max-height: 125px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    border: 2px solid #E6BA7A;
-    box-shadow: 0 4px 10px rgba(141, 90, 40, 0.18);
-}
-
-/* Dog Selector Bar */
-.dog-selector-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    flex-wrap: wrap;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.08);
-    width: 100%;
-}
-
-.selector-label {
-    font-size: 10px;
-    font-weight: bold;
-    color: #7F8C8D;
-    margin-right: 2px;
-}
-
-.dog-pill {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1.5px solid #D6EAF8;
-    border-radius: 16px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: bold;
-    color: #34495E;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    user-select: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.dog-pill-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    flex-shrink: 0;
-}
-
-.dog-pill:hover {
-    background: #EBF5FB;
-    border-color: #3498DB;
-}
-
-.dog-pill.active {
-    background: #3498DB;
-    border-color: #2980B9;
-    color: #FFF;
-    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
-    transform: scale(1.04);
-}
-.dog-pill.active .dog-pill-thumb {
-    border-color: #FFF;
 }
 
 /* Beautiful Glossy Action Buttons */

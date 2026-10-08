@@ -4,55 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=20">
+    <link rel="stylesheet" href="/style.css?v=21">
 </head>
 <body>
     <div class="container">
-        <!-- Top Nav Bar: Theme Demos + Language Toggle -->
+        <!-- Top Nav Bar: Language Toggle -->
         <div class="top-nav-bar">
-            <div class="header-theme-switcher" id="themeSwitcher">
-                <button class="theme-pill" data-theme="arcade">方案1: 街机3D</button>
-                <button class="theme-pill" data-theme="card">方案2: 萌宠插画</button>
-                <button class="theme-pill active" data-theme="minimal">方案3: 柔和质感</button>
-            </div>
             <button id="langToggle">中 / En</button>
         </div>
         
-        <!-- Header Banner Container (Complete figures of both dogs flanking mahjong) -->
-        <header class="header-title theme-minimal" id="headerBanner">
-            <img src="/images/poodle-fluffy-mahjong-banner.jpg" class="theme-banner-img" id="themeBannerImg" alt="麻将萌犬" style="display:none;">
+        <!-- Header Banner Container (Final Design: Complete figures of both dogs flanking mahjong) -->
+        <header class="header-title" id="headerBanner">
             <div class="header-stage">
                 <!-- Left Dog: Full Figure Brown Curly Poodle with Blue Harness -->
                 <div class="stage-dog-wrapper dog-left-wrapper">
                     <img src="/images/poodle-full.png" id="stageDogLeft" class="stage-dog-img" alt="泰迪贵宾">
                 </div>
 
-                <!-- Center Stage: Authentic Mahjong Tiles + Title + Switcher -->
+                <!-- Center Stage: Authentic Mahjong Tiles + Title -->
                 <div class="stage-center">
                     <div class="mahjong-banner-decor">
                         <div class="mahjong-mini-tile red-dragon">中</div>
                         <div class="mahjong-mini-tile green-dragon">發</div>
                     </div>
                     <h1 id="mainTitle" data-i18n="title">麻将计分器</h1>
-                    <!-- Dog Avatar / Scene Switcher -->
-                    <div class="dog-selector-bar" id="dogSelectorBar">
-                        <button class="dog-pill active" data-left="/images/poodle-full.png" data-right="/images/fluffy-full.png" data-name="realDuo">
-                            <img src="/images/poodle-full.png" class="dog-pill-thumb" alt="本命双犬">
-                            <span class="pill-text" data-i18n="realDuo">本命双犬</span>
-                        </button>
-                        <button class="dog-pill" data-left="/images/dog-golden.jpg" data-right="/images/dog-collie.jpg" data-name="goldenCollie">
-                            <img src="/images/dog-golden.jpg" class="dog-pill-thumb" alt="金毛+边牧">
-                            <span class="pill-text" data-i18n="goldenCollie">金毛+边牧</span>
-                        </button>
-                        <button class="dog-pill" data-left="/images/poodle-full.png" data-right="/images/poodle-full.png" data-name="poodle">
-                            <img src="/images/poodle-full.png" class="dog-pill-thumb" alt="泰迪贵宾">
-                            <span class="pill-text" data-i18n="poodle">泰迪贵宾</span>
-                        </button>
-                        <button class="dog-pill" data-left="/images/fluffy-full.png" data-right="/images/fluffy-full.png" data-name="fluffy">
-                            <img src="/images/fluffy-full.png" class="dog-pill-thumb" alt="花色萌宠">
-                            <span class="pill-text" data-i18n="fluffy">花色萌宠</span>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Right Dog: Full Figure White & Tan Fluffy Puppy -->
@@ -77,6 +52,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=20"></script>
+    <script src="/app.js?v=21"></script>
 </body>
 </html>

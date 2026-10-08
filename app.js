@@ -43,15 +43,7 @@ const i18n = {
         unlockPlaceholder: "Enter password",
         unlockBtn: "Unlock",
         wrongPwd: "Incorrect password, please try again",
-        networkError: "Network error, please retry",
-        theme1: "Theme 1: Arcade 3D",
-        theme2: "Theme 2: Cute Pet Card",
-        theme3: "Theme 3: Soft Glass",
-        dogSelectLabel: "Pet Avatar:",
-        realDuo: "Poodle & Pup",
-        goldenCollie: "Golden & Collie",
-        poodle: "Teddy Poodle",
-        fluffy: "Fluffy Pup"
+        networkError: "Network error, please retry"
     },
     zh: {
         title: "麻将计分器",
@@ -88,54 +80,16 @@ const i18n = {
         unlockPlaceholder: "输入密码",
         unlockBtn: "解锁",
         wrongPwd: "密码错误，请重新输入",
-        networkError: "网络错误，请重试",
-        theme1: "方案1: 街机3D",
-        theme2: "方案2: 萌宠插画",
-        theme3: "方案3: 柔和质感",
-        dogSelectLabel: "换萌犬:",
-        realDuo: "本命双犬",
-        goldenCollie: "金毛+边牧",
-        poodle: "泰迪贵宾",
-        fluffy: "花色萌宠"
+        networkError: "网络错误，请重试"
     }
 };
 
 let currentLang = 'zh';
 
-// --- Theme Demo Switcher ---
-function initThemeSwitcher() {
-    const switcher = document.getElementById('themeSwitcher');
-    if (!switcher) return;
-    switcher.addEventListener('click', (e) => {
-        if (e.target.classList.contains('theme-pill')) {
-            const theme = e.target.dataset.theme;
-            switcher.querySelectorAll('.theme-pill').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            headerBanner.className = 'header-title theme-' + theme;
-            const bannerImg = document.getElementById('themeBannerImg');
-            if (bannerImg) {
-                bannerImg.style.display = (theme === 'card') ? 'block' : 'none';
-            }
-            localStorage.setItem('header_theme', theme);
-        }
-    });
-
-    const savedTheme = localStorage.getItem('header_theme') || 'minimal';
-    switcher.querySelectorAll('.theme-pill').forEach(btn => {
-        if (btn.dataset.theme === savedTheme) {
-            btn.click();
-        }
-    });
-}
-
-// --- Dog Avatar Selector Options (Full Figure Pups) ---
-function initDogSelector() {
-    const dogBar = document.getElementById('dogSelectorBar');
-    if (!dogBar) return;
-
-    const leftDog = document.getElementById('stageDogLeft') || document.getElementById('leftDog');
-    const rightDog = document.getElementById('stageDogRight') || document.getElementById('rightDog');
+// --- Interactive Dog Figures Animation (Final Design) ---
+function initDogs() {
+    const leftDog = document.getElementById('stageDogLeft');
+    const rightDog = document.getElementById('stageDogRight');
 
     [leftDog, rightDog].forEach(dogImg => {
         if (dogImg) {
@@ -145,46 +99,6 @@ function initDogSelector() {
             });
         }
     });
-
-    dogBar.addEventListener('click', (e) => {
-        const btn = e.target.closest('.dog-pill');
-        if (btn) {
-            const left = btn.dataset.left;
-            const right = btn.dataset.right;
-            if (leftDog && left) leftDog.src = left;
-            if (rightDog && right) rightDog.src = right;
-
-            dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-
-            if (leftDog) {
-                leftDog.classList.add('bouncing');
-                setTimeout(() => leftDog.classList.remove('bouncing'), 400);
-            }
-            if (rightDog) {
-                rightDog.classList.add('bouncing');
-                setTimeout(() => rightDog.classList.remove('bouncing'), 400);
-            }
-
-            localStorage.setItem('header_dog_left', left);
-            localStorage.setItem('header_dog_right', right);
-            localStorage.setItem('header_dog_name', btn.dataset.name || '');
-        }
-    });
-
-    const savedLeft = localStorage.getItem('header_dog_left');
-    const savedRight = localStorage.getItem('header_dog_right');
-    const savedName = localStorage.getItem('header_dog_name');
-    if (savedLeft && savedRight) {
-        if (leftDog) leftDog.src = savedLeft;
-        if (rightDog) rightDog.src = savedRight;
-        dogBar.querySelectorAll('.dog-pill').forEach(btn => {
-            if (btn.dataset.name === savedName || (btn.dataset.left === savedLeft && btn.dataset.right === savedRight)) {
-                dogBar.querySelectorAll('.dog-pill').forEach(p => p.classList.remove('active'));
-                btn.classList.add('active');
-            }
-        });
-    }
 }
 
 function toggleLanguage() {
@@ -225,23 +139,6 @@ function toggleLanguage() {
     if (lockedStatusSpan) {
         lockedStatusSpan.innerText = i18n[currentLang].lockedStatus;
     }
-
-    // Update theme switcher pills
-    const pill1 = document.querySelector('.theme-pill[data-theme="arcade"]');
-    if (pill1) pill1.innerText = i18n[currentLang].theme1;
-    const pill2 = document.querySelector('.theme-pill[data-theme="card"]');
-    if (pill2) pill2.innerText = i18n[currentLang].theme2;
-    const pill3 = document.querySelector('.theme-pill[data-theme="minimal"]');
-    if (pill3) pill3.innerText = i18n[currentLang].theme3;
-    const dogSelectLabel = document.getElementById('dogSelectLabel');
-    if (dogSelectLabel) dogSelectLabel.innerText = i18n[currentLang].dogSelectLabel;
-
-    document.querySelectorAll('.dog-pill .pill-text').forEach(span => {
-        const key = span.dataset.i18n;
-        if (key && i18n[currentLang][key]) {
-            span.innerText = i18n[currentLang][key];
-        }
-    });
     
     // Update dynamic round texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
@@ -964,8 +861,7 @@ setInterval(async () => {
 }, 3000);
 
 // Initialize everything
-initThemeSwitcher();
-initDogSelector();
+initDogs();
 checkRoom();
 
 function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
