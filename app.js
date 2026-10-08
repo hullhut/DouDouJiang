@@ -118,21 +118,17 @@ function initDogs() {
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     
+    // Update header banner image according to language
+    const headerBannerImg = document.getElementById('headerBannerImg');
+    if (headerBannerImg) {
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.jpg?v=27' : '/images/header-zh.jpg?v=27';
+        headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
+    }
+
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
     document.title = i18n[currentLang].docTitle;
     startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
-
-    // Update plaque subtitle in English
-    const plaqueSubTitle = document.getElementById('plaqueSubTitle');
-    if (plaqueSubTitle) {
-        if (currentLang === 'en') {
-            plaqueSubTitle.style.display = 'inline-block';
-            plaqueSubTitle.innerText = 'Mahjong Score Tracker';
-        } else {
-            plaqueSubTitle.style.display = 'none';
-        }
-    }
     
     const clearAllBtn = document.getElementById('clearAllBtn');
     if (clearAllBtn) {
