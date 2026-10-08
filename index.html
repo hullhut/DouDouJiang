@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=24">
+    <link rel="stylesheet" href="/style.css?v=25">
 </head>
 <body>
     <div class="container">
@@ -13,10 +13,20 @@
             <button id="langToggle">中 / En</button>
         </div>
         
-        <!-- Header Banner Container (Option 3: Transparent Cutout Flanking Dogs & Mahjong Rack) -->
+        <!-- Scheme Preview Selector Bar -->
+        <div class="scheme-preview-bar" id="schemePreviewBar">
+            <span class="preview-label">🎨 方案预览：</span>
+            <div class="scheme-btn-group">
+                <button class="scheme-btn active" data-scheme="1" id="btnScheme1">方案一 (客厅)</button>
+                <button class="scheme-btn" data-scheme="2" id="btnScheme2">方案二 (天蓝)</button>
+                <button class="scheme-btn" data-scheme="3" id="btnScheme3">方案三 (暖杏)</button>
+            </div>
+        </div>
+
+        <!-- Header Banner Container (Option 3: Framed Card Banner with Flanking Dogs & Mahjong Rack) -->
         <header class="header-banner-container" id="headerBanner">
             <div class="banner-wrapper" id="bannerWrapper">
-                <img src="/images/header-option3-transparent.png?v=24" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
+                <img src="/images/header-scheme1-home.jpg" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
                 <!-- Interactive Hotspots for Poodle, Fluffy Pup and Title -->
                 <div class="pet-hotspot hotspot-left-poodle" id="hotspotLeftPoodle" title="泰迪贵宾"></div>
                 <div class="pet-hotspot hotspot-right-fluffy" id="hotspotRightFluffy" title="花色小狗"></div>
@@ -42,6 +52,6 @@
             </div>
         </main>
     </div>
-    <script src="/app.js?v=24"></script>
+    <script src="/app.js?v=25"></script>
 </body>
 </html>
