@@ -48,11 +48,10 @@ const i18n = {
         theme2: "Theme 2: Cute Pet Card",
         theme3: "Theme 3: Soft Glass",
         dogSelectLabel: "Pet Avatar:",
-        golden: "Golden",
-        collie: "Collie",
-        corgi: "Corgi",
-        shiba: "Shiba",
-        duo: "Golden+Collie"
+        realDuo: "Poodle & Pup",
+        goldenCollie: "Golden & Collie",
+        poodle: "Teddy Poodle",
+        fluffy: "Fluffy Pup"
     },
     zh: {
         title: "麻将计分器",
@@ -94,11 +93,10 @@ const i18n = {
         theme2: "方案2: 萌宠插画",
         theme3: "方案3: 柔和质感",
         dogSelectLabel: "换萌犬:",
-        golden: "金毛",
-        collie: "边牧",
-        corgi: "柯基",
-        shiba: "柴犬",
-        duo: "金毛+边牧"
+        realDuo: "本命双犬",
+        goldenCollie: "金毛+边牧",
+        poodle: "泰迪贵宾",
+        fluffy: "花色萌宠"
     }
 };
 
@@ -131,13 +129,13 @@ function initThemeSwitcher() {
     });
 }
 
-// --- Dog Avatar Selector Options (Cartoon Illustrated Pups) ---
+// --- Dog Avatar Selector Options (Full Figure Pups) ---
 function initDogSelector() {
     const dogBar = document.getElementById('dogSelectorBar');
     if (!dogBar) return;
 
-    const leftDog = document.getElementById('leftDog');
-    const rightDog = document.getElementById('rightDog');
+    const leftDog = document.getElementById('stageDogLeft') || document.getElementById('leftDog');
+    const rightDog = document.getElementById('stageDogRight') || document.getElementById('rightDog');
 
     [leftDog, rightDog].forEach(dogImg => {
         if (dogImg) {
