@@ -885,42 +885,8 @@ setInterval(async () => {
     } catch(e) {}
 }, 3000);
 
-function initSchemeSelector() {
-    const schemeMap = {
-        '1': '/images/header-scheme1-home.jpg',
-        '2': '/images/header-scheme2-card.png',
-        '3': '/images/header-scheme3-card.png'
-    };
-    const headerBannerImg = document.getElementById('headerBannerImg');
-    const buttons = document.querySelectorAll('.scheme-btn');
-    
-    const savedScheme = localStorage.getItem('doudoujiang_header_scheme') || '1';
-    
-    function setScheme(schemeId) {
-        if (!schemeMap[schemeId] || !headerBannerImg) return;
-        headerBannerImg.src = schemeMap[schemeId];
-        buttons.forEach(btn => {
-            if (btn.dataset.scheme === schemeId) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-        localStorage.setItem('doudoujiang_header_scheme', schemeId);
-    }
-    
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            setScheme(btn.dataset.scheme);
-        });
-    });
-    
-    setScheme(savedScheme);
-}
-
 // Initialize everything
 initDogs();
-initSchemeSelector();
 checkRoom();
 
 function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
