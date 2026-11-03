@@ -179,7 +179,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=34' : '/images/header-zh.png?v=34';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=35' : '/images/header-zh.png?v=35';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -917,31 +917,37 @@ function renderCurrentGamePanel(gameId) {
         let lbHtml = '';
         const rankBadges = ['🥇', '🥈', '🥉', '4️⃣'];
         leaderboard.forEach((p, idx) => {
-            const badge = rankBadges[idx] || `${idx + 1}`;
+            const rank = idx + 1;
             const colorClass = p.money >= 0 ? 'positive' : 'negative';
             const sign = p.money > 0 ? '+' : '';
-            const winnerBadge = p.isWinner ? `<span class="winner-crown">👑</span>` : '';
-            const cardClass = p.isWinner ? 'game-rank-card is-winner' : 'game-rank-card';
+            const winnerBadge = p.isWinner 
+                ? `<span class="winner-crown">👑</span><span class="winner-label">${currentLang === 'en' ? 'Game Winner' : '当局赢家'}</span>` 
+                : '';
+            const itemClass = p.isWinner ? 'leaderboard-item is-winner' : 'leaderboard-item';
             const dirName = i18n[currentLang][p.dir === '东' ? 'east' : p.dir === '南' ? 'south' : p.dir === '西' ? 'west' : 'north'];
 
             const netSign = p.netTigers > 0 ? '+' : '';
             const netColorClass = p.netTigers > 0 ? 'pos' : (p.netTigers < 0 ? 'neg' : 'zero');
-            const tigersText = currentLang === 'en' ? `Total: ${p.tigers}` : `共 ${p.tigers} 虎`;
-            const netText = currentLang === 'en' ? `Net: ${netSign}${p.netTigers}` : `净胜: ${netSign}${p.netTigers} 虎`;
-            const moneyText = currentLang === 'en' ? `${sign}${p.money}` : `${sign}${p.money} 元`;
+            const tigersText = currentLang === 'en' ? `Total: ${p.tigers}` : `总抓虎: ${p.tigers} 虎`;
+            const netText = currentLang === 'en' ? `Net: ${netSign}${p.netTigers}` : `净胜虎: ${netSign}${p.netTigers} 虎`;
 
             lbHtml += `
-                <div class="${cardClass}">
-                    <div class="game-rank-badge">${badge}</div>
-                    <div class="game-rank-player">
-                        <span>${p.alias}</span>
-                        <span style="font-size:11px; color:#7F8C8D; font-weight:normal;">(${dirName})</span>
-                        ${winnerBadge}
+                <div class="${itemClass}">
+                    <div class="leader-rank rank-${rank}">${rank}</div>
+                    <div class="leader-info">
+                        <div class="leader-name-row">
+                            <span class="leader-name">${p.alias}</span>
+                            <span class="game-dir-tag">(${dirName})</span>
+                            ${winnerBadge}
+                        </div>
+                        <div class="leader-sub">
+                            <span>${tigersText}</span>
+                            <span style="margin: 0 4px; color: #BDC3C7;">|</span>
+                            <span class="${netColorClass}" style="font-weight: 800;">${netText}</span>
+                        </div>
                     </div>
-                    <div class="game-rank-stats">
-                        <span class="game-rank-tigers" title="累计抓虎">🐅 ${tigersText}</span>
-                        <span class="game-rank-net-tigers ${netColorClass}" title="净胜虎数">${netText}</span>
-                        <span class="game-rank-money score-val ${colorClass}">${moneyText}</span>
+                    <div class="leader-score score-val ${colorClass}">
+                        ${sign}${p.money} <span style="font-size:13px;">${currentLang === 'en' ? '' : '元'}</span>
                     </div>
                 </div>
             `;
@@ -960,19 +966,24 @@ function renderCurrentGamePanel(gameId) {
 
             const netSign = item.netTigers > 0 ? '+' : '';
             const netColorClass = item.netTigers > 0 ? 'pos' : (item.netTigers < 0 ? 'neg' : 'zero');
-            const rawLabel = currentLang === 'en' ? `Total: ${item.tigers}` : `共抓: ${item.tigers} 虎`;
-            const netTag = currentLang === 'en' ? `Net: ${netSign}${item.netTigers}` : `净胜: ${netSign}${item.netTigers} 虎`;
+            const rawLabel = currentLang === 'en' ? `Total: ${item.tigers}` : `总抓虎: ${item.tigers} 虎`;
+            const netTag = currentLang === 'en' ? `Net: ${netSign}${item.netTigers}` : `净胜虎: ${netSign}${item.netTigers} 虎`;
 
             formulaHtml += `
                 <div class="single-calc-card row-${item.dir}">
                     <div class="calc-card-top">
-                        <div class="calc-player-name">
-                            <span>${item.alias} (${dirName})</span>
-                            <span class="calc-tigers-tag">${rawLabel}</span>
-                            <span class="calc-net-tag ${netColorClass}">${netTag}</span>
+                        <div class="calc-player-info">
+                            <div class="calc-player-title-row">
+                                <span class="calc-player-name">${item.alias}</span>
+                                <span class="calc-player-dir">(${dirName})</span>
+                            </div>
+                            <div class="calc-tigers-sub">
+                                <span class="calc-tigers-tag">${rawLabel}</span>
+                                <span class="calc-net-tag ${netColorClass}">${netTag}</span>
+                            </div>
                         </div>
                         <div class="calc-money-tag score-val ${colorClass}">
-                            ${sign}${item.money} ${currentLang === 'en' ? '' : '元'}
+                            ${sign}${item.money} <span style="font-size:13px;">${currentLang === 'en' ? '' : '元'}</span>
                         </div>
                     </div>
                     <div class="calc-formula-box">
