@@ -167,6 +167,15 @@
 - `functions/api/game.js`：对局状态拉取与推送（绑定 Cloudflare D1 `doudoujiang-db`）。
 - `functions/mj/[[roomPath]].js`：多级房间路由重定向至主页。
 
+### 6.3 部署机制与环境说明
+- **托管服务**：Cloudflare Pages (`doudoujiang.pages.dev`)
+- **部署模式**：Direct Upload 直接上传模式（非 GitHub 自动 Webhook 触发）。
+- **一键部署脚本**：项目根目录下提供 `deploy.ps1`，直接运行即可自动打包上传并即刻全球生效：
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\deploy.ps1
+  ```
+- **配置与鉴权**：本地私有凭据保存在 `.env.local`（已加入 `.gitignore` 严禁提交），脚本会自动读取 `CLOUDFLARE_API_KEY` 与 `CLOUDFLARE_EMAIL`。
+
 ---
 
 ## 7. 下个对话开发行动清单
@@ -180,5 +189,6 @@
 2. **第二步（生成预览图）**：
    - 将精修后的透明主体渲染在浅蓝主页面上，生成实机整页截图（390px 移动端视角）。
    - 创建 Markdown Artifact 并附带预览图供用户审阅确认。
-3. **第三步（用户确认后推送）**：
-   - 用户点头确认整体融合感与精细度后，再执行 `git commit` 与 `git push origin main` 触发 Cloudflare 生产环境自动部署。
+3. **第三步（用户确认后推送并发布上线）**：
+   - 用户点头确认整体融合感与精细度后，执行 `git commit` 与 `git push origin main` 保存版本；
+   - 运行 `powershell -ExecutionPolicy Bypass -File .\deploy.ps1` 将最新版本发布至 Cloudflare Pages 生产环境。
