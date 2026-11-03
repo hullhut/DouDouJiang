@@ -20,13 +20,51 @@ body {
     width: 100%;
 }
 
-/* --- Top Navigation Bar: Language Toggle on the Right --- */
+/* --- Top Navigation Bar: Share Link (Left) & Language Toggle (Right) --- */
 .top-nav-bar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
     width: 100%;
+    padding: 0 2px;
+}
+
+.share-link-pill {
+    background: #FFFFFF;
+    border: 2px solid #2ECC71;
+    color: #27AE60;
+    padding: 4px 13px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #219653, 0 3px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.share-link-pill:hover {
+    background: #E8F8F5;
+}
+
+.share-link-pill:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #219653;
+}
+
+.share-link-pill .share-icon {
+    font-size: 13px;
+    line-height: 1;
+}
+
+.share-link-pill .share-text {
+    font-size: 12.5px;
+    font-weight: 800;
 }
 
 #langToggle {
@@ -231,11 +269,10 @@ h1 {
     max-width: 100%;
 }
 
-/* Beautiful Glossy Action Buttons */
 /* Beautiful Glossy Action Buttons (Equal Width with Header & Bottom) */
 .action-buttons {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
     margin-bottom: 16px;
     justify-content: center;
@@ -247,22 +284,30 @@ h1 {
     flex: 1;
     min-width: 0;
     border-radius: 36px;
-    padding: 10px 4px;
-    font-size: clamp(12px, 3.4vw, 15px);
+    padding: 8px 3px;
+    font-size: clamp(11px, 2.9vw, 14px);
     font-weight: 900;
     color: white;
     cursor: pointer;
     text-align: center;
-    text-transform: uppercase;
+    text-transform: none;
     transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
-    border: 2.5px solid #FFF;
+    border: 2px solid #FFF;
     user-select: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 2px;
     box-sizing: border-box;
     white-space: nowrap;
+    letter-spacing: -0.2px;
+}
+
+/* English Mode specific sizing adjustments to prevent text overflow */
+body.lang-en .header-buttons button {
+    font-size: clamp(10px, 2.5vw, 12.5px);
+    padding: 8px 2px;
+    letter-spacing: -0.3px;
 }
 
 .btn-icon {
@@ -1429,4 +1474,50 @@ h1 {
 .view-game-results-btn:active {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #1F618D;
+}
+
+/* Modern Floating Toast Notification */
+.app-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 99999;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
+    padding: 10px 22px;
+    border-radius: 50px;
+    box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.app-toast.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-25px);
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.app-toast .toast-icon {
+    font-size: 16px;
+    line-height: 1;
+    animation: toastPop 0.4s ease-out;
+}
+
+@keyframes toastPop {
+    0% { transform: scale(0.6) rotate(-20deg); }
+    50% { transform: scale(1.25) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
 }

@@ -18,7 +18,7 @@ const i18n = {
         gameEndedBadge: "Game Settled ✅",
         viewGrand: "Leaderboard 👑",
         clearAll: "Clear All",
-        confirmClearAll: "Sure to Clear All?",
+        confirmClearAll: "Sure to Clear?",
         gameTitle: "Game {n}",
         statusInProgress: "In Progress",
         statusEnded: "Settled",
@@ -60,11 +60,11 @@ const i18n = {
         west: "West",
         north: "North",
         roomLabel: "🏠 Room: ",
-        shareLink: "🔗 Share Link",
+        shareLink: "Share Link",
         pwdPlaceholder: "Set Room Password (Optional)",
         lockRoom: "🔒 Lock Room",
         lockedStatus: "🔒 Protected",
-        linkCopied: "Room link copied to clipboard!",
+        linkCopied: "Room link copied! Share with friends.",
         enterPwdAlert: "Please enter password",
         pwdFailedAlert: "Failed to set password: ",
         lockedTitle: "🔒 Protected Room",
@@ -84,7 +84,7 @@ const i18n = {
         gameEndedBadge: "局已结束 ✅",
         viewGrand: "全场总榜 👑",
         clearAll: "全部清空",
-        confirmClearAll: "确认清空全部对局？",
+        confirmClearAll: "确认全清？",
         gameTitle: "第 {n} 局",
         statusInProgress: "进行中",
         statusEnded: "已结束",
@@ -126,11 +126,11 @@ const i18n = {
         west: "西",
         north: "北",
         roomLabel: "🏠 房间: ",
-        shareLink: "🔗 邀请牌友",
+        shareLink: "分享链接",
         pwdPlaceholder: "设置房间密码(非必填)",
         lockRoom: "🔒 锁定房间",
         lockedStatus: "🔒 已加密",
-        linkCopied: "房间链接已复制！",
+        linkCopied: "房间链接已复制，快发给牌友吧！",
         enterPwdAlert: "请输入密码",
         pwdFailedAlert: "密码设置失败: ",
         lockedTitle: "🔒 房间已加密",
@@ -176,10 +176,13 @@ function initDogs() {
 function toggleLanguage() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
     
+    // Scoped CSS helper for English mode
+    document.body.classList.toggle('lang-en', currentLang === 'en');
+    
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=35' : '/images/header-zh.png?v=35';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=36' : '/images/header-zh.png?v=36';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -193,6 +196,12 @@ function toggleLanguage() {
     }
     if (clearAllBtn) {
         clearAllBtn.innerHTML = clearAllBtn.dataset.confirm === "true" ? i18n[currentLang].confirmClearAll : i18n[currentLang].clearAll;
+    }
+
+    // Update Top Bar Share Link pill
+    const shareLinkText = document.getElementById('shareLinkText');
+    if (shareLinkText) {
+        shareLinkText.innerText = i18n[currentLang].shareLink;
     }
 
     // Update Room Bar texts
@@ -1245,6 +1254,10 @@ async function checkRoom() {
     if (roomCodeDisplay) {
         roomCodeDisplay.addEventListener('click', copyLink);
     }
+    const shareLinkBtn = document.getElementById('shareLinkBtn');
+    if (shareLinkBtn) {
+        shareLinkBtn.addEventListener('click', copyLink);
+    }
     
     const headerBtns = document.querySelector('.header-buttons');
     const roomInfo = document.createElement('div');
@@ -1347,12 +1360,40 @@ window.unlockRoom = async function() {
     }
 };
 
-// Clipboard copy with fallback (Bug 9)
+// --- Modern Floating Toast Notification ---
+let toastTimeout = null;
+function showToast(message, icon = '✨', duration = 2500) {
+    const toast = document.getElementById('appToast');
+    const toastText = document.getElementById('toastText');
+    const toastIcon = document.getElementById('toastIcon');
+    if (!toast || !toastText) {
+        alert(message);
+        return;
+    }
+
+    if (toastIcon && icon) {
+        toastIcon.innerText = icon;
+    }
+    toastText.innerText = message;
+
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+        toastTimeout = null;
+    }
+
+    toast.classList.remove('hidden');
+
+    toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+    }, duration);
+}
+
+// Clipboard copy with fallback and modern Toast
 function copyLink() {
     const text = window.location.href;
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
-            alert(i18n[currentLang].linkCopied);
+            showToast(i18n[currentLang].linkCopied, '✨', 2500);
         }).catch(() => fallbackCopy(text));
     } else {
         fallbackCopy(text);
@@ -1371,7 +1412,7 @@ function fallbackCopy(text) {
     try {
         const successful = document.execCommand('copy');
         if (successful) {
-            alert(i18n[currentLang].linkCopied);
+            showToast(i18n[currentLang].linkCopied, '✨', 2500);
         } else {
             prompt(i18n[currentLang].shareLink, text);
         }
@@ -1603,6 +1644,11 @@ setInterval(async () => {
 // Initialize Page
 document.addEventListener('DOMContentLoaded', () => {
     initDogs();
+    document.body.classList.toggle('lang-en', currentLang === 'en');
+    const shareLinkBtn = document.getElementById('shareLinkBtn');
+    if (shareLinkBtn) {
+        shareLinkBtn.addEventListener('click', copyLink);
+    }
     checkRoom();
     
     // If not in a room and no game cards exist, create first game card automatically

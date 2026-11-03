@@ -4,24 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 豆豆酱麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=35">
+    <link rel="stylesheet" href="/style.css?v=36">
 </head>
 <body>
     <div class="app-container">
-        <!-- Top bar with Language Switcher and Room Code Display -->
+        <!-- Top bar with Language Switcher and Share Link -->
         <div class="top-nav-bar">
-            <div class="room-code-tag" id="roomCodeDisplay" title="点击复制房间链接">
-                <span class="room-icon">🔗</span>
-                <span class="room-label">房间号:</span>
-                <span class="room-value" id="roomCodeText">加载中...</span>
-            </div>
+            <button class="share-link-pill" id="shareLinkBtn" title="点击复制房间链接分享给牌友">
+                <span class="share-icon">🔗</span>
+                <span class="share-text" id="shareLinkText" data-i18n="shareLink">分享链接</span>
+            </button>
             <button class="lang-toggle-pill" id="langToggle" title="切换中英文 / Switch Language">En / 中</button>
         </div>
         
         <!-- Header Banner Container (Dual Language Flanking Dogs & Mahjong Rack) -->
         <header class="header-banner-container" id="headerBanner">
             <div class="banner-wrapper" id="bannerWrapper">
-                <img src="/images/header-zh.png?v=35" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
+                <img src="/images/header-zh.png?v=36" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
                 <!-- Interactive Hotspots for Poodle, Fluffy Pup and Title -->
                 <div class="pet-hotspot hotspot-left-poodle" id="hotspotLeftPoodle" title="泰迪贵宾"></div>
                 <div class="pet-hotspot hotspot-right-fluffy" id="hotspotRightFluffy" title="花色小狗"></div>
@@ -103,7 +102,13 @@
         </div>
     </div>
 
-    <script src="/scoring.js?v=35"></script>
-    <script src="/app.js?v=35"></script>
+    <!-- 现代化浮动提示 (Toast Notification) -->
+    <div id="appToast" class="app-toast hidden" role="status" aria-live="polite">
+        <span class="toast-icon" id="toastIcon">✨</span>
+        <span class="toast-text" id="toastText">房间链接已复制，快发给牌友吧！</span>
+    </div>
+
+    <script src="/scoring.js?v=36"></script>
+    <script src="/app.js?v=36"></script>
 </body>
 </html>
