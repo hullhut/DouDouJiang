@@ -47,6 +47,8 @@ function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
  */
 function calculateGameDetails(handsMap, unit, dirs = ['东', '西', '南', '北'], aliases = {}) {
     let rawSums = {};
+    const unitVal = parseFloat(unit) || 0.5;
+
     dirs.forEach(dir => {
         const val = handsMap[dir];
         if (Array.isArray(val)) {
@@ -54,28 +56,35 @@ function calculateGameDetails(handsMap, unit, dirs = ['东', '西', '南', '北'
         } else {
             rawSums[dir] = parseFloat(val) || 0;
         }
+        rawSums[dir] = Math.round(rawSums[dir] * 100) / 100;
     });
 
-    const scores = calculateScores(rawSums, unit, dirs);
+    const scores = calculateScores(rawSums, unitVal, dirs);
+    const seatOrder = ['东', '南', '西', '北'];
+
     const details = dirs.map(dir => {
         const ownTigers = rawSums[dir];
+        const otherDirs = seatOrder.filter(d => dirs.includes(d) && d !== dir);
+        const othersList = otherDirs.map(other => rawSums[other]);
+        const othersBreakdown = othersList.map(n => Math.round(n * 100) / 100).join(' - ');
         let othersSum = 0;
-        dirs.forEach(other => {
-            if (other !== dir) {
-                othersSum += rawSums[other];
-            }
-        });
+        othersList.forEach(v => { othersSum += v; });
+        othersSum = Math.round(othersSum * 100) / 100;
         
-        const netTigers = ownTigers * 3 - othersSum;
+        const netTigers = Math.round((ownTigers * 3 - othersSum) * 100) / 100;
         const finalMoney = scores[dir];
         const sign = finalMoney > 0 ? '+' : '';
-        // 按照用户要求生成的完整计算过程公式字符串: ((本人总虎数*3-其他人虎数之和)*单位)
-        const formula = `((${ownTigers} × 3 - ${othersSum}) × ${unit}) = ${sign}${finalMoney} 元`;
+        const ownTigersFormatted = Math.round(ownTigers * 100) / 100;
+        
+        // 用户指定精简计算过程公式: ((本人虎数*3 - 他人1 - 他人2 - 他人3) * 单位) = +/-金额 元
+        const formula = `((${ownTigersFormatted}*3 - ${othersBreakdown}) * ${unitVal}) = ${sign}${finalMoney} 元`;
 
         return {
             dir,
             alias: (aliases[dir] && aliases[dir].trim()) ? aliases[dir].trim() : dir,
             tigers: ownTigers,
+            othersList,
+            othersBreakdown,
             othersSum,
             netTigers,
             money: finalMoney,

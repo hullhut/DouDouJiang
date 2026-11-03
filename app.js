@@ -22,16 +22,21 @@ const i18n = {
         gameTitle: "Game {n}",
         statusInProgress: "In Progress",
         statusEnded: "Settled",
-        addHand: "➕ Add Hand",
+        addHand: "➕ Next Hand",
         handPlaceholder: "H{n}",
         aliasPlaceholder: "Player Alias",
         scorePlaceholder: "Score",
         rowTotalTigers: "{n} Tigers",
         unitText: "Unit (Yuan/Tiger)",
-        saveGame: "💾 Save Records",
-        modifyGame: "✏️ Edit Records",
+        saveHand: "💾 Save Hand",
+        saveChanges: "💾 Save Changes",
+        handSavedTag: "Hand Saved ✅",
+        saveGame: "💾 Save Game",
+        modifyGame: "✏️ Edit Game",
         clearGame: "🔄 Reset Game",
         confirmClearGame: "Sure to Reset?",
+        saveHandFirstTip: "Please save this hand before adding the next one!",
+        calcProcessLabel: "Calculation = ",
         viewGameResults: "📊 View Results & Rank",
         modalTitle: "🀄 Settlement & Leaderboard",
         tabCurrentGame: "🀄 Current Game Results",
@@ -83,16 +88,21 @@ const i18n = {
         gameTitle: "第 {n} 局",
         statusInProgress: "进行中",
         statusEnded: "已结束",
-        addHand: "➕ 记新一把",
+        addHand: "➕ 再记一把",
         handPlaceholder: "把{n}",
         aliasPlaceholder: "玩家昵称",
         scorePlaceholder: "虎数",
         rowTotalTigers: "共 {n} 虎",
         unitText: "计分单位 (元/虎)",
-        saveGame: "💾 保存记录",
-        modifyGame: "✏️ 修改记录",
+        saveHand: "💾 保存这把",
+        saveChanges: "💾 保存修改",
+        handSavedTag: "已保存这把 ✅",
+        saveGame: "💾 保存本局",
+        modifyGame: "✏️ 修改本局",
         clearGame: "🔄 重置本局",
         confirmClearGame: "确认重置？",
+        saveHandFirstTip: "请先保存这把，再记新一把！",
+        calcProcessLabel: "计算过程 = ",
         viewGameResults: "📊 查看本局结算与排行",
         modalTitle: "🀄 结算与排行榜",
         tabCurrentGame: "🀄 当局结算与排行",
@@ -169,7 +179,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=32' : '/images/header-zh.png?v=32';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=33' : '/images/header-zh.png?v=33';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -218,15 +228,6 @@ function toggleLanguage() {
         const gameId = gameDiv.dataset.game || gameDiv.id.replace('round-', '').replace('game-', '');
         const titleSpan = gameDiv.querySelector('.round-header-title');
         if (titleSpan) titleSpan.innerText = i18n[currentLang].gameTitle.replace('{n}', gameId);
-        
-        const isEnded = gameDiv.classList.contains('is-ended');
-        const statusBadge = gameDiv.querySelector('.game-status-badge');
-        if (statusBadge) {
-            statusBadge.innerText = isEnded ? i18n[currentLang].statusEnded : i18n[currentLang].statusInProgress;
-        }
-
-        const addHandBtn = gameDiv.querySelector('.round-plus-btn');
-        if (addHandBtn) addHandBtn.innerText = i18n[currentLang].addHand;
 
         gameDiv.querySelectorAll('.player-row').forEach(row => {
             const aliasInput = row.querySelector('.player-alias');
@@ -242,23 +243,6 @@ function toggleLanguage() {
         const unitTextNode = gameDiv.querySelector('.unit-text-label');
         if (unitTextNode) unitTextNode.innerText = i18n[currentLang].unitText;
 
-        const saveBtn = gameDiv.querySelector('.save-round-btn');
-        if (saveBtn) saveBtn.innerHTML = i18n[currentLang].saveGame;
-        
-        const modifyBtn = gameDiv.querySelector('.modify-round-btn');
-        if (modifyBtn) modifyBtn.innerHTML = i18n[currentLang].modifyGame;
-
-        const endBtn = gameDiv.querySelector('.end-game-btn');
-        if (endBtn) {
-            if (isEnded) {
-                endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
-            } else if (endBtn.dataset.confirm === "true") {
-                endBtn.innerHTML = i18n[currentLang].confirmEndGame.replace('{n}', gameId);
-            } else {
-                endBtn.innerHTML = i18n[currentLang].endGame;
-            }
-        }
-
         const viewResultsBtn = gameDiv.querySelector('.view-game-results-btn');
         if (viewResultsBtn) viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
 
@@ -268,6 +252,8 @@ function toggleLanguage() {
                 ? `🔄 ${i18n[currentLang].confirmClearGame}` 
                 : `🔄 ${i18n[currentLang].clearGame}`;
         }
+
+        updateGameHandState(gameDiv);
     });
 }
 
@@ -352,8 +338,10 @@ function createGameRound(autoScroll = true) {
     gameDiv.id = `game-${gameId}`;
     gameDiv.dataset.game = gameId;
     gameDiv.dataset.round = gameId; // 保持向后兼容
+    gameDiv.dataset.handSaved = "false";
+    gameDiv.dataset.isEditing = "false";
     
-    // 局卡片头部：局数标题 + 状态徽章 + 【➕ 记新一把】按钮（原抓虎位置）
+    // 局卡片头部：局数标题 + 状态徽章 + 【➕ 再记一把】按钮
     const header = document.createElement('div');
     header.className = 'round-header';
 
@@ -372,29 +360,41 @@ function createGameRound(autoScroll = true) {
 
     header.appendChild(headerLeft);
 
-    // 【➕ 记新一把】按钮：每打完一把洗牌，按一次即为当前局所有玩家追加这一把的虎数框
+    // 【➕ 再记一把】按钮：每打完一把洗牌，按一次为所有玩家追加这一把的虎数框（必须保存这把后才能再记一把）
     const addHandBtn = document.createElement('button');
     addHandBtn.className = 'round-plus-btn';
     addHandBtn.innerText = i18n[currentLang].addHand;
-    addHandBtn.title = "打完一把洗牌，追加这一把的虎数录入框";
+    addHandBtn.title = i18n[currentLang].saveHandFirstTip;
     addHandBtn.onclick = () => {
         if (gameDiv.classList.contains('is-ended')) return;
-        // 如果已保存，先自动解除锁定以便输入新把
-        if (gameDiv.classList.contains('is-saved')) {
-            unlockGameForEdit(gameDiv);
+        if (gameDiv.dataset.handSaved !== "true") {
+            alert(i18n[currentLang].saveHandFirstTip);
+            return;
         }
         
         // 计算当前是第几把
         const anyList = gameDiv.querySelector('.player-row .tiger-list');
         const nextHandIndex = anyList ? anyList.querySelectorAll('.tiger-input').length + 1 : 1;
 
-        gameDiv.querySelectorAll('.player-row').forEach(row => {
+        let firstNewInp = null;
+        gameDiv.querySelectorAll('.player-row').forEach((row, rIdx) => {
             const list = row.querySelector('.tiger-list');
             if (list) {
-                list.appendChild(createTigerInput(nextHandIndex));
+                const newInp = createTigerInput(nextHandIndex);
+                list.appendChild(newInp);
+                if (rIdx === 0) firstNewInp = newInp;
                 updateRowTotalTigers(row);
             }
         });
+
+        // 追加新的一把后，该新把进入未保存状态
+        gameDiv.dataset.handSaved = "false";
+        gameDiv.dataset.isEditing = "false";
+        updateGameHandState(gameDiv);
+
+        if (firstNewInp) {
+            setTimeout(() => firstNewInp.focus(), 60);
+        }
         triggerSync();
     };
     header.appendChild(addHandBtn);
@@ -482,21 +482,35 @@ function createGameRound(autoScroll = true) {
     const actionsRow1 = document.createElement('div');
     actionsRow1.className = 'footer-actions-row1';
 
-    // 【💾 保存记录】按钮
+    // 【💾 保存这把】/【💾 保存修改】按钮
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-round-btn';
-    saveBtn.innerHTML = i18n[currentLang].saveGame;
+    saveBtn.innerHTML = i18n[currentLang].saveHand;
     saveBtn.onclick = () => {
-        saveGameRecords(gameDiv);
+        if (gameDiv.dataset.isEditing === "true") {
+            // 完成修改本局：保存修改
+            gameDiv.dataset.isEditing = "false";
+            gameDiv.dataset.handSaved = "true";
+        } else {
+            // 保存当前把
+            gameDiv.dataset.handSaved = "true";
+        }
+        updateGameHandState(gameDiv);
+        triggerSync();
     };
     actionsRow1.appendChild(saveBtn);
 
-    // 【✏️ 修改记录】按钮 (保存后解锁用)
+    // 【✏️ 修改本局】按钮 (随时可解锁之前所有把进行修改)
     const modifyBtn = document.createElement('button');
-    modifyBtn.className = 'modify-round-btn hidden';
+    modifyBtn.className = 'modify-round-btn';
     modifyBtn.innerHTML = i18n[currentLang].modifyGame;
     modifyBtn.onclick = () => {
-        unlockGameForEdit(gameDiv);
+        if (gameDiv.classList.contains('is-ended')) {
+            gameDiv.classList.remove('is-ended');
+        }
+        gameDiv.dataset.isEditing = "true";
+        updateGameHandState(gameDiv);
+        triggerSync();
     };
     actionsRow1.appendChild(modifyBtn);
 
@@ -545,6 +559,8 @@ function createGameRound(autoScroll = true) {
         if (endGameBtn.dataset.confirm === "true") {
             endGameBtn.dataset.confirm = "false";
             endGameBtn.classList.remove('confirming');
+            gameDiv.dataset.handSaved = "true";
+            gameDiv.dataset.isEditing = "false";
             endSpecificGame(gameDiv);
         } else {
             endGameBtn.dataset.confirm = "true";
@@ -581,6 +597,9 @@ function createGameRound(autoScroll = true) {
 
     gameRoundsContainer.appendChild(gameDiv);
 
+    // 初始化卡片内输入框及按钮的可用/置灰状态
+    updateGameHandState(gameDiv);
+
     if (autoScroll) {
         gameDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -590,21 +609,153 @@ function createGameRound(autoScroll = true) {
 }
 
 /**
+ * 刷新单局卡片内的输入框与按钮状态（严格执行：只能修改当前把，其他把置灰；必须保存这把后才能再记一把；修改本局可改之前把）
+ */
+function updateGameHandState(gameDiv) {
+    const isEnded = gameDiv.classList.contains('is-ended');
+    const isEditing = gameDiv.dataset.isEditing === "true";
+    const isHandSaved = gameDiv.dataset.handSaved === "true";
+
+    const addHandBtn = gameDiv.querySelector('.round-plus-btn');
+    const saveHandBtn = gameDiv.querySelector('.save-round-btn');
+    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
+    const endGameBtn = gameDiv.querySelector('.end-game-btn');
+    const badge = gameDiv.querySelector('.game-status-badge');
+
+    if (isEnded) {
+        if (badge) {
+            badge.className = 'game-status-badge ended';
+            badge.innerText = i18n[currentLang].statusEnded;
+        }
+        if (endGameBtn) {
+            endGameBtn.className = 'end-game-btn ended';
+            endGameBtn.innerHTML = i18n[currentLang].gameEndedBadge;
+        }
+        if (addHandBtn) {
+            addHandBtn.disabled = true;
+            addHandBtn.classList.add('btn-disabled');
+            addHandBtn.innerText = i18n[currentLang].addHand;
+            addHandBtn.title = "";
+        }
+        // 局已结束，全部置灰锁定
+        gameDiv.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        if (saveHandBtn) saveHandBtn.classList.add('hidden');
+        if (modifyBtn) {
+            modifyBtn.classList.remove('hidden');
+            modifyBtn.disabled = false;
+            modifyBtn.innerHTML = i18n[currentLang].modifyGame;
+        }
+        return;
+    }
+
+    if (badge) {
+        badge.className = 'game-status-badge in-progress';
+        badge.innerText = i18n[currentLang].statusInProgress;
+    }
+    if (endGameBtn) {
+        endGameBtn.className = 'end-game-btn';
+        endGameBtn.dataset.confirm = "false";
+        endGameBtn.innerHTML = i18n[currentLang].endGame;
+    }
+
+    if (isEditing) {
+        // --- 修改本局模式：解锁之前所有把的记录进行修改 ---
+        gameDiv.querySelectorAll('input').forEach(inp => {
+            inp.disabled = false;
+            inp.classList.remove('disabled-hand');
+        });
+
+        if (addHandBtn) {
+            addHandBtn.disabled = true;
+            addHandBtn.classList.add('btn-disabled');
+            addHandBtn.innerText = i18n[currentLang].addHand;
+            addHandBtn.title = "请先保存本局修改";
+        }
+
+        if (saveHandBtn) {
+            saveHandBtn.classList.remove('hidden');
+            saveHandBtn.disabled = false;
+            saveHandBtn.classList.remove('btn-disabled');
+            saveHandBtn.innerHTML = i18n[currentLang].saveChanges;
+        }
+        if (modifyBtn) {
+            modifyBtn.classList.add('hidden');
+        }
+    } else {
+        // --- 常规打牌记分模式 ---
+        // 只能修改当前把的记录，其他把记录置灰
+        gameDiv.querySelectorAll('.player-row').forEach(row => {
+            const aliasInp = row.querySelector('.player-alias');
+            if (aliasInp) aliasInp.disabled = false;
+
+            const inputs = row.querySelectorAll('.tiger-input');
+            const total = inputs.length;
+            inputs.forEach((inp, idx) => {
+                if (idx < total - 1) {
+                    // 其他把记录：坚决置灰锁定！
+                    inp.disabled = true;
+                    inp.classList.add('disabled-hand');
+                } else {
+                    // 当前最后一把：若尚未保存则可修改，已保存则锁定
+                    if (isHandSaved) {
+                        inp.disabled = true;
+                        inp.classList.add('disabled-hand');
+                    } else {
+                        inp.disabled = false;
+                        inp.classList.remove('disabled-hand');
+                    }
+                }
+            });
+            updateRowTotalTigers(row);
+        });
+
+        const unitInp = gameDiv.querySelector('.round-unit');
+        if (unitInp) unitInp.disabled = false;
+
+        // 【➕ 再记一把】按钮控制：每把都必须保存后，才能再记一把！
+        if (addHandBtn) {
+            addHandBtn.innerText = i18n[currentLang].addHand;
+            if (isHandSaved) {
+                addHandBtn.disabled = false;
+                addHandBtn.classList.remove('btn-disabled');
+                addHandBtn.title = "点击再记一把";
+            } else {
+                addHandBtn.disabled = true;
+                addHandBtn.classList.add('btn-disabled');
+                addHandBtn.title = i18n[currentLang].saveHandFirstTip;
+            }
+        }
+
+        // 【💾 保存这把】按钮控制
+        if (saveHandBtn) {
+            saveHandBtn.classList.remove('hidden');
+            if (isHandSaved) {
+                saveHandBtn.disabled = true;
+                saveHandBtn.classList.add('btn-disabled');
+                saveHandBtn.innerHTML = i18n[currentLang].handSavedTag; // "已保存这把 ✅"
+            } else {
+                saveHandBtn.disabled = false;
+                saveHandBtn.classList.remove('btn-disabled');
+                saveHandBtn.innerHTML = i18n[currentLang].saveHand; // "💾 保存这把"
+            }
+        }
+
+        // 【✏️ 修改本局】按钮控制：常驻可见，随时可点击修改之前把
+        if (modifyBtn) {
+            modifyBtn.classList.remove('hidden');
+            modifyBtn.disabled = false;
+            modifyBtn.innerHTML = i18n[currentLang].modifyGame; // "✏️ 修改本局"
+        }
+    }
+}
+
+/**
  * 保存本局记录：锁定输入框防止传阅误触，行末显示各自当前总虎数
  */
 function saveGameRecords(gameDiv) {
-    gameDiv.classList.add('is-saved');
-    gameDiv.querySelectorAll('input').forEach(el => el.disabled = true);
-    
-    // 切换按钮状态：隐藏保存，展现修改
-    const saveBtn = gameDiv.querySelector('.save-round-btn');
-    if (saveBtn) saveBtn.classList.add('hidden');
-    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
-    if (modifyBtn) modifyBtn.classList.remove('hidden');
-
-    // 重新计算并刷新各行虎数
-    gameDiv.querySelectorAll('.player-row').forEach(row => updateRowTotalTigers(row));
-
+    gameDiv.dataset.isEditing = "false";
+    gameDiv.dataset.handSaved = "true";
+    updateGameHandState(gameDiv);
     triggerSync();
 }
 
@@ -613,29 +764,10 @@ function saveGameRecords(gameDiv) {
  */
 function unlockGameForEdit(gameDiv) {
     if (gameDiv.classList.contains('is-ended')) {
-        // 如果本局已结束，恢复为进行中状态，重新允许结算
         gameDiv.classList.remove('is-ended');
-        const badge = gameDiv.querySelector('.game-status-badge');
-        if (badge) {
-            badge.className = 'game-status-badge in-progress';
-            badge.innerText = i18n[currentLang].statusInProgress;
-        }
-        const endBtn = gameDiv.querySelector('.end-game-btn');
-        if (endBtn) {
-            endBtn.className = 'end-game-btn';
-            endBtn.dataset.confirm = "false";
-            endBtn.innerHTML = i18n[currentLang].endGame;
-        }
     }
-
-    gameDiv.classList.remove('is-saved');
-    gameDiv.querySelectorAll('input').forEach(el => el.disabled = false);
-
-    const saveBtn = gameDiv.querySelector('.save-round-btn');
-    if (saveBtn) saveBtn.classList.remove('hidden');
-    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
-    if (modifyBtn) modifyBtn.classList.add('hidden');
-
+    gameDiv.dataset.isEditing = "true";
+    updateGameHandState(gameDiv);
     triggerSync();
 }
 
@@ -643,21 +775,9 @@ function unlockGameForEdit(gameDiv) {
  * 重置本局数据
  */
 function resetGameRecords(gameDiv) {
-    gameDiv.classList.remove('is-saved');
     gameDiv.classList.remove('is-ended');
-
-    const badge = gameDiv.querySelector('.game-status-badge');
-    if (badge) {
-        badge.className = 'game-status-badge in-progress';
-        badge.innerText = i18n[currentLang].statusInProgress;
-    }
-
-    const endBtn = gameDiv.querySelector('.end-game-btn');
-    if (endBtn) {
-        endBtn.className = 'end-game-btn';
-        endBtn.dataset.confirm = "false";
-        endBtn.innerHTML = i18n[currentLang].endGame;
-    }
+    gameDiv.dataset.isEditing = "false";
+    gameDiv.dataset.handSaved = "false";
 
     gameDiv.querySelectorAll('.player-row').forEach(row => {
         const list = row.querySelector('.tiger-list');
@@ -668,13 +788,7 @@ function resetGameRecords(gameDiv) {
         updateRowTotalTigers(row);
     });
 
-    gameDiv.querySelectorAll('input').forEach(el => el.disabled = false);
-
-    const saveBtn = gameDiv.querySelector('.save-round-btn');
-    if (saveBtn) saveBtn.classList.remove('hidden');
-    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
-    if (modifyBtn) modifyBtn.classList.add('hidden');
-
+    updateGameHandState(gameDiv);
     triggerSync();
 }
 
@@ -686,23 +800,11 @@ function endSpecificGame(gameDiv) {
 
     // 1. 锁定本局并标记为已结束
     gameDiv.classList.add('is-ended');
-    saveGameRecords(gameDiv);
+    gameDiv.dataset.handSaved = "true";
+    gameDiv.dataset.isEditing = "false";
+    updateGameHandState(gameDiv);
 
-    // 2. 状态徽章变为已结束
-    const badge = gameDiv.querySelector('.game-status-badge');
-    if (badge) {
-        badge.className = 'game-status-badge ended';
-        badge.innerText = i18n[currentLang].statusEnded;
-    }
-
-    // 3. 结束按钮更新为已结束标识
-    const endBtn = gameDiv.querySelector('.end-game-btn');
-    if (endBtn) {
-        endBtn.className = 'end-game-btn ended';
-        endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
-    }
-
-    // 4. 打开结算弹窗，展示本局计算明细与排行榜
+    // 2. 打开结算弹窗，展示本局计算明细与排行榜
     openSettlementModal(gameId, 'current');
 
     triggerSync();
@@ -838,16 +940,18 @@ function renderCurrentGamePanel(gameId) {
                     <div class="calc-card-top">
                         <div class="calc-player-name">
                             <span>${item.alias} (${dirName})</span>
-                            <span class="calc-tigers-tag">本局抓虎: ${item.tigers}</span>
+                            <span class="calc-tigers-tag">${currentLang === 'en' ? 'Tigers: ' : '共抓虎: '}${item.tigers}</span>
                         </div>
                         <div class="calc-money-tag score-val ${colorClass}">
-                            ${sign}${item.money} 元
+                            ${sign}${item.money} ${currentLang === 'en' ? '' : '元'}
                         </div>
                     </div>
                     <div class="calc-formula-box">
-                        <div class="calc-formula-title">计算过程 (（本人虎数 × 3 - 其他人虎数之和）× 计数单位):</div>
-                        <div style="color:#2C3E50; font-weight:bold; margin-top:3px;">
-                            = ((${item.tigers} × 3 - ${item.othersSum}) × ${unit}) = ${sign}${item.money} 元
+                        <div class="calc-formula-line">
+                            <span class="calc-formula-label">${i18n[currentLang].calcProcessLabel || '计算过程 = '}</span>
+                            <span class="calc-formula-expr">((${item.tigers}*3 - ${item.othersBreakdown}) * ${unit})</span>
+                            <span class="calc-formula-equal"> = </span>
+                            <span class="calc-formula-result ${colorClass}">${sign}${item.money} ${currentLang === 'en' ? '' : '元'}</span>
                         </div>
                     </div>
                 </div>
@@ -1302,14 +1406,15 @@ function triggerSync() {
 function getGameState() {
     const rounds = [];
     document.querySelectorAll('.game-round').forEach(gameDiv => {
-        const isSaved = gameDiv.classList.contains('is-saved');
+        const isHandSaved = gameDiv.dataset.handSaved === "true";
         const isEnded = gameDiv.classList.contains('is-ended');
         const unit = parseFloat(gameDiv.querySelector('.round-unit').value) || 0.5;
 
         const roundState = {
             unit: unit,
             players: {},
-            isSaved: isSaved,
+            isSaved: isHandSaved,
+            isHandSaved: isHandSaved,
             isEnded: isEnded
         };
         
@@ -1399,21 +1504,15 @@ async function applyGameState(state) {
 
         if (rState.isEnded) {
             gameDiv.classList.add('is-ended');
-            const badge = gameDiv.querySelector('.game-status-badge');
-            if (badge) {
-                badge.className = 'game-status-badge ended';
-                badge.innerText = i18n[currentLang].statusEnded;
-            }
-            const endBtn = gameDiv.querySelector('.end-game-btn');
-            if (endBtn) {
-                endBtn.className = 'end-game-btn ended';
-                endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
-            }
         }
 
-        if (rState.isSaved || rState.isEnded) {
-            saveGameRecords(gameDiv);
-        }
+        const handSaved = (rState.isHandSaved !== undefined) 
+            ? (rState.isHandSaved ? "true" : "false") 
+            : ((rState.isSaved || rState.isEnded) ? "true" : "false");
+        gameDiv.dataset.handSaved = handSaved;
+        gameDiv.dataset.isEditing = "false";
+
+        updateGameHandState(gameDiv);
     });
 }
 

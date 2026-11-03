@@ -81,7 +81,7 @@ test('calculateGameDetails sums multiple hands (把) and generates required form
     assert.strictEqual(east.othersSum, 2); // 1 + 0 + 1 = 2
     assert.strictEqual(east.netTigers, 7); // 3*3 - 2 = 7
     assert.strictEqual(east.money, 3.5);   // 7 * 0.5 = 3.5
-    assert.strictEqual(east.formula, '((3 × 3 - 2) × 0.5) = +3.5 元');
+    assert.strictEqual(east.formula, '((3*3 - 1 - 0 - 1) * 0.5) = +3.5 元');
 
     // 生成当局排行榜
     const leaderboard = calculateGameLeaderboard(res.details);
