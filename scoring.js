@@ -1,8 +1,9 @@
 /**
- * 豆豆酱麻将计分核心计算引擎 (ScoringEngine) - 阶段二升级版
- * 1. 单局虎数计算、零和博弈数学严格守恒校验与残差微调补偿；
- * 2. 单局公式字符串生成: ((本人虎数*3-其他人虎数之和)*单位)；
- * 3. 全局统计以【玩家别名 (Alias)】为唯一识别实体，完美支持中途换座位、上下人替补场景。
+ * 豆豆酱麻将计分核心计算引擎 (ScoringEngine) - “把与局”架构升级版
+ * 1. 最小单位【把】：洗一次牌打一把，记录各家抓的虎数；
+ * 2. 结算单位【局】：连打两三圈后点结束本局，计算本局详细得分与当局排行榜；
+ * 3. 统计单位【总】：跨局累计总游戏排行榜，以【玩家别名 (Alias)】为唯一识别键（支持换位与替补）；
+ * 4. 零和博弈严格数学恒等（所有玩家得分之和恒等于 0）。
  */
 
 function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
@@ -41,10 +42,13 @@ function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
     return scores;
 }
 
-function calculateRoundDetails(tigersMap, unit, dirs = ['东', '西', '南', '北'], aliases = {}) {
+/**
+ * 计算单局（包含多把记录）的结算详情与各家公式推导过程
+ */
+function calculateGameDetails(handsMap, unit, dirs = ['东', '西', '南', '北'], aliases = {}) {
     let rawSums = {};
     dirs.forEach(dir => {
-        const val = tigersMap[dir];
+        const val = handsMap[dir];
         if (Array.isArray(val)) {
             rawSums[dir] = val.reduce((acc, v) => acc + (parseFloat(v) || 0), 0);
         } else {
@@ -65,7 +69,7 @@ function calculateRoundDetails(tigersMap, unit, dirs = ['东', '西', '南', '�
         const netTigers = ownTigers * 3 - othersSum;
         const finalMoney = scores[dir];
         const sign = finalMoney > 0 ? '+' : '';
-        // 按照用户要求生成的完整计算过程公式字符串: ((本人虎数*3-其他人虎数之和)*单位)
+        // 按照用户要求生成的完整计算过程公式字符串: ((本人总虎数*3-其他人虎数之和)*单位)
         const formula = `((${ownTigers} × 3 - ${othersSum}) × ${unit}) = ${sign}${finalMoney} 元`;
 
         return {
@@ -82,35 +86,57 @@ function calculateRoundDetails(tigersMap, unit, dirs = ['东', '西', '南', '�
     return { details, scores, rawSums };
 }
 
+// 保持历史兼容别名
+const calculateRoundDetails = calculateGameDetails;
+
 /**
- * 阶段二重点升级：以【玩家别名 Alias】为全局唯一键统计！
+ * 根据单局结算明细生成当局排行榜 (1~4名)
+ */
+function calculateGameLeaderboard(details) {
+    if (!details || !Array.isArray(details)) return [];
+    const sorted = [...details].sort((a, b) => {
+        if (b.money !== a.money) {
+            return b.money - a.money;
+        }
+        return b.netTigers - a.netTigers;
+    });
+    const maxMoney = sorted.length > 0 ? sorted[0].money : 0;
+    return sorted.map((p, idx) => ({
+        ...p,
+        rank: idx + 1,
+        isWinner: (p.money === maxMoney && maxMoney > 0)
+    }));
+}
+
+/**
+ * 以【玩家别名 Alias】为全局唯一键统计全场总游戏排行榜！
  * 支持中途换座位、上下人替补场景，确保各人战绩精确归集，全场依然严格零和恒等。
  */
-function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaultAliases = {}) {
+function calculateGrandTotal(games, dirs = ['东', '西', '南', '北'], defaultAliases = {}) {
     let summary = {}; // 以 aliasKey 为主键归集
-    let settledRoundsCount = 0;
+    let settledGamesCount = 0;
 
-    rounds.forEach(round => {
-        // 支持 isSaved 或 isEnded 状态判定为已结算局
-        if (!round.isEnded && !round.isSaved && !round.details) return;
-        settledRoundsCount++;
+    games.forEach(game => {
+        // 支持 isEnded 或 isSaved 状态判定为已结算局
+        if (!game.isEnded && !game.isSaved && !game.details) return;
+        settledGamesCount++;
 
-        let roundDetails = null;
-        if (round.details && Array.isArray(round.details)) {
-            roundDetails = round.details;
+        let gameDetails = null;
+        if (game.details && Array.isArray(game.details)) {
+            gameDetails = game.details;
         } else {
-            const tigersInput = {};
-            const roundAliases = {};
+            const handsInput = {};
+            const gameAliases = {};
             dirs.forEach(d => {
-                const p = round.players ? round.players[d] : null;
-                tigersInput[d] = p ? (p.tigers || []) : [];
-                roundAliases[d] = (p && p.alias && p.alias.trim()) ? p.alias.trim() : (defaultAliases[d] || d);
+                const p = game.players ? game.players[d] : null;
+                handsInput[d] = p ? (p.tigers || p.hands || []) : [];
+                gameAliases[d] = (p && p.alias && p.alias.trim()) ? p.alias.trim() : (defaultAliases[d] || d);
             });
-            const res = calculateRoundDetails(tigersInput, round.unit || 0.5, dirs, roundAliases);
-            roundDetails = res.details;
+            const res = calculateGameDetails(handsInput, game.unit || 0.5, dirs, gameAliases);
+            gameDetails = res.details;
         }
 
-        roundDetails.forEach(item => {
+        gameDetails.forEach(item => {
             const rawAlias = item.alias ? item.alias.trim() : '';
             const aliasKey = rawAlias || `${item.dir}位玩家`;
 
@@ -121,12 +147,15 @@ function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaul
                     totalRawTigers: 0,
                     totalNetTigers: 0,
                     totalMoney: 0,
-                    roundsPlayed: 0,
-                    roundsWon: 0
+                    gamesPlayed: 0,
+                    gamesWon: 0,
+                    roundsPlayed: 0, // 兼容字段
+                    roundsWon: 0     // 兼容字段
                 };
             }
 
             const p = summary[aliasKey];
+            p.gamesPlayed++;
             p.roundsPlayed++;
             if (!p.dirsPlayed.includes(item.dir)) {
                 p.dirsPlayed.push(item.dir);
@@ -134,7 +163,10 @@ function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaul
             p.totalRawTigers += item.tigers;
             p.totalNetTigers += item.netTigers;
             p.totalMoney = Math.round((p.totalMoney + item.money) * 100) / 100;
-            if (item.money > 0) p.roundsWon++;
+            if (item.money > 0) {
+                p.gamesWon++;
+                p.roundsWon++;
+            }
         });
     });
 
@@ -143,7 +175,8 @@ function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaul
     // 按金额排行
     const byMoney = [...allPlayers].sort((a, b) => b.totalMoney - a.totalMoney);
     const maxMoney = byMoney.length > 0 ? byMoney[0].totalMoney : 0;
-    byMoney.forEach(p => {
+    byMoney.forEach((p, idx) => {
+        p.rankMoney = idx + 1;
         p.isBigWinnerMoney = (p.totalMoney === maxMoney && maxMoney > 0);
     });
 
@@ -155,12 +188,14 @@ function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaul
         return b.totalRawTigers - a.totalRawTigers;
     });
     const maxNetTigers = byTigers.length > 0 ? byTigers[0].totalNetTigers : 0;
-    byTigers.forEach(p => {
+    byTigers.forEach((p, idx) => {
+        p.rankTigers = idx + 1;
         p.isBigWinnerTigers = (p.totalNetTigers === maxNetTigers && maxNetTigers > 0);
     });
 
     return {
-        settledRoundsCount,
+        settledGamesCount,
+        settledRoundsCount: settledGamesCount, // 兼容
         byMoney,
         byTigers,
         summary
@@ -170,14 +205,18 @@ function calculateGrandTotal(rounds, dirs = ['东', '西', '南', '北'], defaul
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         calculateScores,
+        calculateGameDetails,
         calculateRoundDetails,
+        calculateGameLeaderboard,
         calculateGrandTotal
     };
 }
 if (typeof window !== 'undefined') {
     window.ScoringEngine = {
         calculateScores,
+        calculateGameDetails,
         calculateRoundDetails,
+        calculateGameLeaderboard,
         calculateGrandTotal
     };
 }

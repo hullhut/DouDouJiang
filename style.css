@@ -243,66 +243,76 @@ h1 {
     box-sizing: border-box;
 }
 
-.primary-btn, .end-session-btn, .clear-all-btn {
+.primary-btn, .end-session-btn, .view-grand-btn, .clear-all-btn {
     flex: 1;
     min-width: 0;
     border-radius: 36px;
-    padding: 11px 6px;
-    font-size: clamp(13px, 3.8vw, 17px);
+    padding: 10px 4px;
+    font-size: clamp(12px, 3.4vw, 15px);
     font-weight: 900;
     color: white;
     cursor: pointer;
     text-align: center;
     text-transform: uppercase;
     transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
-    border: 3px solid #FFF;
+    border: 2.5px solid #FFF;
     user-select: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
     box-sizing: border-box;
     white-space: nowrap;
 }
 
 .btn-icon {
-    font-size: 20px;
+    font-size: 18px;
     display: inline-block;
     line-height: 1;
 }
 
 .primary-btn {
     background: linear-gradient(180deg, #FFD147 0%, #FFA800 100%);
-    box-shadow: 0 5px 0px #E67E22, 0 6px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0px #E67E22, 0 5px 8px rgba(0,0,0,0.18);
     text-shadow: 1px 1px 0px #D35400;
 }
 .primary-btn:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0px #E67E22, 0 3px 4px rgba(0,0,0,0.2);
+    transform: translateY(2px);
+    box-shadow: 0 2px 0px #E67E22, 0 2px 4px rgba(0,0,0,0.18);
 }
 
 .end-session-btn {
     background: linear-gradient(180deg, #2ECC71 0%, #27AE60 100%);
-    box-shadow: 0 5px 0px #219653, 0 6px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0px #219653, 0 5px 8px rgba(0,0,0,0.18);
     text-shadow: 1px 1px 0px #1E8449;
 }
 .end-session-btn:active {
-    transform: translateY(3px);
+    transform: translateY(2px);
     box-shadow: 0 2px 0px #219653;
 }
 .end-session-btn.confirming {
     background: linear-gradient(180deg, #E67E22 0%, #D35400 100%);
-    box-shadow: 0 5px 0px #BA4A00;
+    box-shadow: 0 4px 0px #BA4A00;
     text-shadow: 1px 1px 0px #935116;
+}
+
+.view-grand-btn {
+    background: linear-gradient(180deg, #9B59B6 0%, #8E44AD 100%);
+    box-shadow: 0 4px 0px #7D3C98, 0 5px 8px rgba(0,0,0,0.18);
+    text-shadow: 1px 1px 0px #6C3483;
+}
+.view-grand-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0px #7D3C98;
 }
 
 .clear-all-btn {
     background: linear-gradient(180deg, #FF6B6B 0%, #E74C3C 100%);
-    box-shadow: 0 5px 0px #C0392B, 0 6px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 0px #C0392B, 0 5px 8px rgba(0,0,0,0.18);
     text-shadow: 1px 1px 0px #922B21;
 }
 .clear-all-btn:active {
-    transform: translateY(3px);
+    transform: translateY(2px);
     box-shadow: 0 2px 0px #C0392B;
 }
 
@@ -374,10 +384,36 @@ h1 {
     border-bottom: 2px dashed #D2B48C;
 }
 
+.round-header-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
 .round-header-title {
     font-size: 17px;
     font-weight: 900;
     text-align: left;
+}
+
+.game-status-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.game-status-badge.in-progress {
+    background: #E8F8F5;
+    color: #16A085;
+    border: 1px solid #A3E4D7;
+}
+.game-status-badge.ended {
+    background: #EAECEE;
+    color: #7F8C8D;
+    border: 1px solid #BDC3C7;
 }
 
 .round-plus-btn {
@@ -385,14 +421,17 @@ h1 {
     border: 2px solid #FFF;
     border-radius: 20px;
     color: #FFF;
-    padding: 4px 12px;
+    padding: 5px 14px;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 900;
     cursor: pointer;
     box-shadow: 0 3px 0 #005EA6, 0 3px 6px rgba(0,0,0,0.15);
     transition: transform 0.1s, opacity 0.2s;
     user-select: none;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 .round-plus-btn:hover {
     background: linear-gradient(180deg, #4dc0ff 0%, #0a8fed 100%);
@@ -418,8 +457,7 @@ h1 {
     cursor: not-allowed;
 }
 .game-round.is-saved .round-plus-btn {
-    opacity: 0.5;
-    pointer-events: none;
+    opacity: 0.6;
 }
 
 /* Player Rows */
@@ -432,6 +470,33 @@ h1 {
     margin-bottom: 10px;
     border: 2.5px solid #CCC;
     gap: 8px;
+    position: relative;
+}
+
+.row-total-tigers {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    padding: 4px 8px;
+    background: linear-gradient(135deg, #FFF9E6 0%, #FEF5D1 100%);
+    border: 1.5px solid #F39C12;
+    border-radius: 12px;
+    color: #B9770E;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(243, 156, 18, 0.12);
+    margin-left: auto;
+}
+.row-total-tigers .total-tigers-num {
+    font-size: 16px;
+    font-weight: 900;
+    color: #D35400;
+}
+.row-total-tigers .total-tigers-unit {
+    font-size: 11px;
+    color: #B9770E;
 }
 
 .row-东 { border-color: #4A90E2; background-color: #EAF4FC; }
@@ -808,6 +873,8 @@ h1 {
     padding: 10px 16px;
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 10px;
     flex-shrink: 0;
 }
 
@@ -815,27 +882,180 @@ h1 {
     background: linear-gradient(180deg, #FFD147 0%, #FFA800 100%);
     border: 2px solid #FFF;
     color: #FFF;
-    padding: 8px 32px;
+    padding: 8px 24px;
     font-size: 15px;
     font-weight: 900;
     border-radius: 20px;
     cursor: pointer;
     box-shadow: 0 4px 0 #D35400, 0 4px 8px rgba(0,0,0,0.15);
     text-shadow: 1px 1px 0 #D35400;
+    white-space: nowrap;
 }
 .modal-action-btn:active {
     transform: translateY(2px);
     box-shadow: 0 2px 0 #D35400;
 }
 
-/* Single Round Calculation Process Card */
+.modal-action-btn.secondary {
+    background: linear-gradient(180deg, #2ECC71 0%, #27AE60 100%);
+    box-shadow: 0 4px 0 #219653, 0 4px 8px rgba(0,0,0,0.15);
+    text-shadow: 1px 1px 0 #1E8449;
+}
+.modal-action-btn.secondary:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #219653;
+}
+
+/* Tab Panels in Settlement Modal */
+.tab-panel {
+    display: block;
+}
+.tab-panel.hidden {
+    display: none !important;
+}
+
+.modal-tab-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+.modal-tab-group.main-tabs .modal-tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 2px solid #D2B48C;
+    background: #FFF;
+    color: #8D5A28;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.modal-tab-group.main-tabs .modal-tab-btn.active {
+    background: linear-gradient(180deg, #FFD147 0%, #FFA800 100%);
+    color: #FFF;
+    border-color: #E67E22;
+    box-shadow: 0 3px 0 #D35400;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+
+.modal-tab-group.sub-tabs {
+    margin-bottom: 0;
+    gap: 4px;
+}
+.modal-tab-group.sub-tabs .modal-tab-btn {
+    padding: 4px 10px;
+    border-radius: 14px;
+    border: 1.5px solid #D2B48C;
+    background: #FFF;
+    color: #8D5A28;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.modal-tab-group.sub-tabs .modal-tab-btn.active {
+    background: #E67E22;
+    color: #FFF;
+    border-color: #D35400;
+    box-shadow: 0 2px 0 #BA4A00;
+}
+
+.grand-total-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 900;
+    color: #8D5A28;
+    margin: 12px 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 当局排行榜卡片 (1~4名) */
+.game-leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.game-rank-card {
+    display: flex;
+    align-items: center;
+    background: #FFF;
+    border: 2px solid #E8DFD0;
+    border-radius: 12px;
+    padding: 8px 12px;
+    gap: 8px;
+    transition: all 0.2s;
+}
+.game-rank-card.is-winner {
+    border-color: #F1C40F;
+    background: linear-gradient(90deg, #FFFDEB 0%, #FFF 100%);
+    box-shadow: 0 3px 6px rgba(241, 196, 15, 0.2);
+}
+.game-rank-badge {
+    font-size: 16px;
+    font-weight: 900;
+    flex-shrink: 0;
+    width: 28px;
+    text-align: center;
+}
+.game-rank-player {
+    flex: 1;
+    min-width: 0;
+    font-weight: 900;
+    color: #2C3E50;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.game-rank-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.game-rank-tigers {
+    font-size: 11px;
+    font-weight: 800;
+    color: #B9770E;
+    background: #FFF9E6;
+    padding: 2px 6px;
+    border-radius: 8px;
+    border: 1px solid #F39C12;
+    white-space: nowrap;
+}
+.game-rank-money {
+    font-size: 15px;
+    font-weight: 900;
+    min-width: 60px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* 单局计算公式明细卡片 */
+.game-formula-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 .single-calc-card {
     background: #FFF;
     border: 2px solid #E8DFD0;
-    border-radius: 14px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border-radius: 12px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 .single-calc-card.row-东 { border-color: #4A90E2; }
 .single-calc-card.row-南 { border-color: #E67E22; }
@@ -846,10 +1066,10 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 .calc-player-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 900;
     color: #2C3E50;
     display: flex;
@@ -860,20 +1080,20 @@ h1 {
     background: #FFF2D6;
     color: #D35400;
     border: 1px solid #F39C12;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
     font-weight: 800;
 }
 .calc-money-tag {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 900;
 }
 .calc-formula-box {
     background: #F8F9FA;
     border: 1px dashed #BDC3C7;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 6px 8px;
     font-family: monospace, sans-serif;
     font-size: 12px;
     color: #555;
@@ -887,40 +1107,13 @@ h1 {
     font-weight: bold;
 }
 
-/* Grand Total Leaderboard */
-.modal-tab-group {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    justify-content: center;
-}
-.modal-tab-btn {
-    flex: 1;
-    padding: 8px 10px;
-    border-radius: 20px;
-    border: 2px solid #D2B48C;
-    background: #FFF;
-    color: #8D5A28;
-    font-weight: 800;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-}
-.modal-tab-btn.active {
-    background: linear-gradient(180deg, #FFD147 0%, #FFA800 100%);
-    color: #FFF;
-    border-color: #E67E22;
-    box-shadow: 0 3px 0 #D35400;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
-}
-
+/* 全场排行榜列表项 */
 .grand-total-subtitle {
     text-align: center;
     font-size: 12px;
     color: #8D5A28;
     font-weight: bold;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .leaderboard-item {
@@ -929,7 +1122,7 @@ h1 {
     background: #FFF;
     border: 2px solid #E8DFD0;
     border-radius: 14px;
-    padding: 10px 12px;
+    padding: 9px 12px;
     margin-bottom: 8px;
     gap: 10px;
     position: relative;
@@ -988,8 +1181,31 @@ h1 {
     margin-top: 2px;
 }
 .leader-score {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 900;
     text-align: right;
     flex-shrink: 0;
+}
+
+/* 查看结算按钮 (在局卡片底部) */
+.view-game-results-btn {
+    background: linear-gradient(180deg, #3498DB 0%, #2980B9 100%);
+    box-shadow: 0 4px 0 #1F618D, 0 4px 6px rgba(0,0,0,0.15);
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 900;
+    border-radius: 25px;
+    border: 2px solid #FFF;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: transform 0.1s;
+}
+.view-game-results-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1F618D;
 }

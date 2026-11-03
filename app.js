@@ -1,6 +1,7 @@
 const gameRoundsContainer = document.getElementById('gameRoundsContainer');
 const startGameBtn = document.getElementById('startGameBtn');
 const endSessionBtn = document.getElementById('endSessionBtn');
+const viewGrandBtn = document.getElementById('viewGrandBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
 const langToggle = document.getElementById('langToggle');
 const mainTitle = document.getElementById('mainTitle');
@@ -12,37 +13,43 @@ const i18n = {
         title: "Mahjong Score Tracker",
         docTitle: "🐶 🀄 Mahjong Score Tracker 🐕",
         startGame: "Start Game ▶",
-        startAnother: "Start Another ▶",
-        endSession: "End Game 🏆",
-        confirmEndSession: "Sure End?",
+        startAnother: "Start Next Game ▶",
+        endGame: "End Game 🏆",
+        confirmEndGame: "Sure to End Game?",
+        viewGrand: "Leaderboard 👑",
         clearAll: "Clear All",
-        confirmClearAll: "Sure?",
-        roundTitle: "Players & Scores - Round {n}",
+        confirmClearAll: "Sure to Clear?",
+        gameTitle: "Game {n}",
+        statusInProgress: "In Progress",
+        statusEnded: "Settled",
+        addHand: "➕ Add Hand",
+        handPlaceholder: "H{n}",
         aliasPlaceholder: "Player Alias",
         scorePlaceholder: "Score",
-        unitText: "Unit (Yuan)",
-        saveRound: "💾 Save Round",
-        modifyRound: "✏️ Modify",
-        clearRound: "🔄 Reset",
-        confirmClear: "Sure?",
-        addTigerRow: "➕ Add Tigers",
-        resultTitle: "💰 Round Results 💰",
-        viewDetails: "📊 View Calculation Process",
-        singleModalTitle: "Round {n} Settlement Details",
-        calcProcess: "Calculation Process",
-        formulaDesc: "((Own Tigers × 3 - Others' Tigers) × Unit)",
-        tigersTag: "{count} Tigers",
-        grandTotalTitle: "🏆 Global Game Leaderboard 🏆",
-        roundsPlayed: "{n} Round(s) Played",
-        tabMoney: "💰 By Money (¥)",
+        rowTotalTigers: "Game: {n} Tigers",
+        unitText: "Unit (Yuan/Tiger)",
+        saveGame: "💾 Save Records",
+        modifyGame: "✏️ Edit Records",
+        clearGame: "🔄 Reset Game",
+        confirmClearGame: "Sure to Reset?",
+        viewGameResults: "📊 View Game Results",
+        modalTitle: "🀄 Settlement & Leaderboard",
+        tabCurrentGame: "🀄 Current Game Results",
+        tabGrandTotal: "🏆 Grand Total Leaderboard",
+        tabMoney: "💰 By Money",
         tabTigers: "🐯 By Tigers",
+        gameSubtitle: "Game {n} Settlement ({hands} Hands Played)",
+        gameLeaderboardTitle: "🏆 Game Leaderboard (Game {n})",
+        gameFormulaTitle: "🧮 Tigers & Calculation Process",
+        grandSubtitle: "Grand Total ({n} Games Settled)",
         bigWinner: "Big Winner 👑",
         tigerKing: "Tiger King 🐯👑",
-        playedAndWon: "Played {played} round(s) | Won {won}",
+        playedAndWon: "{played} Games | {won} Wins",
         seatsPlayed: "Seats",
-        rawTigersSummary: "Total Tigers: {raw} | Net: {net}",
+        rawTigersSummary: "Tigers: {raw} | Net: {net}",
         closeModal: "Close",
-        noRoundsAlert: "No saved/settled rounds yet! Please save at least one round first.",
+        startNextGame: "Start Next Game ▶",
+        noGamesAlert: "No games played yet! Please start a game first.",
         east: "East",
         south: "South",
         west: "West",
@@ -66,37 +73,43 @@ const i18n = {
         title: "麻将计分器",
         docTitle: "🐶 🀄 麻将计分器 🐕",
         startGame: "开始游戏 ▶",
-        startAnother: "再开一局 ▶",
-        endSession: "结束游戏 🏆",
-        confirmEndSession: "确认结束?",
+        startAnother: "开始下一局 ▶",
+        endGame: "结束本局 🏆",
+        confirmEndGame: "确认结束本局？",
+        viewGrand: "全场总榜 👑",
         clearAll: "全部清空",
-        confirmClearAll: "确认全清?",
-        roundTitle: "玩家与分数 - 第 {n} 局",
+        confirmClearAll: "确认全清？",
+        gameTitle: "第 {n} 局",
+        statusInProgress: "进行中",
+        statusEnded: "已结束",
+        addHand: "➕ 记新一把",
+        handPlaceholder: "把{n}",
         aliasPlaceholder: "玩家昵称",
         scorePlaceholder: "虎数",
-        unitText: "计数单位 (元)",
-        saveRound: "💾 保存本局",
-        modifyRound: "✏️ 修改本局",
-        clearRound: "🔄 重置本局",
-        confirmClear: "确认重置?",
-        addTigerRow: "➕ 抓虎",
-        resultTitle: "💰 本局结算结果 💰",
-        viewDetails: "📊 查看计算过程",
-        singleModalTitle: "第 {n} 局结算详情",
-        calcProcess: "详细计算过程",
-        formulaDesc: "((本人虎数 × 3 - 其他人虎数之和) × 单位)",
-        tigersTag: "{count} 虎",
-        grandTotalTitle: "🏆 全局结算大赢家 🏆",
-        roundsPlayed: "共进行了 {n} 局",
-        tabMoney: "💰 按金额统计",
-        tabTigers: "🐯 按虎数统计",
+        rowTotalTigers: "本局: {n} 虎",
+        unitText: "计分单位 (元/虎)",
+        saveGame: "💾 保存记录",
+        modifyGame: "✏️ 修改记录",
+        clearGame: "🔄 重置本局",
+        confirmClearGame: "确认重置？",
+        viewGameResults: "📊 查看本局结算与排行",
+        modalTitle: "🀄 结算与排行榜",
+        tabCurrentGame: "🀄 当局结算与排行",
+        tabGrandTotal: "🏆 全场总游戏排行榜",
+        tabMoney: "💰 按金额排行",
+        tabTigers: "🐯 按虎数排行",
+        gameSubtitle: "第 {n} 局结算详情（共打 {hands} 把）",
+        gameLeaderboardTitle: "🏆 当局排行榜 (第 {n} 局)",
+        gameFormulaTitle: "🧮 本局每人虎数与计算公式",
+        grandSubtitle: "全场累计（已结算 {n} 局）",
         bigWinner: "大赢家 👑",
         tigerKing: "虎王 🐯👑",
         playedAndWon: "出战 {played} 局 | 胜 {won} 局",
         seatsPlayed: "曾坐",
         rawTigersSummary: "总抓虎: {raw} | 净胜虎: {net}",
-        closeModal: "关闭",
-        noRoundsAlert: "暂无已保存的对局，请先保存本局！",
+        closeModal: "确定",
+        startNextGame: "开始下一局 ▶",
+        noGamesAlert: "暂无已完成的对局，请先记录！",
         east: "东",
         south: "南",
         west: "西",
@@ -155,19 +168,21 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=30' : '/images/header-zh.png?v=30';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=31' : '/images/header-zh.png?v=31';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
     // Update static texts
     mainTitle.innerHTML = i18n[currentLang].title;
     document.title = i18n[currentLang].docTitle;
-    startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
+    startGameBtn.innerHTML = gameCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
     if (endSessionBtn) {
-        endSessionBtn.innerHTML = endSessionBtn.dataset.confirm === "true" ? i18n[currentLang].confirmEndSession : i18n[currentLang].endSession;
+        endSessionBtn.innerHTML = endSessionBtn.dataset.confirm === "true" ? i18n[currentLang].confirmEndGame : i18n[currentLang].endGame;
     }
-
+    if (viewGrandBtn) {
+        viewGrandBtn.innerHTML = i18n[currentLang].viewGrand;
+    }
     if (clearAllBtn) {
         clearAllBtn.innerHTML = clearAllBtn.dataset.confirm === "true" ? i18n[currentLang].confirmClearAll : i18n[currentLang].clearAll;
     }
@@ -178,98 +193,79 @@ function toggleLanguage() {
         roomCodeBadge.innerText = i18n[currentLang].roomLabel + currentRoomCode;
     }
     const inviteBtn = document.getElementById('inviteBtn');
-    if (inviteBtn) {
-        inviteBtn.innerText = i18n[currentLang].shareLink;
-    }
+    if (inviteBtn) inviteBtn.innerText = i18n[currentLang].shareLink;
     const setPwdInput = document.getElementById('setPwdInput');
-    if (setPwdInput) {
-        setPwdInput.placeholder = i18n[currentLang].pwdPlaceholder;
-    }
+    if (setPwdInput) setPwdInput.placeholder = i18n[currentLang].pwdPlaceholder;
     const lockRoomBtn = document.getElementById('lockRoomBtn');
-    if (lockRoomBtn) {
-        lockRoomBtn.innerText = i18n[currentLang].lockRoom;
-    }
+    if (lockRoomBtn) lockRoomBtn.innerText = i18n[currentLang].lockRoom;
     const lockedStatusSpan = document.getElementById('lockedStatusSpan');
-    if (lockedStatusSpan) {
-        lockedStatusSpan.innerText = i18n[currentLang].lockedStatus;
-    }
+    if (lockedStatusSpan) lockedStatusSpan.innerText = i18n[currentLang].lockedStatus;
 
     // Update modal controls
+    const tabCurrentGameBtn = document.getElementById('tabCurrentGameBtn');
+    if (tabCurrentGameBtn) tabCurrentGameBtn.innerText = i18n[currentLang].tabCurrentGame;
+    const tabGrandTotalBtn = document.getElementById('tabGrandTotalBtn');
+    if (tabGrandTotalBtn) tabGrandTotalBtn.innerText = i18n[currentLang].tabGrandTotal;
     const tabMoneyBtn = document.getElementById('tabMoneyBtn');
     if (tabMoneyBtn) tabMoneyBtn.innerText = i18n[currentLang].tabMoney;
     const tabTigersBtn = document.getElementById('tabTigersBtn');
     if (tabTigersBtn) tabTigersBtn.innerText = i18n[currentLang].tabTigers;
-    const confirmSingleModalBtn = document.getElementById('confirmSingleModalBtn');
-    if (confirmSingleModalBtn) confirmSingleModalBtn.innerText = i18n[currentLang].closeModal;
-    const confirmGrandModalBtn = document.getElementById('confirmGrandModalBtn');
-    if (confirmGrandModalBtn) confirmGrandModalBtn.innerText = i18n[currentLang].closeModal;
-    
-    // Update dynamic round texts
-    document.querySelectorAll('.game-round').forEach(roundDiv => {
-        const roundId = roundDiv.id.replace('round-', '');
-        const titleSpan = roundDiv.querySelector('.round-header-title');
-        if (titleSpan) titleSpan.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
-        
-        const addTigersBtn = roundDiv.querySelector('.round-plus-btn');
-        if (addTigersBtn) addTigersBtn.innerText = i18n[currentLang].addTigerRow;
+    const modalStartNextGameBtn = document.getElementById('modalStartNextGameBtn');
+    if (modalStartNextGameBtn) modalStartNextGameBtn.innerText = i18n[currentLang].startNextGame;
+    const confirmSettlementModalBtn = document.getElementById('confirmSettlementModalBtn');
+    if (confirmSettlementModalBtn) confirmSettlementModalBtn.innerText = i18n[currentLang].closeModal;
 
-        roundDiv.querySelectorAll('.player-row').forEach(row => {
-            row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
-            row.querySelectorAll('.tiger-input').forEach(input => {
-                input.placeholder = i18n[currentLang].scorePlaceholder;
+    // Update dynamic game cards
+    document.querySelectorAll('.game-round').forEach(gameDiv => {
+        const gameId = gameDiv.dataset.game || gameDiv.id.replace('round-', '').replace('game-', '');
+        const titleSpan = gameDiv.querySelector('.round-header-title');
+        if (titleSpan) titleSpan.innerText = i18n[currentLang].gameTitle.replace('{n}', gameId);
+        
+        const statusBadge = gameDiv.querySelector('.game-status-badge');
+        if (statusBadge) {
+            const isEnded = gameDiv.classList.contains('is-ended');
+            statusBadge.innerText = isEnded ? i18n[currentLang].statusEnded : i18n[currentLang].statusInProgress;
+        }
+
+        const addHandBtn = gameDiv.querySelector('.round-plus-btn');
+        if (addHandBtn) addHandBtn.innerText = i18n[currentLang].addHand;
+
+        gameDiv.querySelectorAll('.player-row').forEach(row => {
+            const aliasInput = row.querySelector('.player-alias');
+            if (aliasInput) aliasInput.placeholder = i18n[currentLang].aliasPlaceholder;
+            
+            row.querySelectorAll('.tiger-input').forEach((input, idx) => {
+                input.placeholder = i18n[currentLang].handPlaceholder.replace('{n}', idx + 1);
             });
+
+            updateRowTotalTigers(row);
         });
 
-        const unitTextNode = roundDiv.querySelector('.unit-text-label');
-        if (unitTextNode) {
-            unitTextNode.innerText = i18n[currentLang].unitText;
-        }
+        const unitTextNode = gameDiv.querySelector('.unit-text-label');
+        if (unitTextNode) unitTextNode.innerText = i18n[currentLang].unitText;
 
-        const saveBtn = roundDiv.querySelector('.save-round-btn');
-        if (saveBtn) {
-            saveBtn.innerHTML = i18n[currentLang].saveRound;
-        }
+        const saveBtn = gameDiv.querySelector('.save-round-btn');
+        if (saveBtn) saveBtn.innerHTML = i18n[currentLang].saveGame;
         
-        const clearBtn = roundDiv.querySelector('.clear-round-btn');
+        const modifyBtn = gameDiv.querySelector('.modify-round-btn');
+        if (modifyBtn) modifyBtn.innerHTML = i18n[currentLang].modifyGame;
+
+        const viewResultsBtn = gameDiv.querySelector('.view-game-results-btn');
+        if (viewResultsBtn) viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
+
+        const clearBtn = gameDiv.querySelector('.clear-round-btn');
         if (clearBtn) {
-            if (clearBtn.dataset.confirm === "true") {
-                clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
-            } else {
-                clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
-            }
+            clearBtn.innerHTML = clearBtn.dataset.confirm === "true" 
+                ? `🔄 ${i18n[currentLang].confirmClearGame}` 
+                : `🔄 ${i18n[currentLang].clearGame}`;
         }
-        
-        const modifyBtn = roundDiv.querySelector('.modify-round-btn');
-        if (modifyBtn) {
-            modifyBtn.innerHTML = i18n[currentLang].modifyRound;
-        }
-        
-        const resultTitle = roundDiv.querySelector('.result-title');
-        if (resultTitle) {
-            resultTitle.innerText = i18n[currentLang].resultTitle;
-        }
-
-        const viewDetailBtn = roundDiv.querySelector('.view-detail-btn');
-        if (viewDetailBtn) {
-            viewDetailBtn.innerHTML = i18n[currentLang].viewDetails;
-        }
-
-        roundDiv.querySelectorAll('.result-item').forEach(item => {
-            const dir = item.dataset.dir;
-            const alias = item.dataset.alias;
-            if (dir && alias) {
-                const dirName = i18n[currentLang][dir === '东' ? 'east' : dir === '南' ? 'south' : dir === '西' ? 'west' : 'north'];
-                const playerSpan = item.querySelector('.result-player');
-                if (playerSpan) playerSpan.innerText = `${alias} (${dirName})`;
-            }
-        });
     });
 }
 
 langToggle.addEventListener('click', toggleLanguage);
 
 // --- Game Logic ---
-let roundCount = 0;
+let gameCount = 0;
 const directions = ['东', '西', '南', '北'];
 
 // Initial default aliases for fresh game
@@ -281,12 +277,12 @@ let aliases = {
 };
 
 // Global helper to create a strictly numeric tiger input
-function createTigerInput() {
+function createTigerInput(handIndex = 1) {
     const input = document.createElement('input');
     input.type = 'text';
     input.inputMode = 'decimal';
     input.className = 'tiger-input';
-    input.placeholder = i18n[currentLang].scorePlaceholder;
+    input.placeholder = i18n[currentLang].handPlaceholder.replace('{n}', handIndex);
     input.value = '';
     
     // Strict numeric restriction: only numbers and at most 1 decimal dot
@@ -297,70 +293,124 @@ function createTigerInput() {
             val = parts[0] + '.' + parts.slice(1).join('');
         }
         e.target.value = val;
+
+        const row = e.target.closest('.player-row');
+        if (row) updateRowTotalTigers(row);
+    });
+
+    input.addEventListener('blur', (e) => {
+        const row = e.target.closest('.player-row');
+        if (row) updateRowTotalTigers(row);
+        triggerSync();
     });
 
     return input;
 }
 
+// Update the real-time tiger sum at the end of each player's row
+function updateRowTotalTigers(row) {
+    if (!row) return;
+    let sum = 0;
+    row.querySelectorAll('.tiger-input').forEach(input => {
+        if (input.value !== '') {
+            sum += parseFloat(input.value) || 0;
+        }
+    });
+    // Format sum: integer if whole number, otherwise up to 1 decimal place
+    const formattedSum = Math.round(sum * 10) / 10;
+    
+    let totalPill = row.querySelector('.row-total-tigers');
+    if (!totalPill) {
+        totalPill = document.createElement('div');
+        totalPill.className = 'row-total-tigers';
+        totalPill.title = '本局累计抓虎数';
+        row.appendChild(totalPill);
+    }
+    totalPill.innerHTML = `
+        <span class="total-tigers-label">${i18n[currentLang].rowTotalTigers.split(':')[0]}:</span>
+        <span class="total-tigers-num">${formattedSum}</span>
+        <span class="total-tigers-unit">虎</span>
+    `;
+}
+
 /**
- * 阶段二核心改造：创建单局
- * 1. 移除每行分散的4个加号，改为单局统一加号按钮“➕ 抓虎”；
- * 2. 引入【💾 保存本局】按钮，点击后锁定为只读防误触，展示结算结果；
- * 3. 保存后提供专属【✏️ 修改本局】按钮进行解锁。
+ * 创建一局游戏卡片（包含多“把”的虎数录入与行末统计）
  */
 function createGameRound(autoScroll = true) {
-    if (roundCount === 0) {
-        document.getElementById('startGameBtn').innerHTML = i18n[currentLang].startAnother;
-    }
-    roundCount++;
-    const roundId = roundCount;
+    gameCount++;
+    const gameId = gameCount;
+    startGameBtn.innerHTML = i18n[currentLang].startAnother;
     
-    const roundDiv = document.createElement('div');
-    roundDiv.className = 'game-round';
-    roundDiv.id = `round-${roundId}`;
-    roundDiv.dataset.round = roundId;
+    const gameDiv = document.createElement('div');
+    gameDiv.className = 'game-round';
+    gameDiv.id = `game-${gameId}`;
+    gameDiv.dataset.game = gameId;
+    gameDiv.dataset.round = gameId; // 保持向后兼容
     
-    // Round Header with Title and Single Unified Plus Button (➕ 抓虎)
+    // 局卡片头部：局数标题 + 状态徽章 + 【➕ 记新一把】按钮（原抓虎位置）
     const header = document.createElement('div');
     header.className = 'round-header';
 
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'round-header-left';
+
     const titleSpan = document.createElement('span');
     titleSpan.className = 'round-header-title';
-    titleSpan.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
-    header.appendChild(titleSpan);
+    titleSpan.innerText = i18n[currentLang].gameTitle.replace('{n}', gameId);
+    headerLeft.appendChild(titleSpan);
 
-    // 单局统一“+”号按钮：按一次即为当局所有玩家追加一列抓虎输入框
-    const addTigersBtn = document.createElement('button');
-    addTigersBtn.className = 'round-plus-btn';
-    addTigersBtn.innerText = i18n[currentLang].addTigerRow;
-    addTigersBtn.title = "追加一列虎数录入框";
-    addTigersBtn.onclick = () => {
-        if (roundDiv.classList.contains('is-saved')) return;
-        roundDiv.querySelectorAll('.player-row .tiger-list').forEach(list => {
-            list.appendChild(createTigerInput());
+    const statusBadge = document.createElement('span');
+    statusBadge.className = 'game-status-badge in-progress';
+    statusBadge.innerText = i18n[currentLang].statusInProgress;
+    headerLeft.appendChild(statusBadge);
+
+    header.appendChild(headerLeft);
+
+    // 【➕ 记新一把】按钮：每打完一把洗牌，按一次即为当前局所有玩家追加这一把的虎数框
+    const addHandBtn = document.createElement('button');
+    addHandBtn.className = 'round-plus-btn';
+    addHandBtn.innerText = i18n[currentLang].addHand;
+    addHandBtn.title = "打完一把洗牌，追加这一把的虎数录入框";
+    addHandBtn.onclick = () => {
+        if (gameDiv.classList.contains('is-ended')) return;
+        // 如果已保存，先自动解除锁定以便输入新把
+        if (gameDiv.classList.contains('is-saved')) {
+            unlockGameForEdit(gameDiv);
+        }
+        
+        // 计算当前是第几把
+        const anyList = gameDiv.querySelector('.player-row .tiger-list');
+        const nextHandIndex = anyList ? anyList.querySelectorAll('.tiger-input').length + 1 : 1;
+
+        gameDiv.querySelectorAll('.player-row').forEach(row => {
+            const list = row.querySelector('.tiger-list');
+            if (list) {
+                list.appendChild(createTigerInput(nextHandIndex));
+                updateRowTotalTigers(row);
+            }
         });
         triggerSync();
     };
-    header.appendChild(addTigersBtn);
-    roundDiv.appendChild(header);
+    header.appendChild(addHandBtn);
+    gameDiv.appendChild(header);
 
-    // Player Rows: 每行只保留麻将牌、玩家别名输入框、虎数框容器，横向彻底释放
+    // 东西南北 4 行玩家记录行
     directions.forEach(dir => {
         const row = document.createElement('div');
         row.className = `player-row row-${dir}`;
         row.dataset.dir = dir;
 
+        // 麻将牌图标 (東, 南, 西, 北)
         const dirContainer = document.createElement('div');
         dirContainer.className = 'player-dir-container';
-
         const tileIcon = document.createElement('div');
         tileIcon.className = 'real-mahjong-tile';
         const traditionalDir = { '东': '東', '南': '南', '西': '西', '北': '北' }[dir];
         tileIcon.innerText = traditionalDir;
-
         dirContainer.appendChild(tileIcon);
         row.appendChild(dirContainer);
 
+        // 玩家别名与各把虎数输入容器
         const playerInfo = document.createElement('div');
         playerInfo.className = 'player-info';
 
@@ -374,18 +424,37 @@ function createGameRound(autoScroll = true) {
         aliasInput.setAttribute('autocapitalize', 'off');
         aliasInput.setAttribute('spellcheck', 'false');
         
+        aliasInput.addEventListener('change', () => {
+            if (aliasInput.value.trim()) {
+                aliases[dir] = aliasInput.value.trim();
+            }
+            triggerSync();
+        });
         playerInfo.appendChild(aliasInput);
 
+        // 虎数输入框列表（默认自带第 1 把）
         const tigerList = document.createElement('div');
         tigerList.className = 'tiger-list';
-        tigerList.appendChild(createTigerInput());
+        tigerList.appendChild(createTigerInput(1));
         playerInfo.appendChild(tigerList);
         
         row.appendChild(playerInfo);
-        roundDiv.appendChild(row);
+
+        // 行末：实时总虎数标签
+        const totalPill = document.createElement('div');
+        totalPill.className = 'row-total-tigers';
+        totalPill.title = '本局累计抓虎数';
+        totalPill.innerHTML = `
+            <span class="total-tigers-label">${i18n[currentLang].rowTotalTigers.split(':')[0]}:</span>
+            <span class="total-tigers-num">0</span>
+            <span class="total-tigers-unit">虎</span>
+        `;
+        row.appendChild(totalPill);
+
+        gameDiv.appendChild(row);
     });
 
-    // Footer Controls
+    // 底部控制区（计分单位 + 保存记录 / 修改记录 / 重置本局）
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
@@ -402,43 +471,53 @@ function createGameRound(autoScroll = true) {
         }
         e.target.value = val;
     });
+    unitInp.addEventListener('change', triggerSync);
+    footer.appendChild(unitDiv);
 
-    // 【💾 保存本局】按钮
+    // 【💾 保存记录】按钮
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-round-btn';
-    saveBtn.innerHTML = i18n[currentLang].saveRound;
+    saveBtn.innerHTML = i18n[currentLang].saveGame;
     saveBtn.onclick = () => {
-        saveRound(roundDiv, true);
+        saveGameRecords(gameDiv);
     };
 
-    // 【✏️ 修改本局】按钮 (保存后解锁用)
+    // 【✏️ 修改记录】按钮 (保存后解锁用)
     const modifyBtn = document.createElement('button');
     modifyBtn.className = 'modify-round-btn hidden';
-    modifyBtn.innerHTML = i18n[currentLang].modifyRound;
+    modifyBtn.innerHTML = i18n[currentLang].modifyGame;
     modifyBtn.onclick = () => {
-        unlockRoundForEdit(roundDiv);
+        unlockGameForEdit(gameDiv);
+    };
+
+    // 【📊 查看本局结算与排行】按钮 (结算后可重复查看)
+    const viewResultsBtn = document.createElement('button');
+    viewResultsBtn.className = 'view-game-results-btn hidden';
+    viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
+    viewResultsBtn.onclick = () => {
+        openSettlementModal(gameId, 'current');
     };
 
     // 【🔄 重置本局】按钮 (防误触二次确认)
     const clearBtn = document.createElement('button');
     clearBtn.className = 'clear-round-btn';
     clearBtn.dataset.confirm = "false";
-    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearGame}`;
     clearBtn.onclick = () => {
         if (clearBtn.dataset.confirm === "true") {
             clearBtn.dataset.confirm = "false";
-            clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+            clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearGame}`;
             clearBtn.style.backgroundColor = "";
-            resetRound(roundDiv);
+            resetGameRecords(gameDiv);
         } else {
             clearBtn.dataset.confirm = "true";
-            clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
+            clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClearGame}`;
             clearBtn.style.backgroundColor = "#e67e22";
             
             setTimeout(() => {
                 if (clearBtn.dataset.confirm === "true") {
                     clearBtn.dataset.confirm = "false";
-                    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
+                    clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearGame}`;
                     clearBtn.style.backgroundColor = "";
                 }
             }, 3000);
@@ -447,112 +526,66 @@ function createGameRound(autoScroll = true) {
     
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'footer-actions';
-    actionsDiv.appendChild(clearBtn);
-    actionsDiv.appendChild(modifyBtn);
     actionsDiv.appendChild(saveBtn);
-    
-    footer.appendChild(unitDiv);
-    footer.appendChild(actionsDiv);
-    roundDiv.appendChild(footer);
-    
-    const resultDiv = document.createElement('div');
-    resultDiv.className = 'round-result hidden';
-    roundDiv.appendChild(resultDiv);
+    actionsDiv.appendChild(modifyBtn);
+    actionsDiv.appendChild(viewResultsBtn);
+    actionsDiv.appendChild(clearBtn);
 
-    gameRoundsContainer.appendChild(roundDiv);
+    footer.appendChild(actionsDiv);
+    gameDiv.appendChild(footer);
+
+    gameRoundsContainer.appendChild(gameDiv);
+
     if (autoScroll) {
-        roundDiv.scrollIntoView({ behavior: 'smooth' });
+        gameDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+    
+    triggerSync();
+    return gameDiv;
 }
 
 /**
- * 保存本局并锁定防误触
- * 1. 禁用所有输入框，置入 is-saved 样式；
- * 2. 隐藏【保存】，展现【修改】；
- * 3. 实时计算并展现结算结果与“查看详细过程”按钮；
- * 4. openModal 为 true 时自动弹出单局公式明细弹窗。
+ * 保存本局记录：锁定输入框防止传阅误触，行末显示各自当前总虎数
  */
-function saveRound(roundDiv, openModal = false) {
-    const unitInput = roundDiv.querySelector('.round-unit');
-    const unit = parseFloat(unitInput.value) || 0.5;
-    
-    let tigersMap = {};
-    const roundAliases = {};
-    const rows = roundDiv.querySelectorAll('.player-row');
-    rows.forEach(row => {
-        const dir = row.dataset.dir;
-        const aliasInp = row.querySelector('.player-alias');
-        const aliasVal = (aliasInp && aliasInp.value && aliasInp.value.trim()) ? aliasInp.value.trim() : (aliases[dir] || dir);
-        roundAliases[dir] = aliasVal;
-
-        const inputs = row.querySelectorAll('.tiger-input');
-        const vals = [];
-        inputs.forEach(input => {
-            if (input.value !== '') vals.push(parseFloat(input.value) || 0);
-        });
-        tigersMap[dir] = vals;
-    });
-
-    const engine = window.ScoringEngine || { calculateRoundDetails };
-    const res = engine.calculateRoundDetails(tigersMap, unit, directions, roundAliases);
-
-    const resultDiv = roundDiv.querySelector('.round-result');
-    resultDiv.innerHTML = `<h3 class="result-title">${i18n[currentLang].resultTitle}</h3>`;
-    
-    res.details.forEach(item => {
-        const colorClass = item.money >= 0 ? 'positive' : 'negative';
-        const sign = item.money > 0 ? '+' : '';
-        const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
-
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'result-item';
-        itemDiv.dataset.dir = item.dir;
-        itemDiv.dataset.alias = item.alias;
-        itemDiv.innerHTML = `<span class="result-player">${item.alias} (${dirName})</span> <span class="score-val ${colorClass}">${sign}${item.money}</span>`;
-        resultDiv.appendChild(itemDiv);
-    });
-
-    // 附带“查看计算过程”交互按钮
-    const viewBtn = document.createElement('button');
-    viewBtn.className = 'view-detail-btn';
-    viewBtn.innerHTML = i18n[currentLang].viewDetails;
-    viewBtn.onclick = () => {
-        openSingleRoundModal(roundDiv.dataset.round || roundDiv.id.replace('round-', ''), roundDiv);
-    };
-    resultDiv.appendChild(viewBtn);
-    resultDiv.classList.remove('hidden');
-
-    // 锁定本局：锁定输入框防止传阅误触
-    roundDiv.classList.add('is-saved');
-    roundDiv.querySelectorAll('input').forEach(el => el.disabled = true);
+function saveGameRecords(gameDiv) {
+    gameDiv.classList.add('is-saved');
+    gameDiv.querySelectorAll('input').forEach(el => el.disabled = true);
     
     // 切换按钮状态：隐藏保存，展现修改
-    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    const saveBtn = gameDiv.querySelector('.save-round-btn');
     if (saveBtn) saveBtn.classList.add('hidden');
-    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
     if (modifyBtn) modifyBtn.classList.remove('hidden');
 
-    triggerSync();
+    // 重新计算并刷新各行虎数
+    gameDiv.querySelectorAll('.player-row').forEach(row => updateRowTotalTigers(row));
 
-    if (openModal) {
-        openSingleRoundModal(roundDiv.dataset.round || roundDiv.id.replace('round-', ''), roundDiv);
-    }
+    triggerSync();
 }
 
 /**
  * 解锁本局进入编辑态
  */
-function unlockRoundForEdit(roundDiv) {
-    roundDiv.classList.remove('is-saved');
-    roundDiv.querySelectorAll('input').forEach(el => el.disabled = false);
+function unlockGameForEdit(gameDiv) {
+    if (gameDiv.classList.contains('is-ended')) {
+        // 如果本局已结束，恢复为进行中状态
+        gameDiv.classList.remove('is-ended');
+        const badge = gameDiv.querySelector('.game-status-badge');
+        if (badge) {
+            badge.className = 'game-status-badge in-progress';
+            badge.innerText = i18n[currentLang].statusInProgress;
+        }
+        const viewBtn = gameDiv.querySelector('.view-game-results-btn');
+        if (viewBtn) viewBtn.classList.add('hidden');
+    }
 
-    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    gameDiv.classList.remove('is-saved');
+    gameDiv.querySelectorAll('input').forEach(el => el.disabled = false);
+
+    const saveBtn = gameDiv.querySelector('.save-round-btn');
     if (saveBtn) saveBtn.classList.remove('hidden');
-    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
     if (modifyBtn) modifyBtn.classList.add('hidden');
-
-    const resultDiv = roundDiv.querySelector('.round-result');
-    if (resultDiv) resultDiv.classList.add('hidden');
 
     triggerSync();
 }
@@ -560,122 +593,276 @@ function unlockRoundForEdit(roundDiv) {
 /**
  * 重置本局数据
  */
-function resetRound(roundDiv) {
-    roundDiv.classList.remove('is-saved');
-    roundDiv.querySelectorAll('.tiger-list').forEach(list => {
-        list.innerHTML = '';
-        list.appendChild(createTigerInput());
+function resetGameRecords(gameDiv) {
+    gameDiv.classList.remove('is-saved');
+    gameDiv.classList.remove('is-ended');
+
+    const badge = gameDiv.querySelector('.game-status-badge');
+    if (badge) {
+        badge.className = 'game-status-badge in-progress';
+        badge.innerText = i18n[currentLang].statusInProgress;
+    }
+
+    gameDiv.querySelectorAll('.player-row').forEach(row => {
+        const list = row.querySelector('.tiger-list');
+        if (list) {
+            list.innerHTML = '';
+            list.appendChild(createTigerInput(1));
+        }
+        updateRowTotalTigers(row);
     });
-    roundDiv.querySelectorAll('input').forEach(el => el.disabled = false);
 
-    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    gameDiv.querySelectorAll('input').forEach(el => el.disabled = false);
+
+    const saveBtn = gameDiv.querySelector('.save-round-btn');
     if (saveBtn) saveBtn.classList.remove('hidden');
-    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    const modifyBtn = gameDiv.querySelector('.modify-round-btn');
     if (modifyBtn) modifyBtn.classList.add('hidden');
-
-    const resultDiv = roundDiv.querySelector('.round-result');
-    if (resultDiv) resultDiv.classList.add('hidden');
+    const viewBtn = gameDiv.querySelector('.view-game-results-btn');
+    if (viewBtn) viewBtn.classList.add('hidden');
 
     triggerSync();
 }
 
-// Single Round Detail Modal (Shows Tiger Count and Formula: ((本人虎数*3-其他人虎数之和)*单位))
-function openSingleRoundModal(roundId, roundDiv) {
-    const modal = document.getElementById('singleRoundModal');
-    const modalTitle = document.getElementById('singleRoundModalTitle');
-    const modalBody = document.getElementById('singleRoundModalBody');
-    if (!modal || !modalBody) return;
-    
-    modalTitle.innerText = i18n[currentLang].singleModalTitle.replace('{n}', roundId);
-    
-    const unitInput = roundDiv.querySelector('.round-unit');
-    const unit = parseFloat(unitInput.value) || 0.5;
-    
-    const tigersMap = {};
-    const roundAliases = {};
+/**
+ * 结束当前局：打完两三圈后正式结算！
+ * 1. 锁定当轮输入，标记本局已结束；
+ * 2. 计算本局每人总得分与公式明细；
+ * 3. 生成当局排行榜 (1~4名)；
+ * 4. 汇总全场总游戏排行榜 (以别名唯一归集)；
+ * 5. 弹出综合结算弹窗。
+ */
+function endCurrentGame() {
+    // 找到最后一局进行中的对局
+    const allGames = document.querySelectorAll('.game-round');
+    if (allGames.length === 0) {
+        alert(i18n[currentLang].noGamesAlert);
+        return;
+    }
+
+    let targetGame = null;
+    for (let i = allGames.length - 1; i >= 0; i--) {
+        if (!allGames[i].classList.contains('is-ended')) {
+            targetGame = allGames[i];
+            break;
+        }
+    }
+    // 如果全都已结束，则取最后一局
+    if (!targetGame) {
+        targetGame = allGames[allGames.length - 1];
+    }
+
+    const gameId = targetGame.dataset.game || targetGame.id.replace('round-', '').replace('game-', '');
+
+    // 锁定本局并标记为已结束
+    targetGame.classList.add('is-ended');
+    saveGameRecords(targetGame);
+
+    const badge = targetGame.querySelector('.game-status-badge');
+    if (badge) {
+        badge.className = 'game-status-badge ended';
+        badge.innerText = i18n[currentLang].statusEnded;
+    }
+
+    const viewBtn = targetGame.querySelector('.view-game-results-btn');
+    if (viewBtn) viewBtn.classList.remove('hidden');
+
+    // 打开综合结算与排行榜大弹窗
+    openSettlementModal(gameId, 'current');
+
+    triggerSync();
+}
+
+// --- 综合结算与排行榜弹窗控制器 ---
+let activeModalTab = 'current'; // 'current' or 'grand'
+let grandViewMode = 'money';    // 'money' or 'tigers'
+let lastSettledGameId = 1;
+
+function openSettlementModal(gameId, defaultTab = 'current') {
+    const modal = document.getElementById('settlementModal');
+    if (!modal) return;
+
+    lastSettledGameId = gameId || lastSettledGameId || 1;
+    activeModalTab = defaultTab;
+
+    // 切换标签页视觉状态
+    const tabCurrentBtn = document.getElementById('tabCurrentGameBtn');
+    const tabGrandBtn = document.getElementById('tabGrandTotalBtn');
+    const currentPanel = document.getElementById('tabCurrentGamePanel');
+    const grandPanel = document.getElementById('tabGrandTotalPanel');
+
+    if (activeModalTab === 'current') {
+        tabCurrentBtn.classList.add('active');
+        tabGrandBtn.classList.remove('active');
+        currentPanel.classList.remove('hidden');
+        grandPanel.classList.add('hidden');
+    } else {
+        tabCurrentBtn.classList.remove('active');
+        tabGrandBtn.classList.add('active');
+        currentPanel.classList.add('hidden');
+        grandPanel.classList.remove('hidden');
+    }
+
+    // 渲染两个标签页的内容
+    renderCurrentGamePanel(lastSettledGameId);
+    renderGrandTotalPanel();
+
+    modal.classList.remove('hidden');
+}
+
+/**
+ * 渲染 Tab 1: 当局结算与排行（包含当局排行榜与详细计算公式）
+ */
+function renderCurrentGamePanel(gameId) {
+    const gameDiv = document.getElementById(`game-${gameId}`) || document.getElementById(`round-${gameId}`);
+    if (!gameDiv) return;
+
+    const unitInput = gameDiv.querySelector('.round-unit');
+    const unit = parseFloat(unitInput ? unitInput.value : 0.5) || 0.5;
+
+    const handsMap = {};
+    const gameAliases = {};
+    let totalHandsCount = 0;
+
     directions.forEach(dir => {
-        const row = roundDiv.querySelector(`.row-${dir}`);
+        const row = gameDiv.querySelector(`.row-${dir}`);
+        if (!row) return;
+
         const aliasInp = row.querySelector('.player-alias');
         const aliasVal = (aliasInp && aliasInp.value && aliasInp.value.trim()) ? aliasInp.value.trim() : (aliases[dir] || dir);
-        roundAliases[dir] = aliasVal;
+        gameAliases[dir] = aliasVal;
 
         const inputs = row.querySelectorAll('.tiger-input');
+        totalHandsCount = Math.max(totalHandsCount, inputs.length);
         const vals = [];
         inputs.forEach(input => {
             if (input.value !== '') vals.push(parseFloat(input.value) || 0);
         });
-        tigersMap[dir] = vals;
+        handsMap[dir] = vals;
     });
 
-    const engine = window.ScoringEngine || { calculateRoundDetails };
-    const res = engine.calculateRoundDetails(tigersMap, unit, directions, roundAliases);
+    const engine = window.ScoringEngine || {};
+    const res = engine.calculateGameDetails 
+        ? engine.calculateGameDetails(handsMap, unit, directions, gameAliases)
+        : engine.calculateRoundDetails(handsMap, unit, directions, gameAliases);
+    
+    const leaderboard = engine.calculateGameLeaderboard 
+        ? engine.calculateGameLeaderboard(res.details)
+        : [...res.details].sort((a,b) => b.money - a.money).map((p, i) => ({ ...p, rank: i + 1, isWinner: p.money > 0 && i === 0 }));
 
-    let html = '';
-    res.details.forEach(item => {
-        const colorClass = item.money >= 0 ? 'positive' : 'negative';
-        const sign = item.money > 0 ? '+' : '';
-        const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
-        
-        html += `
-            <div class="single-calc-card row-${item.dir}">
-                <div class="calc-card-top">
-                    <div class="calc-player-name">
-                        <span>${item.alias} (${dirName})</span>
-                        <span class="calc-tigers-tag">🐅 ${i18n[currentLang].tigersTag.replace('{count}', item.tigers)}</span>
+    // 1. 设置副标题
+    const subTitle = document.getElementById('currentGameSubtitle');
+    if (subTitle) {
+        subTitle.innerText = i18n[currentLang].gameSubtitle.replace('{n}', gameId).replace('{hands}', totalHandsCount);
+    }
+    const rankNum = document.getElementById('currentGameRankNum');
+    if (rankNum) rankNum.innerText = gameId;
+
+    // 2. 渲染当局排行榜 (1~4名)
+    const lbContainer = document.getElementById('currentGameLeaderboard');
+    if (lbContainer) {
+        let lbHtml = '';
+        const rankBadges = ['🥇', '🥈', '🥉', '4️⃣'];
+        leaderboard.forEach((p, idx) => {
+            const badge = rankBadges[idx] || `${idx + 1}`;
+            const colorClass = p.money >= 0 ? 'positive' : 'negative';
+            const sign = p.money > 0 ? '+' : '';
+            const winnerBadge = p.isWinner ? `<span class="winner-crown">👑</span>` : '';
+            const cardClass = p.isWinner ? 'game-rank-card is-winner' : 'game-rank-card';
+            const dirName = i18n[currentLang][p.dir === '东' ? 'east' : p.dir === '南' ? 'south' : p.dir === '西' ? 'west' : 'north'];
+
+            lbHtml += `
+                <div class="${cardClass}">
+                    <div class="game-rank-badge">${badge}</div>
+                    <div class="game-rank-player">
+                        <span>${p.alias}</span>
+                        <span style="font-size:11px; color:#7F8C8D; font-weight:normal;">(${dirName})</span>
+                        ${winnerBadge}
                     </div>
-                    <div class="calc-money-tag score-val ${colorClass}">
-                        ${sign}${item.money} 元
+                    <div class="game-rank-stats">
+                        <span class="game-rank-tigers">🐅 ${p.tigers} 虎</span>
+                        <span class="game-rank-money score-val ${colorClass}">${sign}${p.money} 元</span>
                     </div>
                 </div>
-                <div class="calc-formula-box">
-                    <div class="calc-formula-title">${i18n[currentLang].calcProcess}:</div>
-                    <div>${i18n[currentLang].formulaDesc}</div>
-                    <div style="color:#2C3E50; font-weight:bold; margin-top:3px;">
-                        = ((${item.tigers} × 3 - ${item.othersSum}) × ${unit}) = ${sign}${item.money} 元
+            `;
+        });
+        lbContainer.innerHTML = lbHtml;
+    }
+
+    // 3. 渲染每人计算公式明细卡片
+    const formulaContainer = document.getElementById('currentGameFormulas');
+    if (formulaContainer) {
+        let formulaHtml = '';
+        res.details.forEach(item => {
+            const colorClass = item.money >= 0 ? 'positive' : 'negative';
+            const sign = item.money > 0 ? '+' : '';
+            const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
+
+            formulaHtml += `
+                <div class="single-calc-card row-${item.dir}">
+                    <div class="calc-card-top">
+                        <div class="calc-player-name">
+                            <span>${item.alias} (${dirName})</span>
+                            <span class="calc-tigers-tag">本局抓虎: ${item.tigers}</span>
+                        </div>
+                        <div class="calc-money-tag score-val ${colorClass}">
+                            ${sign}${item.money} 元
+                        </div>
+                    </div>
+                    <div class="calc-formula-box">
+                        <div class="calc-formula-title">计算过程 (（本人虎数 × 3 - 其他人虎数之和）× 计数单位):</div>
+                        <div style="color:#2C3E50; font-weight:bold; margin-top:3px;">
+                            = ((${item.tigers} × 3 - ${item.othersSum}) × ${unit}) = ${sign}${item.money} 元
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-    });
-
-    modalBody.innerHTML = html;
-    modal.classList.remove('hidden');
+            `;
+        });
+        formulaContainer.innerHTML = formulaHtml;
+    }
 }
 
-// --- Grand Total Leaderboard Modal (Money vs Tigers Option, Grouped by Alias) ---
-let currentGrandTab = 'money'; // 'money' or 'tigers'
-
-function openGrandTotalModal(tab = currentGrandTab) {
-    currentGrandTab = tab;
-    const modal = document.getElementById('grandTotalModal');
+/**
+ * 渲染 Tab 2: 全场总游戏排行榜 (以别名唯一归集，支持金额/虎数双榜切换)
+ */
+function renderGrandTotalPanel() {
     const list = document.getElementById('grandTotalList');
     const subtitle = document.getElementById('grandTotalSubtitle');
-    if (!modal || !list) return;
+    if (!list) return;
 
     const state = getGameState();
-    const engine = window.ScoringEngine || { calculateGrandTotal };
-    const grand = engine.calculateGrandTotal(state.rounds, directions, aliases);
+    const engine = window.ScoringEngine || {};
+    const grand = engine.calculateGrandTotal 
+        ? engine.calculateGrandTotal(state.rounds, directions, aliases)
+        : { settledGamesCount: 0, byMoney: [], byTigers: [] };
 
-    subtitle.innerText = i18n[currentLang].roundsPlayed.replace('{n}', grand.settledRoundsCount);
+    if (subtitle) {
+        subtitle.innerText = i18n[currentLang].grandSubtitle.replace('{n}', grand.settledGamesCount);
+    }
 
     const tabMoneyBtn = document.getElementById('tabMoneyBtn');
     const tabTigersBtn = document.getElementById('tabTigersBtn');
 
-    if (currentGrandTab === 'money') {
-        tabMoneyBtn.classList.add('active');
-        tabTigersBtn.classList.remove('active');
+    if (grandViewMode === 'money') {
+        if (tabMoneyBtn) tabMoneyBtn.classList.add('active');
+        if (tabTigersBtn) tabTigersBtn.classList.remove('active');
         renderGrandMoneyList(grand.byMoney);
     } else {
-        tabMoneyBtn.classList.remove('active');
-        tabTigersBtn.classList.add('active');
+        if (tabMoneyBtn) tabMoneyBtn.classList.remove('active');
+        if (tabTigersBtn) tabTigersBtn.classList.add('active');
         renderGrandTigersList(grand.byTigers);
     }
-
-    modal.classList.remove('hidden');
 }
 
 function renderGrandMoneyList(rankedPlayers) {
     const list = document.getElementById('grandTotalList');
+    if (!list) return;
+
+    if (rankedPlayers.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:20px; color:#95A5A6; font-weight:bold;">${i18n[currentLang].noGamesAlert}</div>`;
+        return;
+    }
+
     let html = '';
     rankedPlayers.forEach((p, idx) => {
         const rank = idx + 1;
@@ -687,7 +874,7 @@ function renderGrandMoneyList(rankedPlayers) {
         const seatsText = p.dirsPlayed && p.dirsPlayed.length > 0 
             ? `${i18n[currentLang].seatsPlayed}: ${p.dirsPlayed.map(d => i18n[currentLang][d === '东' ? 'east' : d === '南' ? 'south' : d === '西' ? 'west' : 'north']).join('、')}`
             : '';
-        const playedText = i18n[currentLang].playedAndWon.replace('{played}', p.roundsPlayed).replace('{won}', p.roundsWon);
+        const playedText = i18n[currentLang].playedAndWon.replace('{played}', p.gamesPlayed || p.roundsPlayed || 0).replace('{won}', p.gamesWon || p.roundsWon || 0);
 
         html += `
             <div class="${itemClass}">
@@ -698,9 +885,10 @@ function renderGrandMoneyList(rankedPlayers) {
                         ${winnerBadge}
                     </div>
                     <div class="leader-sub">${playedText} ${seatsText ? ' | ' + seatsText : ''}</div>
+                    <div class="leader-sub" style="color:#B9770E;">总抓虎: ${p.totalRawTigers} | 净胜虎: ${p.totalNetTigers > 0 ? '+' : ''}${p.totalNetTigers}</div>
                 </div>
                 <div class="leader-score score-val ${colorClass}">
-                    ${sign}${p.totalMoney} 元
+                    ${sign}${p.totalMoney} <span style="font-size:13px;">元</span>
                 </div>
             </div>
         `;
@@ -710,18 +898,25 @@ function renderGrandMoneyList(rankedPlayers) {
 
 function renderGrandTigersList(rankedPlayers) {
     const list = document.getElementById('grandTotalList');
+    if (!list) return;
+
+    if (rankedPlayers.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:20px; color:#95A5A6; font-weight:bold;">${i18n[currentLang].noGamesAlert}</div>`;
+        return;
+    }
+
     let html = '';
     rankedPlayers.forEach((p, idx) => {
         const rank = idx + 1;
         const colorClass = p.totalNetTigers >= 0 ? 'positive' : 'negative';
         const sign = p.totalNetTigers > 0 ? '+' : '';
-        const winnerBadge = p.isBigWinnerTigers ? `<span class="winner-crown">🐅</span><span style="color:#E67E22; font-size:12px; font-weight:800;">${i18n[currentLang].tigerKing}</span>` : '';
+        const winnerBadge = p.isBigWinnerTigers ? `<span class="winner-crown">🐯</span><span style="color:#D35400; font-size:12px; font-weight:800;">${i18n[currentLang].tigerKing}</span>` : '';
         const itemClass = p.isBigWinnerTigers ? 'leaderboard-item is-winner' : 'leaderboard-item';
 
         const seatsText = p.dirsPlayed && p.dirsPlayed.length > 0 
             ? `${i18n[currentLang].seatsPlayed}: ${p.dirsPlayed.map(d => i18n[currentLang][d === '东' ? 'east' : d === '南' ? 'south' : d === '西' ? 'west' : 'north']).join('、')}`
             : '';
-        const tigerStats = i18n[currentLang].rawTigersSummary.replace('{raw}', p.totalRawTigers).replace('{net}', (p.totalNetTigers > 0 ? '+' : '') + p.totalNetTigers);
+        const playedText = i18n[currentLang].playedAndWon.replace('{played}', p.gamesPlayed || p.roundsPlayed || 0).replace('{won}', p.gamesWon || p.roundsWon || 0);
 
         html += `
             <div class="${itemClass}">
@@ -731,10 +926,11 @@ function renderGrandTigersList(rankedPlayers) {
                         <span class="leader-name">${p.alias}</span>
                         ${winnerBadge}
                     </div>
-                    <div class="leader-sub">${tigerStats} ${seatsText ? ' | ' + seatsText : ''}</div>
+                    <div class="leader-sub">${playedText} ${seatsText ? ' | ' + seatsText : ''}</div>
+                    <div class="leader-sub" style="color:#27AE60;">累计盈亏: ${p.totalMoney > 0 ? '+' : ''}${p.totalMoney} 元</div>
                 </div>
                 <div class="leader-score score-val ${colorClass}">
-                    ${sign}${p.totalNetTigers} 虎
+                    ${sign}${p.totalNetTigers} <span style="font-size:13px;">虎</span>
                 </div>
             </div>
         `;
@@ -742,84 +938,111 @@ function renderGrandTigersList(rankedPlayers) {
     list.innerHTML = html;
 }
 
-// Modal tab listeners
+// Modal Event Listeners
+const tabCurrentGameBtn = document.getElementById('tabCurrentGameBtn');
+if (tabCurrentGameBtn) {
+    tabCurrentGameBtn.addEventListener('click', () => {
+        activeModalTab = 'current';
+        tabCurrentGameBtn.classList.add('active');
+        document.getElementById('tabGrandTotalBtn').classList.remove('active');
+        document.getElementById('tabCurrentGamePanel').classList.remove('hidden');
+        document.getElementById('tabGrandTotalPanel').classList.add('hidden');
+        renderCurrentGamePanel(lastSettledGameId);
+    });
+}
+
+const tabGrandTotalBtn = document.getElementById('tabGrandTotalBtn');
+if (tabGrandTotalBtn) {
+    tabGrandTotalBtn.addEventListener('click', () => {
+        activeModalTab = 'grand';
+        tabGrandTotalBtn.classList.add('active');
+        document.getElementById('tabCurrentGameBtn').classList.remove('active');
+        document.getElementById('tabGrandTotalPanel').classList.remove('hidden');
+        document.getElementById('tabCurrentGamePanel').classList.add('hidden');
+        renderGrandTotalPanel();
+    });
+}
+
 const tabMoneyBtn = document.getElementById('tabMoneyBtn');
 if (tabMoneyBtn) {
-    tabMoneyBtn.addEventListener('click', () => openGrandTotalModal('money'));
+    tabMoneyBtn.addEventListener('click', () => {
+        grandViewMode = 'money';
+        renderGrandTotalPanel();
+    });
 }
+
 const tabTigersBtn = document.getElementById('tabTigersBtn');
 if (tabTigersBtn) {
-    tabTigersBtn.addEventListener('click', () => openGrandTotalModal('tigers'));
-}
-
-// Close modal listeners
-const closeSingleModalBtn = document.getElementById('closeSingleModalBtn');
-if (closeSingleModalBtn) {
-    closeSingleModalBtn.addEventListener('click', () => {
-        document.getElementById('singleRoundModal').classList.add('hidden');
-    });
-}
-const confirmSingleModalBtn = document.getElementById('confirmSingleModalBtn');
-if (confirmSingleModalBtn) {
-    confirmSingleModalBtn.addEventListener('click', () => {
-        document.getElementById('singleRoundModal').classList.add('hidden');
-    });
-}
-const closeGrandModalBtn = document.getElementById('closeGrandModalBtn');
-if (closeGrandModalBtn) {
-    closeGrandModalBtn.addEventListener('click', () => {
-        document.getElementById('grandTotalModal').classList.add('hidden');
-    });
-}
-const confirmGrandModalBtn = document.getElementById('confirmGrandModalBtn');
-if (confirmGrandModalBtn) {
-    confirmGrandModalBtn.addEventListener('click', () => {
-        document.getElementById('grandTotalModal').classList.add('hidden');
+    tabTigersBtn.addEventListener('click', () => {
+        grandViewMode = 'tigers';
+        renderGrandTotalPanel();
     });
 }
 
-// Top button listeners
+const closeSettlementModalBtn = document.getElementById('closeSettlementModalBtn');
+if (closeSettlementModalBtn) {
+    closeSettlementModalBtn.addEventListener('click', () => {
+        document.getElementById('settlementModal').classList.add('hidden');
+    });
+}
+
+const confirmSettlementModalBtn = document.getElementById('confirmSettlementModalBtn');
+if (confirmSettlementModalBtn) {
+    confirmSettlementModalBtn.addEventListener('click', () => {
+        document.getElementById('settlementModal').classList.add('hidden');
+    });
+}
+
+const modalStartNextGameBtn = document.getElementById('modalStartNextGameBtn');
+if (modalStartNextGameBtn) {
+    modalStartNextGameBtn.addEventListener('click', () => {
+        document.getElementById('settlementModal').classList.add('hidden');
+        createGameRound(true);
+    });
+}
+
+// --- Top Action Buttons Wiring ---
 startGameBtn.addEventListener('click', () => {
     createGameRound(true);
-    triggerSync();
 });
 
-// Grand End Game button with double confirmation (Bug 7)
+// 【结束本局 🏆】按钮带二次防误触确认机制
 if (endSessionBtn) {
     endSessionBtn.addEventListener('click', () => {
         if (endSessionBtn.dataset.confirm === "true") {
             endSessionBtn.dataset.confirm = "false";
-            endSessionBtn.innerHTML = i18n[currentLang].endSession;
+            endSessionBtn.innerHTML = i18n[currentLang].endGame;
             endSessionBtn.classList.remove('confirming');
-            
-            const state = getGameState();
-            const settled = state.rounds.filter(r => r.isSaved || r.isEnded);
-            if (settled.length === 0) {
-                alert(i18n[currentLang].noRoundsAlert);
-                return;
-            }
-            openGrandTotalModal();
+            endCurrentGame();
         } else {
             endSessionBtn.dataset.confirm = "true";
-            endSessionBtn.innerHTML = i18n[currentLang].confirmEndSession;
+            endSessionBtn.innerHTML = i18n[currentLang].confirmEndGame;
             endSessionBtn.classList.add('confirming');
             
             setTimeout(() => {
                 if (endSessionBtn.dataset.confirm === "true") {
                     endSessionBtn.dataset.confirm = "false";
-                    endSessionBtn.innerHTML = i18n[currentLang].endSession;
+                    endSessionBtn.innerHTML = i18n[currentLang].endGame;
                     endSessionBtn.classList.remove('confirming');
                 }
-            }, 3000);
+            }, 3500);
         }
     });
 }
 
+// 【全场总榜 👑】按钮
+if (viewGrandBtn) {
+    viewGrandBtn.addEventListener('click', () => {
+        openSettlementModal(lastSettledGameId, 'grand');
+    });
+}
+
+// 【全部清空】按钮带二次确认
 if (clearAllBtn) {
     clearAllBtn.addEventListener('click', () => {
         if (clearAllBtn.dataset.confirm === "true") {
             gameRoundsContainer.innerHTML = '';
-            roundCount = 0;
+            gameCount = 0;
             startGameBtn.innerHTML = i18n[currentLang].startGame;
             
             clearAllBtn.dataset.confirm = "false";
@@ -843,7 +1066,7 @@ if (clearAllBtn) {
     });
 }
 
-// --- Notepad Room Sync Logic ---
+// --- Room & Sync Logic ---
 let currentRoomCode = null;
 
 async function checkRoom() {
@@ -857,9 +1080,17 @@ async function checkRoom() {
     } else {
         return;
     }
+
+    const roomCodeText = document.getElementById('roomCodeText');
+    if (roomCodeText) {
+        roomCodeText.innerText = currentRoomCode;
+    }
+    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+    if (roomCodeDisplay) {
+        roomCodeDisplay.addEventListener('click', copyLink);
+    }
     
     const headerBtns = document.querySelector('.header-buttons');
-    
     const roomInfo = document.createElement('div');
     roomInfo.className = 'room-settings-bar';
     roomInfo.innerHTML = `
@@ -876,7 +1107,6 @@ async function checkRoom() {
     `;
 
     headerBtns.insertAdjacentElement('afterend', roomInfo);
-    
     loadRoomData();
 }
 
@@ -911,7 +1141,7 @@ async function loadRoomData() {
     const data = await res.json();
     
     if (data.error === 'Password required' || data.error === 'Incorrect password') {
-        document.querySelector('.container').innerHTML = `
+        document.querySelector('.app-container').innerHTML = `
             <div class="locked-screen">
                   <h2>${i18n[currentLang].lockedTitle}</h2>
                   <p style="color: #555; font-weight: bold; margin-bottom: 20px;">${i18n[currentLang].lockedPrompt}</p>
@@ -1022,7 +1252,7 @@ document.addEventListener('compositionend', (e) => {
 
 document.addEventListener('input', (e) => {
     recordActivity();
-    if (isComposing) return; // Do not interrupt during Chinese Pinyin input!
+    if (isComposing) return;
     
     if (e.target.tagName === 'INPUT') {
         if (e.target.classList.contains('player-alias')) {
@@ -1057,24 +1287,26 @@ function triggerSync() {
     }, 250);
 }
 
-// Serialization (Supports isSaved, per-round aliases, and empty tiger inputs)
+// Serialization
 function getGameState() {
     const rounds = [];
-    document.querySelectorAll('.game-round').forEach(roundDiv => {
-        const isSaved = roundDiv.classList.contains('is-saved');
+    document.querySelectorAll('.game-round').forEach(gameDiv => {
+        const isSaved = gameDiv.classList.contains('is-saved');
+        const isEnded = gameDiv.classList.contains('is-ended');
+        const unit = parseFloat(gameDiv.querySelector('.round-unit').value) || 0.5;
+
         const roundState = {
-            unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 0.5,
+            unit: unit,
             players: {},
             isSaved: isSaved,
-            isEnded: isSaved // Compatibility with previous records
+            isEnded: isEnded
         };
         
-        roundDiv.querySelectorAll('.player-row').forEach(row => {
+        gameDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
             const aliasInput = row.querySelector('.player-alias');
             const rowAlias = (aliasInput && aliasInput.value && aliasInput.value.trim()) ? aliasInput.value.trim() : (aliases[dir] || dir);
             
-            // Update global aliases cache for next round creation
             aliases[dir] = rowAlias;
 
             const tigers = [];
@@ -1083,7 +1315,8 @@ function getGameState() {
             });
             roundState.players[dir] = {
                 alias: rowAlias,
-                tigers: tigers
+                tigers: tigers,
+                hands: tigers
             };
         });
         rounds.push(roundState);
@@ -1091,7 +1324,7 @@ function getGameState() {
     return { aliases: aliases, rounds: rounds };
 }
 
-// Deserialization (Restores saved state, locked inputs, and custom aliases per round)
+// Deserialization
 async function applyGameState(state) {
     let roundsToApply = [];
     if (Array.isArray(state)) {
@@ -1099,68 +1332,82 @@ async function applyGameState(state) {
     } else if (state && state.rounds) {
         roundsToApply = state.rounds;
         if (state.aliases) {
-            aliases = Object.assign(aliases, state.aliases);
+            aliases = { ...aliases, ...state.aliases };
         }
     }
-    const container = document.getElementById('gameRoundsContainer');
-    container.innerHTML = '';
-    roundCount = 0;
-    
-    roundsToApply.forEach(roundState => {
-        createGameRound(false);
-        const roundDiv = container.lastElementChild;
-        if (!roundDiv) return;
-        
-        const unitInput = roundDiv.querySelector('.round-unit');
-        if (unitInput) unitInput.value = (roundState.unit !== undefined ? roundState.unit : 0.5);
-        
-        roundDiv.querySelectorAll('.player-row').forEach(row => {
-            const dir = row.dataset.dir;
-            const playerData = roundState.players ? roundState.players[dir] : null;
-            let tigers = [];
-            let rowAlias = aliases[dir] || '';
-            
-            if (Array.isArray(playerData)) {
-                tigers = playerData;
-            } else if (playerData && typeof playerData === 'object') {
-                tigers = playerData.tigers || [];
-                if (playerData.alias) rowAlias = playerData.alias;
-            }
-            
-            const aliasInput = row.querySelector('.player-alias');
-            if (aliasInput && rowAlias) {
-                aliasInput.value = rowAlias;
-            }
-            
-            const tigerList = row.querySelector('.tiger-list');
-            if (tigerList) {
-                tigerList.innerHTML = '';
-                if (tigers.length === 0) {
-                    tigerList.appendChild(createTigerInput());
-                } else {
-                    tigers.forEach(val => {
-                        const input = createTigerInput();
-                        input.value = (val === '' || val === null || val === undefined) ? '' : val;
-                        tigerList.appendChild(input);
-                    });
+
+    if (!roundsToApply || roundsToApply.length === 0) return;
+
+    // Guard against overwriting while user is typing
+    if (Date.now() - lastInteractionTime < 2500) {
+        return;
+    }
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+        return;
+    }
+
+    gameRoundsContainer.innerHTML = '';
+    gameCount = 0;
+
+    roundsToApply.forEach((rState, rIdx) => {
+        const gameDiv = createGameRound(false);
+        const unitInp = gameDiv.querySelector('.round-unit');
+        if (unitInp && rState.unit !== undefined) {
+            unitInp.value = rState.unit;
+        }
+
+        directions.forEach(dir => {
+            const row = gameDiv.querySelector(`.row-${dir}`);
+            if (!row) return;
+
+            const pData = rState.players ? rState.players[dir] : null;
+            if (pData) {
+                const aliasInp = row.querySelector('.player-alias');
+                if (aliasInp && pData.alias) {
+                    aliasInp.value = pData.alias;
+                    aliases[dir] = pData.alias;
+                }
+                const tigerList = row.querySelector('.tiger-list');
+                if (tigerList) {
+                    tigerList.innerHTML = '';
+                    const hands = pData.tigers || pData.hands || [];
+                    if (hands.length === 0) {
+                        tigerList.appendChild(createTigerInput(1));
+                    } else {
+                        hands.forEach((val, hIdx) => {
+                            const inp = createTigerInput(hIdx + 1);
+                            inp.value = (val !== null && val !== undefined) ? val : '';
+                            tigerList.appendChild(inp);
+                        });
+                    }
                 }
             }
+            updateRowTotalTigers(row);
         });
-        
-        // If round was saved or ended, apply save & lock styling
-        if (roundState.isSaved || roundState.isEnded) {
-            saveRound(roundDiv, false);
+
+        if (rState.isEnded) {
+            gameDiv.classList.add('is-ended');
+            const badge = gameDiv.querySelector('.game-status-badge');
+            if (badge) {
+                badge.className = 'game-status-badge ended';
+                badge.innerText = i18n[currentLang].statusEnded;
+            }
+            const viewBtn = gameDiv.querySelector('.view-game-results-btn');
+            if (viewBtn) viewBtn.classList.remove('hidden');
+        }
+
+        if (rState.isSaved || rState.isEnded) {
+            saveGameRecords(gameDiv);
         }
     });
-
-    document.getElementById('startGameBtn').innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
 }
 
-// Push state to server with password (Bug 3 Fix)
 async function pushStateToServer() {
-    if (isSyncing || !currentRoomCode) return;
+    if (!currentRoomCode || isSyncing) return;
     const state = getGameState();
-    const roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
+    const pwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
+    
     try {
         await fetch('/api/game', {
             method: 'POST',
@@ -1169,40 +1416,43 @@ async function pushStateToServer() {
                 action: 'save_state',
                 roomCode: currentRoomCode,
                 state: state,
-                password: roomPwd
+                password: pwd
             })
         });
     } catch(e) {
-        console.error('Push state failed:', e);
+        console.error("Failed to push state", e);
     }
 }
 
-// Periodically pull state from server (Guarded against user typing and Chinese IME)
+// Periodic sync poll (Every 3 seconds)
 setInterval(async () => {
     if (!currentRoomCode || isSyncing) return;
-    if (isComposing) return;
-    if (Date.now() - lastInteractionTime < 4000) return;
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    if (Date.now() - lastInteractionTime < 2500) return;
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
     
+    let url = '/api/room?code=' + encodeURIComponent(currentRoomCode);
+    let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
+    if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
+
     try {
-        let url = '/api/room?code=' + encodeURIComponent(currentRoomCode);
-        let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
-        if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
-        
         const res = await fetch(url);
         const data = await res.json();
         if (data.success && data.room && data.room.state) {
-            const remoteStateStr = JSON.stringify(data.room.state);
-            const localStateStr = JSON.stringify(getGameState());
-            if (remoteStateStr !== localStateStr) {
-                isSyncing = true;
-                applyGameState(data.room.state);
-                isSyncing = false;
-            }
+            isSyncing = true;
+            await applyGameState(data.room.state);
+            isSyncing = false;
         }
     } catch(e) {}
 }, 3000);
 
-// Initialize everything
-initDogs();
-checkRoom();
+// Initialize Page
+document.addEventListener('DOMContentLoaded', () => {
+    initDogs();
+    checkRoom();
+    
+    // If not in a room and no game cards exist, create first game card automatically
+    if (!window.location.pathname.startsWith('/mj/') && document.querySelectorAll('.game-round').length === 0) {
+        createGameRound(false);
+    }
+});

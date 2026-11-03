@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🐶 🀄 麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=30">
+    <title>🐶 🀄 豆豆酱麻将计分器 🐕</title>
+    <link rel="stylesheet" href="/style.css?v=31">
 </head>
 <body>
-    <div class="container">
-        <!-- Top Nav Bar: Language Toggle -->
+    <div class="app-container">
+        <!-- Top bar with Language Switcher and Room Code Display -->
         <div class="top-nav-bar">
-            <button id="langToggle">中 / En</button>
+            <div class="room-code-tag" id="roomCodeDisplay" title="点击复制房间链接">
+                <span class="room-icon">🔗</span>
+                <span class="room-label">房间号:</span>
+                <span class="room-value" id="roomCodeText">加载中...</span>
+            </div>
+            <button class="lang-toggle-pill" id="langToggle" title="切换中英文 / Switch Language">En / 中</button>
         </div>
         
         <!-- Header Banner Container (Dual Language Flanking Dogs & Mahjong Rack) -->
         <header class="header-banner-container" id="headerBanner">
             <div class="banner-wrapper" id="bannerWrapper">
-                <img src="/images/header-zh.png?v=30" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
+                <img src="/images/header-zh.png?v=31" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
                 <!-- Interactive Hotspots for Poodle, Fluffy Pup and Title -->
                 <div class="pet-hotspot hotspot-left-poodle" id="hotspotLeftPoodle" title="泰迪贵宾"></div>
                 <div class="pet-hotspot hotspot-right-fluffy" id="hotspotRightFluffy" title="花色小狗"></div>
@@ -25,12 +30,16 @@
             <h1 id="mainTitle" class="sr-only" data-i18n="title">麻将计分器</h1>
         </header>
 
+        <!-- Top Main Action Buttons -->
         <div class="action-buttons header-buttons">
             <button id="startGameBtn" class="primary-btn" data-i18n="startGame">
                 开始游戏 ▶
             </button>
-            <button id="endSessionBtn" class="end-session-btn" data-i18n="endSession" data-confirm="false">
-                结束游戏 🏆
+            <button id="endSessionBtn" class="end-session-btn" data-i18n="endGame" data-confirm="false">
+                结束本局 🏆
+            </button>
+            <button id="viewGrandBtn" class="view-grand-btn" data-i18n="viewGrand">
+                全场总榜 👑
             </button>
             <button id="clearAllBtn" class="clear-all-btn" data-i18n="clearAll" data-confirm="false">
                 全部清空
@@ -39,52 +48,65 @@
 
         <main>
             <div id="gameRoundsContainer">
-                <!-- Dynamic blocks -->
+                <!-- 动态局数卡片容器 -->
             </div>
         </main>
     </div>
 
-    <!-- 单局结算明细弹窗 (展示每人虎数与详细计算过程) -->
-    <div id="singleRoundModal" class="modal-overlay hidden">
+    <!-- 结算与排行榜综合弹窗 -->
+    <div id="settlementModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 id="singleRoundModalTitle">第 1 局结算详情</h3>
-                <button class="modal-close-btn" id="closeSingleModalBtn">✕</button>
-            </div>
-            <div class="modal-body" id="singleRoundModalBody">
-                <!-- 动态填充 -->
-            </div>
-            <div class="modal-footer">
-                <button class="modal-action-btn" id="confirmSingleModalBtn">确定</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 全局总结算大赢家排行榜弹窗 (支持按金额/按虎数切换) -->
-    <div id="grandTotalModal" class="modal-overlay hidden">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="grandTotalModalTitle">🏆 全局结算大赢家 🏆</h3>
-                <button class="modal-close-btn" id="closeGrandModalBtn">✕</button>
+                <h3 id="settlementModalTitle">🀄 结算与排行榜</h3>
+                <button class="modal-close-btn" id="closeSettlementModalBtn">✕</button>
             </div>
             <div class="modal-body">
-                <!-- 统计维度切换选项卡 -->
-                <div class="modal-tab-group">
-                    <button id="tabMoneyBtn" class="modal-tab-btn active">💰 按金额统计</button>
-                    <button id="tabTigersBtn" class="modal-tab-btn">🐯 按虎数统计</button>
+                <!-- 顶部主标签页切换：当局结算 vs 全场总榜 -->
+                <div class="modal-tab-group main-tabs">
+                    <button id="tabCurrentGameBtn" class="modal-tab-btn active">🀄 当局结算与排行</button>
+                    <button id="tabGrandTotalBtn" class="modal-tab-btn">🏆 全场总游戏排行榜</button>
                 </div>
-                <div id="grandTotalSubtitle" class="grand-total-subtitle">共进行了 0 局</div>
-                <div id="grandTotalList" class="grand-total-list">
-                    <!-- 动态排行榜 -->
+
+                <!-- Tab 1: 当局结算与排行 -->
+                <div id="tabCurrentGamePanel" class="tab-panel">
+                    <div id="currentGameSubtitle" class="grand-total-subtitle">第 1 局结算详情（共打 0 把）</div>
+                    
+                    <!-- 当局排行榜 (1~4名) -->
+                    <div class="section-title">🏆 当局排行榜 (第 <span id="currentGameRankNum">1</span> 局)</div>
+                    <div id="currentGameLeaderboard" class="game-leaderboard-list">
+                        <!-- 动态生成 1~4 名排行榜卡片 -->
+                    </div>
+
+                    <!-- 详细计算公式推导过程 -->
+                    <div class="section-title" style="margin-top: 14px;">🧮 本局每人虎数与计算公式</div>
+                    <div id="currentGameFormulas" class="game-formula-list">
+                        <!-- 动态生成每人计算公式明细 -->
+                    </div>
+                </div>
+
+                <!-- Tab 2: 全场总游戏排行榜 -->
+                <div id="tabGrandTotalPanel" class="tab-panel hidden">
+                    <div class="grand-total-header-row">
+                        <div id="grandTotalSubtitle" class="grand-total-subtitle">全场累计（已结算 0 局）</div>
+                        <!-- 金额 vs 虎数切换 -->
+                        <div class="modal-tab-group sub-tabs">
+                            <button id="tabMoneyBtn" class="modal-tab-btn active">💰 按金额</button>
+                            <button id="tabTigersBtn" class="modal-tab-btn">🐯 按虎数</button>
+                        </div>
+                    </div>
+                    <div id="grandTotalList" class="grand-total-list">
+                        <!-- 动态全场排行榜 -->
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="modal-action-btn" id="confirmGrandModalBtn">关闭</button>
+                <button class="modal-action-btn secondary" id="modalStartNextGameBtn">开始下一局 ▶</button>
+                <button class="modal-action-btn" id="confirmSettlementModalBtn">确定</button>
             </div>
         </div>
     </div>
 
-    <script src="/scoring.js?v=30"></script>
-    <script src="/app.js?v=30"></script>
+    <script src="/scoring.js?v=31"></script>
+    <script src="/app.js?v=31"></script>
 </body>
 </html>
