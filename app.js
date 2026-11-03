@@ -179,7 +179,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=33' : '/images/header-zh.png?v=33';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=34' : '/images/header-zh.png?v=34';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -360,7 +360,29 @@ function createGameRound(autoScroll = true) {
 
     header.appendChild(headerLeft);
 
-    // 【➕ 再记一把】按钮：每打完一把洗牌，按一次为所有玩家追加这一把的虎数框（必须保存这把后才能再记一把）
+    // 头部右侧操作组：【💾 保存这把】与【➕ 再记一把】并排，随手操作更直观
+    const headerActions = document.createElement('div');
+    headerActions.className = 'round-header-actions';
+
+    // 【💾 保存这把】按钮（把级操作，录完这把直接在旁边保存）
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-round-btn save-hand-btn';
+    saveBtn.innerHTML = i18n[currentLang].saveHand;
+    saveBtn.onclick = () => {
+        if (gameDiv.dataset.isEditing === "true") {
+            // 完成修改本局：保存修改
+            gameDiv.dataset.isEditing = "false";
+            gameDiv.dataset.handSaved = "true";
+        } else {
+            // 保存当前这把
+            gameDiv.dataset.handSaved = "true";
+        }
+        updateGameHandState(gameDiv);
+        triggerSync();
+    };
+    headerActions.appendChild(saveBtn);
+
+    // 【➕ 再记一把】按钮（保存这把后在旁边直接追加新一把）
     const addHandBtn = document.createElement('button');
     addHandBtn.className = 'round-plus-btn';
     addHandBtn.innerText = i18n[currentLang].addHand;
@@ -397,7 +419,9 @@ function createGameRound(autoScroll = true) {
         }
         triggerSync();
     };
-    header.appendChild(addHandBtn);
+    headerActions.appendChild(addHandBtn);
+
+    header.appendChild(headerActions);
     gameDiv.appendChild(header);
 
     // 东西南北 4 行玩家记录行
@@ -478,39 +502,29 @@ function createGameRound(autoScroll = true) {
     unitInp.addEventListener('change', triggerSync);
     footer.appendChild(unitDiv);
 
-    // 操作第 1 行：数据记录管理
+    // 操作第 1 行：局级调整与重置
     const actionsRow1 = document.createElement('div');
     actionsRow1.className = 'footer-actions-row1';
 
-    // 【💾 保存这把】/【💾 保存修改】按钮
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'save-round-btn';
-    saveBtn.innerHTML = i18n[currentLang].saveHand;
-    saveBtn.onclick = () => {
-        if (gameDiv.dataset.isEditing === "true") {
-            // 完成修改本局：保存修改
-            gameDiv.dataset.isEditing = "false";
-            gameDiv.dataset.handSaved = "true";
-        } else {
-            // 保存当前把
-            gameDiv.dataset.handSaved = "true";
-        }
-        updateGameHandState(gameDiv);
-        triggerSync();
-    };
-    actionsRow1.appendChild(saveBtn);
-
-    // 【✏️ 修改本局】按钮 (随时可解锁之前所有把进行修改)
+    // 【✏️ 修改本局】按钮 (随时可解锁之前所有把进行修改；编辑中点击亦可完成保存)
     const modifyBtn = document.createElement('button');
     modifyBtn.className = 'modify-round-btn';
     modifyBtn.innerHTML = i18n[currentLang].modifyGame;
     modifyBtn.onclick = () => {
-        if (gameDiv.classList.contains('is-ended')) {
-            gameDiv.classList.remove('is-ended');
+        if (gameDiv.dataset.isEditing === "true") {
+            // 编辑态中再次点击即可保存全局修改
+            gameDiv.dataset.isEditing = "false";
+            gameDiv.dataset.handSaved = "true";
+            updateGameHandState(gameDiv);
+            triggerSync();
+        } else {
+            if (gameDiv.classList.contains('is-ended')) {
+                gameDiv.classList.remove('is-ended');
+            }
+            gameDiv.dataset.isEditing = "true";
+            updateGameHandState(gameDiv);
+            triggerSync();
         }
-        gameDiv.dataset.isEditing = "true";
-        updateGameHandState(gameDiv);
-        triggerSync();
     };
     actionsRow1.appendChild(modifyBtn);
 
@@ -679,7 +693,9 @@ function updateGameHandState(gameDiv) {
             saveHandBtn.innerHTML = i18n[currentLang].saveChanges;
         }
         if (modifyBtn) {
-            modifyBtn.classList.add('hidden');
+            modifyBtn.classList.remove('hidden');
+            modifyBtn.disabled = false;
+            modifyBtn.innerHTML = i18n[currentLang].saveChanges;
         }
     } else {
         // --- 常规打牌记分模式 ---
@@ -908,6 +924,12 @@ function renderCurrentGamePanel(gameId) {
             const cardClass = p.isWinner ? 'game-rank-card is-winner' : 'game-rank-card';
             const dirName = i18n[currentLang][p.dir === '东' ? 'east' : p.dir === '南' ? 'south' : p.dir === '西' ? 'west' : 'north'];
 
+            const netSign = p.netTigers > 0 ? '+' : '';
+            const netColorClass = p.netTigers > 0 ? 'pos' : (p.netTigers < 0 ? 'neg' : 'zero');
+            const tigersText = currentLang === 'en' ? `Total: ${p.tigers}` : `共 ${p.tigers} 虎`;
+            const netText = currentLang === 'en' ? `Net: ${netSign}${p.netTigers}` : `净胜: ${netSign}${p.netTigers} 虎`;
+            const moneyText = currentLang === 'en' ? `${sign}${p.money}` : `${sign}${p.money} 元`;
+
             lbHtml += `
                 <div class="${cardClass}">
                     <div class="game-rank-badge">${badge}</div>
@@ -917,8 +939,9 @@ function renderCurrentGamePanel(gameId) {
                         ${winnerBadge}
                     </div>
                     <div class="game-rank-stats">
-                        <span class="game-rank-tigers">🐅 ${p.tigers} 虎</span>
-                        <span class="game-rank-money score-val ${colorClass}">${sign}${p.money} 元</span>
+                        <span class="game-rank-tigers" title="累计抓虎">🐅 ${tigersText}</span>
+                        <span class="game-rank-net-tigers ${netColorClass}" title="净胜虎数">${netText}</span>
+                        <span class="game-rank-money score-val ${colorClass}">${moneyText}</span>
                     </div>
                 </div>
             `;
@@ -935,12 +958,18 @@ function renderCurrentGamePanel(gameId) {
             const sign = item.money > 0 ? '+' : '';
             const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
 
+            const netSign = item.netTigers > 0 ? '+' : '';
+            const netColorClass = item.netTigers > 0 ? 'pos' : (item.netTigers < 0 ? 'neg' : 'zero');
+            const rawLabel = currentLang === 'en' ? `Total: ${item.tigers}` : `共抓: ${item.tigers} 虎`;
+            const netTag = currentLang === 'en' ? `Net: ${netSign}${item.netTigers}` : `净胜: ${netSign}${item.netTigers} 虎`;
+
             formulaHtml += `
                 <div class="single-calc-card row-${item.dir}">
                     <div class="calc-card-top">
                         <div class="calc-player-name">
                             <span>${item.alias} (${dirName})</span>
-                            <span class="calc-tigers-tag">${currentLang === 'en' ? 'Tigers: ' : '共抓虎: '}${item.tigers}</span>
+                            <span class="calc-tigers-tag">${rawLabel}</span>
+                            <span class="calc-net-tag ${netColorClass}">${netTag}</span>
                         </div>
                         <div class="calc-money-tag score-val ${colorClass}">
                             ${sign}${item.money} ${currentLang === 'en' ? '' : '元'}
@@ -1024,7 +1053,7 @@ function renderGrandMoneyList(rankedPlayers) {
                         ${winnerBadge}
                     </div>
                     <div class="leader-sub">${playedText} ${seatsText ? ' | ' + seatsText : ''}</div>
-                    <div class="leader-sub" style="color:#B9770E;">总抓虎: ${p.totalRawTigers} | 净胜虎: ${p.totalNetTigers > 0 ? '+' : ''}${p.totalNetTigers}</div>
+                    <div class="leader-sub" style="color:#B9770E; font-weight:700;">总抓虎: ${p.totalRawTigers} 虎 | 净胜虎: ${p.totalNetTigers > 0 ? '+' : ''}${p.totalNetTigers} 虎</div>
                 </div>
                 <div class="leader-score score-val ${colorClass}">
                     ${sign}${p.totalMoney} <span style="font-size:13px;">元</span>
@@ -1066,7 +1095,8 @@ function renderGrandTigersList(rankedPlayers) {
                         ${winnerBadge}
                     </div>
                     <div class="leader-sub">${playedText} ${seatsText ? ' | ' + seatsText : ''}</div>
-                    <div class="leader-sub" style="color:#27AE60;">累计盈亏: ${p.totalMoney > 0 ? '+' : ''}${p.totalMoney} 元</div>
+                    <div class="leader-sub" style="color:#B9770E; font-weight:700;">总抓虎: ${p.totalRawTigers} 虎 | 净胜虎: ${p.totalNetTigers > 0 ? '+' : ''}${p.totalNetTigers} 虎</div>
+                    <div class="leader-sub" style="color:#27AE60; font-weight:700;">累计盈亏: ${p.totalMoney > 0 ? '+' : ''}${p.totalMoney} 元</div>
                 </div>
                 <div class="leader-score score-val ${colorClass}">
                     ${sign}${p.totalNetTigers} <span style="font-size:13px;">虎</span>

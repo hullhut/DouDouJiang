@@ -382,6 +382,8 @@ h1 {
     margin-bottom: 14px;
     padding-bottom: 8px;
     border-bottom: 2px dashed #D2B48C;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .round-header-left {
@@ -389,6 +391,43 @@ h1 {
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
+}
+
+.round-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.round-header-actions .save-round-btn {
+    padding: 5px 12px;
+    font-size: 13px;
+    font-weight: 900;
+    border-radius: 20px;
+    border: 2px solid #FFF;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #2ECC71 0%, #27AE60 100%);
+    box-shadow: 0 3px 0 #1E8449, 0 3px 6px rgba(0,0,0,0.15);
+    color: white;
+    transition: transform 0.1s, opacity 0.2s, background 0.2s;
+}
+.round-header-actions .save-round-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1E8449;
+}
+.round-header-actions .save-round-btn:disabled, .round-header-actions .save-round-btn.btn-disabled {
+    opacity: 0.55 !important;
+    background: #BDC3C7 !important;
+    border-color: #A6ACAF !important;
+    color: #7F8C8D !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
 }
 
 .round-header-title {
@@ -1092,6 +1131,29 @@ h1 {
     border: 1px solid #F39C12;
     white-space: nowrap;
 }
+.game-rank-net-tigers {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+.game-rank-net-tigers.pos {
+    color: #C0392B;
+    background: #FDEDEC;
+    border-color: #FADBD8;
+}
+.game-rank-net-tigers.neg {
+    color: #1E8449;
+    background: #EAFAF1;
+    border-color: #D5F5E3;
+}
+.game-rank-net-tigers.zero {
+    color: #7F8C8D;
+    background: #EAEDED;
+    border-color: #BDC3C7;
+}
 .game-rank-money {
     font-size: 15px;
     font-weight: 900;
@@ -1140,6 +1202,29 @@ h1 {
     border-radius: 10px;
     font-size: 11px;
     font-weight: 800;
+}
+.calc-net-tag {
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+.calc-net-tag.pos {
+    background: #FDEDEC;
+    color: #C0392B;
+    border-color: #FADBD8;
+}
+.calc-net-tag.neg {
+    background: #EAFAF1;
+    color: #1E8449;
+    border-color: #D5F5E3;
+}
+.calc-net-tag.zero {
+    background: #EAEDED;
+    color: #7F8C8D;
+    border-color: #BDC3C7;
 }
 .calc-money-tag {
     font-size: 15px;
