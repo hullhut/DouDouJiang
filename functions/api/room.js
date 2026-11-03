@@ -4,17 +4,6 @@ export async function onRequest(context) {
     const method = request.method;
 
     try {
-        // Ensure tables exist
-        try {
-            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS rooms (room_code TEXT PRIMARY KEY, password TEXT)`).run();
-        } catch (e) {}
-        try {
-            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS room_states (room_code TEXT PRIMARY KEY, state TEXT)`).run();
-        } catch (e) {}
-        try {
-            await env.DB.prepare(`CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY AUTOINCREMENT, room_code TEXT, game_data TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`).run();
-        } catch (e) {}
-
         if (method === 'POST') {
             const data = await request.json();
             
@@ -66,7 +55,7 @@ export async function onRequest(context) {
                 return new Response(JSON.stringify({
                     success: true,
                     isNew: true,
-                    room: roomState ? { room_code: roomCode, state: roomState } : null,
+                    room: roomState ? { room_code: roomCode, hasPassword: false, state: roomState } : null,
                     games: []
                 }), {
                     headers: { 'Content-Type': 'application/json' }
@@ -92,11 +81,14 @@ export async function onRequest(context) {
                 `SELECT * FROM games WHERE room_code = ? ORDER BY created_at ASC`
             ).bind(roomCode).all();
 
-            if (roomState) {
-                room.state = roomState;
-            }
+            const safeRoom = {
+                room_code: room.room_code,
+                hasPassword: !!room.password,
+                created_at: room.created_at,
+                state: roomState || null
+            };
 
-            return new Response(JSON.stringify({ success: true, room, games: results || [] }), {
+            return new Response(JSON.stringify({ success: true, room: safeRoom, games: results || [] }), {
                 headers: { 'Content-Type': 'application/json' }
             });
         }

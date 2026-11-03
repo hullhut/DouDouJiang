@@ -1,10 +1,10 @@
 const gameRoundsContainer = document.getElementById('gameRoundsContainer');
 const startGameBtn = document.getElementById('startGameBtn');
+const endSessionBtn = document.getElementById('endSessionBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
 const langToggle = document.getElementById('langToggle');
 const mainTitle = document.getElementById('mainTitle');
 const headerBanner = document.getElementById('headerBanner');
-const leftDog = document.getElementById('leftDog');
-const rightDog = document.getElementById('rightDog');
 
 // --- I18N (Internationalization) ---
 const i18n = {
@@ -13,19 +13,36 @@ const i18n = {
         docTitle: "🐶 🀄 Mahjong Score Tracker 🐕",
         startGame: "Start Game ▶",
         startAnother: "Start Another ▶",
+        endSession: "End Game 🏆",
+        confirmEndSession: "Sure End?",
         clearAll: "Clear All",
         confirmClearAll: "Sure?",
         roundTitle: "Players & Scores - Round {n}",
         aliasPlaceholder: "Player Alias",
         scorePlaceholder: "Score",
         unitText: "Unit (Yuan)",
-        endGame: "End Game",
-        confirmEnd: "Confirm?",
-        clearRound: "Reset Round",
+        saveRound: "💾 Save Round",
+        modifyRound: "✏️ Modify",
+        clearRound: "🔄 Reset",
         confirmClear: "Sure?",
-        modifyRound: "Modify",
-        confirmModify: "Confirm?",
+        addTigerRow: "➕ Add Tigers",
         resultTitle: "💰 Round Results 💰",
+        viewDetails: "📊 View Calculation Process",
+        singleModalTitle: "Round {n} Settlement Details",
+        calcProcess: "Calculation Process",
+        formulaDesc: "((Own Tigers × 3 - Others' Tigers) × Unit)",
+        tigersTag: "{count} Tigers",
+        grandTotalTitle: "🏆 Global Game Leaderboard 🏆",
+        roundsPlayed: "{n} Round(s) Played",
+        tabMoney: "💰 By Money (¥)",
+        tabTigers: "🐯 By Tigers",
+        bigWinner: "Big Winner 👑",
+        tigerKing: "Tiger King 🐯👑",
+        playedAndWon: "Played {played} round(s) | Won {won}",
+        seatsPlayed: "Seats",
+        rawTigersSummary: "Total Tigers: {raw} | Net: {net}",
+        closeModal: "Close",
+        noRoundsAlert: "No saved/settled rounds yet! Please save at least one round first.",
         east: "East",
         south: "South",
         west: "West",
@@ -50,19 +67,36 @@ const i18n = {
         docTitle: "🐶 🀄 麻将计分器 🐕",
         startGame: "开始游戏 ▶",
         startAnother: "再开一局 ▶",
+        endSession: "结束游戏 🏆",
+        confirmEndSession: "确认结束?",
         clearAll: "全部清空",
         confirmClearAll: "确认全清?",
         roundTitle: "玩家与分数 - 第 {n} 局",
         aliasPlaceholder: "玩家昵称",
         scorePlaceholder: "虎数",
         unitText: "计数单位 (元)",
-        endGame: "结束游戏",
-        confirmEnd: "确认结算?",
-        clearRound: "重置本局",
+        saveRound: "💾 保存本局",
+        modifyRound: "✏️ 修改本局",
+        clearRound: "🔄 重置本局",
         confirmClear: "确认重置?",
-        modifyRound: "修改本局",
-        confirmModify: "确认修改?",
+        addTigerRow: "➕ 抓虎",
         resultTitle: "💰 本局结算结果 💰",
+        viewDetails: "📊 查看计算过程",
+        singleModalTitle: "第 {n} 局结算详情",
+        calcProcess: "详细计算过程",
+        formulaDesc: "((本人虎数 × 3 - 其他人虎数之和) × 单位)",
+        tigersTag: "{count} 虎",
+        grandTotalTitle: "🏆 全局结算大赢家 🏆",
+        roundsPlayed: "共进行了 {n} 局",
+        tabMoney: "💰 按金额统计",
+        tabTigers: "🐯 按虎数统计",
+        bigWinner: "大赢家 👑",
+        tigerKing: "虎王 🐯👑",
+        playedAndWon: "出战 {played} 局 | 胜 {won} 局",
+        seatsPlayed: "曾坐",
+        rawTigersSummary: "总抓虎: {raw} | 净胜虎: {net}",
+        closeModal: "关闭",
+        noRoundsAlert: "暂无已保存的对局，请先保存本局！",
         east: "东",
         south: "南",
         west: "西",
@@ -121,7 +155,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=29' : '/images/header-zh.png?v=29';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=30' : '/images/header-zh.png?v=30';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -130,13 +164,12 @@ function toggleLanguage() {
     document.title = i18n[currentLang].docTitle;
     startGameBtn.innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
-    const clearAllBtn = document.getElementById('clearAllBtn');
+    if (endSessionBtn) {
+        endSessionBtn.innerHTML = endSessionBtn.dataset.confirm === "true" ? i18n[currentLang].confirmEndSession : i18n[currentLang].endSession;
+    }
+
     if (clearAllBtn) {
-        if (clearAllBtn.dataset.confirm === "true") {
-            clearAllBtn.innerHTML = i18n[currentLang].confirmClearAll;
-        } else {
-            clearAllBtn.innerHTML = i18n[currentLang].clearAll;
-        }
+        clearAllBtn.innerHTML = clearAllBtn.dataset.confirm === "true" ? i18n[currentLang].confirmClearAll : i18n[currentLang].clearAll;
     }
 
     // Update Room Bar texts
@@ -160,12 +193,26 @@ function toggleLanguage() {
     if (lockedStatusSpan) {
         lockedStatusSpan.innerText = i18n[currentLang].lockedStatus;
     }
+
+    // Update modal controls
+    const tabMoneyBtn = document.getElementById('tabMoneyBtn');
+    if (tabMoneyBtn) tabMoneyBtn.innerText = i18n[currentLang].tabMoney;
+    const tabTigersBtn = document.getElementById('tabTigersBtn');
+    if (tabTigersBtn) tabTigersBtn.innerText = i18n[currentLang].tabTigers;
+    const confirmSingleModalBtn = document.getElementById('confirmSingleModalBtn');
+    if (confirmSingleModalBtn) confirmSingleModalBtn.innerText = i18n[currentLang].closeModal;
+    const confirmGrandModalBtn = document.getElementById('confirmGrandModalBtn');
+    if (confirmGrandModalBtn) confirmGrandModalBtn.innerText = i18n[currentLang].closeModal;
     
     // Update dynamic round texts
     document.querySelectorAll('.game-round').forEach(roundDiv => {
         const roundId = roundDiv.id.replace('round-', '');
-        roundDiv.querySelector('.round-header').innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
+        const titleSpan = roundDiv.querySelector('.round-header-title');
+        if (titleSpan) titleSpan.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
         
+        const addTigersBtn = roundDiv.querySelector('.round-plus-btn');
+        if (addTigersBtn) addTigersBtn.innerText = i18n[currentLang].addTigerRow;
+
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             row.querySelector('.player-alias').placeholder = i18n[currentLang].aliasPlaceholder;
             row.querySelectorAll('.tiger-input').forEach(input => {
@@ -178,13 +225,9 @@ function toggleLanguage() {
             unitTextNode.innerText = i18n[currentLang].unitText;
         }
 
-        const endBtn = roundDiv.querySelector('.end-game-btn');
-        if (endBtn && !endBtn.disabled) {
-            if (endBtn.dataset.confirm === "true") {
-                endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
-            } else {
-                endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
-            }
+        const saveBtn = roundDiv.querySelector('.save-round-btn');
+        if (saveBtn) {
+            saveBtn.innerHTML = i18n[currentLang].saveRound;
         }
         
         const clearBtn = roundDiv.querySelector('.clear-round-btn');
@@ -198,16 +241,17 @@ function toggleLanguage() {
         
         const modifyBtn = roundDiv.querySelector('.modify-round-btn');
         if (modifyBtn) {
-            if (modifyBtn.dataset.confirm === "true") {
-                modifyBtn.innerHTML = `✏️ ${i18n[currentLang].confirmModify}`;
-            } else {
-                modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
-            }
+            modifyBtn.innerHTML = i18n[currentLang].modifyRound;
         }
         
         const resultTitle = roundDiv.querySelector('.result-title');
         if (resultTitle) {
             resultTitle.innerText = i18n[currentLang].resultTitle;
+        }
+
+        const viewDetailBtn = roundDiv.querySelector('.view-detail-btn');
+        if (viewDetailBtn) {
+            viewDetailBtn.innerHTML = i18n[currentLang].viewDetails;
         }
 
         roundDiv.querySelectorAll('.result-item').forEach(item => {
@@ -228,6 +272,7 @@ langToggle.addEventListener('click', toggleLanguage);
 let roundCount = 0;
 const directions = ['东', '西', '南', '北'];
 
+// Initial default aliases for fresh game
 let aliases = {
     '东': 'Mom',
     '西': 'Ben',
@@ -257,6 +302,12 @@ function createTigerInput() {
     return input;
 }
 
+/**
+ * 阶段二核心改造：创建单局
+ * 1. 移除每行分散的4个加号，改为单局统一加号按钮“➕ 抓虎”；
+ * 2. 引入【💾 保存本局】按钮，点击后锁定为只读防误触，展示结算结果；
+ * 3. 保存后提供专属【✏️ 修改本局】按钮进行解锁。
+ */
 function createGameRound(autoScroll = true) {
     if (roundCount === 0) {
         document.getElementById('startGameBtn').innerHTML = i18n[currentLang].startAnother;
@@ -267,14 +318,33 @@ function createGameRound(autoScroll = true) {
     const roundDiv = document.createElement('div');
     roundDiv.className = 'game-round';
     roundDiv.id = `round-${roundId}`;
+    roundDiv.dataset.round = roundId;
     
-    // Header
+    // Round Header with Title and Single Unified Plus Button (➕ 抓虎)
     const header = document.createElement('div');
     header.className = 'round-header';
-    header.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'round-header-title';
+    titleSpan.innerText = i18n[currentLang].roundTitle.replace('{n}', roundId);
+    header.appendChild(titleSpan);
+
+    // 单局统一“+”号按钮：按一次即为当局所有玩家追加一列抓虎输入框
+    const addTigersBtn = document.createElement('button');
+    addTigersBtn.className = 'round-plus-btn';
+    addTigersBtn.innerText = i18n[currentLang].addTigerRow;
+    addTigersBtn.title = "追加一列虎数录入框";
+    addTigersBtn.onclick = () => {
+        if (roundDiv.classList.contains('is-saved')) return;
+        roundDiv.querySelectorAll('.player-row .tiger-list').forEach(list => {
+            list.appendChild(createTigerInput());
+        });
+        triggerSync();
+    };
+    header.appendChild(addTigersBtn);
     roundDiv.appendChild(header);
 
-    // Player Rows
+    // Player Rows: 每行只保留麻将牌、玩家别名输入框、虎数框容器，横向彻底释放
     directions.forEach(dir => {
         const row = document.createElement('div');
         row.className = `player-row row-${dir}`;
@@ -312,20 +382,10 @@ function createGameRound(autoScroll = true) {
         playerInfo.appendChild(tigerList);
         
         row.appendChild(playerInfo);
-
-        const addBtn = document.createElement('button');
-        addBtn.className = 'plus-btn';
-        addBtn.innerText = '+';
-        addBtn.onclick = () => {
-            tigerList.appendChild(createTigerInput());
-            triggerSync();
-        };
-        row.appendChild(addBtn);
-
         roundDiv.appendChild(row);
     });
 
-    // Footer - Default unit changed to 0.5 and centered layout
+    // Footer Controls
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
@@ -333,7 +393,6 @@ function createGameRound(autoScroll = true) {
     unitDiv.className = 'unit-input';
     unitDiv.innerHTML = `<span class="unit-icon">¥</span> <input type="text" inputmode="decimal" class="round-unit" value="0.5"> <span class="unit-text-label">${i18n[currentLang].unitText}</span>`;
     
-    // Strict numeric restriction on unit input
     const unitInp = unitDiv.querySelector('.round-unit');
     unitInp.addEventListener('input', (e) => {
         let val = e.target.value.replace(/[^0-9.]/g, '');
@@ -344,50 +403,33 @@ function createGameRound(autoScroll = true) {
         e.target.value = val;
     });
 
-    const endBtn = document.createElement('button');
-    endBtn.className = 'end-game-btn';
-    endBtn.dataset.confirm = "false";
-    endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
-    
-    endBtn.onclick = () => {
-        if (endBtn.dataset.confirm === "true") {
-            calculateRoundScore(roundDiv, endBtn);
-            triggerSync();
-        } else {
-            endBtn.dataset.confirm = "true";
-            endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].confirmEnd}`;
-            endBtn.style.backgroundColor = "#c0392b";
-            
-            setTimeout(() => {
-                if (!endBtn.disabled) {
-                    endBtn.dataset.confirm = "false";
-                    endBtn.innerHTML = `<input type="checkbox" style="pointer-events:none;"> ${i18n[currentLang].endGame}`;
-                    endBtn.style.backgroundColor = "";
-                }
-            }, 3000);
-        }
+    // 【💾 保存本局】按钮
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-round-btn';
+    saveBtn.innerHTML = i18n[currentLang].saveRound;
+    saveBtn.onclick = () => {
+        saveRound(roundDiv, true);
     };
-    
+
+    // 【✏️ 修改本局】按钮 (保存后解锁用)
+    const modifyBtn = document.createElement('button');
+    modifyBtn.className = 'modify-round-btn hidden';
+    modifyBtn.innerHTML = i18n[currentLang].modifyRound;
+    modifyBtn.onclick = () => {
+        unlockRoundForEdit(roundDiv);
+    };
+
+    // 【🔄 重置本局】按钮 (防误触二次确认)
     const clearBtn = document.createElement('button');
     clearBtn.className = 'clear-round-btn';
     clearBtn.dataset.confirm = "false";
     clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
-
     clearBtn.onclick = () => {
         if (clearBtn.dataset.confirm === "true") {
             clearBtn.dataset.confirm = "false";
             clearBtn.innerHTML = `🔄 ${i18n[currentLang].clearRound}`;
             clearBtn.style.backgroundColor = "";
-            
-            roundDiv.querySelectorAll('.tiger-list').forEach(list => {
-                list.innerHTML = '';
-                list.appendChild(createTigerInput());
-            });
-            roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
-            const checkbox = endBtn.querySelector('input[type="checkbox"]');
-            if(checkbox) checkbox.checked = false;
-            roundDiv.querySelector('.round-result').classList.add('hidden');
-            triggerSync();
+            resetRound(roundDiv);
         } else {
             clearBtn.dataset.confirm = "true";
             clearBtn.innerHTML = `🔄 ${i18n[currentLang].confirmClear}`;
@@ -403,46 +445,11 @@ function createGameRound(autoScroll = true) {
         }
     };
     
-    const modifyBtn = document.createElement('button');
-    modifyBtn.className = 'modify-round-btn hidden';
-    modifyBtn.dataset.confirm = "false";
-    modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
-
-    modifyBtn.onclick = () => {
-        if (modifyBtn.dataset.confirm === "true") {
-            modifyBtn.dataset.confirm = "false";
-            modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
-            modifyBtn.style.backgroundColor = "";
-            
-            roundDiv.querySelectorAll('input, button').forEach(el => el.disabled = false);
-            
-            roundDiv.querySelector('.round-result').classList.add('hidden');
-            modifyBtn.classList.add('hidden');
-            endBtn.classList.remove('hidden');
-            
-            const checkbox = endBtn.querySelector('input[type="checkbox"]');
-            if(checkbox) checkbox.checked = false;
-            triggerSync();
-        } else {
-            modifyBtn.dataset.confirm = "true";
-            modifyBtn.innerHTML = `✏️ ${i18n[currentLang].confirmModify}`;
-            modifyBtn.style.backgroundColor = "#e67e22";
-            
-            setTimeout(() => {
-                if (modifyBtn.dataset.confirm === "true") {
-                    modifyBtn.dataset.confirm = "false";
-                    modifyBtn.innerHTML = `✏️ ${i18n[currentLang].modifyRound}`;
-                    modifyBtn.style.backgroundColor = "";
-                }
-            }, 3000);
-        }
-    };
-    
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'footer-actions';
     actionsDiv.appendChild(clearBtn);
     actionsDiv.appendChild(modifyBtn);
-    actionsDiv.appendChild(endBtn);
+    actionsDiv.appendChild(saveBtn);
     
     footer.appendChild(unitDiv);
     footer.appendChild(actionsDiv);
@@ -458,86 +465,356 @@ function createGameRound(autoScroll = true) {
     }
 }
 
-function calculateRoundScore(roundDiv, endBtn) {
-    const checkbox = endBtn.querySelector('input[type="checkbox"]');
-    if (checkbox) checkbox.checked = true;
-
+/**
+ * 保存本局并锁定防误触
+ * 1. 禁用所有输入框，置入 is-saved 样式；
+ * 2. 隐藏【保存】，展现【修改】；
+ * 3. 实时计算并展现结算结果与“查看详细过程”按钮；
+ * 4. openModal 为 true 时自动弹出单局公式明细弹窗。
+ */
+function saveRound(roundDiv, openModal = false) {
     const unitInput = roundDiv.querySelector('.round-unit');
     const unit = parseFloat(unitInput.value) || 0.5;
     
-    let totalTigers = { '东': 0, '南': 0, '西': 0, '北': 0 };
-
+    let tigersMap = {};
+    const roundAliases = {};
     const rows = roundDiv.querySelectorAll('.player-row');
     rows.forEach(row => {
         const dir = row.dataset.dir;
+        const aliasInp = row.querySelector('.player-alias');
+        const aliasVal = (aliasInp && aliasInp.value && aliasInp.value.trim()) ? aliasInp.value.trim() : (aliases[dir] || dir);
+        roundAliases[dir] = aliasVal;
+
         const inputs = row.querySelectorAll('.tiger-input');
-        let sum = 0;
+        const vals = [];
         inputs.forEach(input => {
-            sum += parseFloat(input.value) || 0;
+            if (input.value !== '') vals.push(parseFloat(input.value) || 0);
         });
-        totalTigers[dir] += sum;
+        tigersMap[dir] = vals;
     });
 
-    let finalScores = { '东': 0, '南': 0, '西': 0, '北': 0 };
-    
-    directions.forEach(dir => {
-        let score = totalTigers[dir] * 3; 
-        directions.forEach(otherDir => {
-            if (dir !== otherDir) {
-                score -= totalTigers[otherDir]; 
-            }
-        });
-        finalScores[dir] = Math.round(score * unit * 100) / 100;
-    });
+    const engine = window.ScoringEngine || { calculateRoundDetails };
+    const res = engine.calculateRoundDetails(tigersMap, unit, directions, roundAliases);
 
     const resultDiv = roundDiv.querySelector('.round-result');
     resultDiv.innerHTML = `<h3 class="result-title">${i18n[currentLang].resultTitle}</h3>`;
     
-    directions.forEach(dir => {
-        const score = finalScores[dir];
-        const colorClass = score >= 0 ? 'positive' : 'negative';
-        const sign = score > 0 ? '+' : '';
-        
-        const row = roundDiv.querySelector(`.row-${dir}`);
-        const alias = row.querySelector('.player-alias').value || aliases[dir];
-        const dirName = i18n[currentLang][dir === '东' ? 'east' : dir === '南' ? 'south' : dir === '西' ? 'west' : 'north'];
+    res.details.forEach(item => {
+        const colorClass = item.money >= 0 ? 'positive' : 'negative';
+        const sign = item.money > 0 ? '+' : '';
+        const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
 
-        const item = document.createElement('div');
-        item.className = 'result-item';
-        item.dataset.dir = dir;
-        item.dataset.alias = alias;
-        item.innerHTML = `<span class="result-player">${alias} (${dirName})</span> <span class="score-val ${colorClass}">${sign}${score}</span>`;
-        resultDiv.appendChild(item);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'result-item';
+        itemDiv.dataset.dir = item.dir;
+        itemDiv.dataset.alias = item.alias;
+        itemDiv.innerHTML = `<span class="result-player">${item.alias} (${dirName})</span> <span class="score-val ${colorClass}">${sign}${item.money}</span>`;
+        resultDiv.appendChild(itemDiv);
     });
-    
+
+    // 附带“查看计算过程”交互按钮
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'view-detail-btn';
+    viewBtn.innerHTML = i18n[currentLang].viewDetails;
+    viewBtn.onclick = () => {
+        openSingleRoundModal(roundDiv.dataset.round || roundDiv.id.replace('round-', ''), roundDiv);
+    };
+    resultDiv.appendChild(viewBtn);
     resultDiv.classList.remove('hidden');
+
+    // 锁定本局：锁定输入框防止传阅误触
+    roundDiv.classList.add('is-saved');
+    roundDiv.querySelectorAll('input').forEach(el => el.disabled = true);
     
-    const inputs = roundDiv.querySelectorAll('input, button');
-    inputs.forEach(el => el.disabled = true);
-    
-    const langToggleBtn = document.getElementById('langToggle');
-    if (langToggleBtn) langToggleBtn.disabled = false;
-    const clearAllBtnElem = document.getElementById('clearAllBtn');
-    if (clearAllBtnElem) clearAllBtnElem.disabled = false;
-    
-    endBtn.style.backgroundColor = "";
-    endBtn.classList.add('hidden');
-    
+    // 切换按钮状态：隐藏保存，展现修改
+    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    if (saveBtn) saveBtn.classList.add('hidden');
     const modifyBtn = roundDiv.querySelector('.modify-round-btn');
-    if (modifyBtn) {
-        modifyBtn.disabled = false;
-        modifyBtn.classList.remove('hidden');
+    if (modifyBtn) modifyBtn.classList.remove('hidden');
+
+    triggerSync();
+
+    if (openModal) {
+        openSingleRoundModal(roundDiv.dataset.round || roundDiv.id.replace('round-', ''), roundDiv);
     }
-    const clearBtn = roundDiv.querySelector('.clear-round-btn');
-    if (clearBtn) clearBtn.disabled = false;
 }
 
+/**
+ * 解锁本局进入编辑态
+ */
+function unlockRoundForEdit(roundDiv) {
+    roundDiv.classList.remove('is-saved');
+    roundDiv.querySelectorAll('input').forEach(el => el.disabled = false);
+
+    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    if (saveBtn) saveBtn.classList.remove('hidden');
+    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    if (modifyBtn) modifyBtn.classList.add('hidden');
+
+    const resultDiv = roundDiv.querySelector('.round-result');
+    if (resultDiv) resultDiv.classList.add('hidden');
+
+    triggerSync();
+}
+
+/**
+ * 重置本局数据
+ */
+function resetRound(roundDiv) {
+    roundDiv.classList.remove('is-saved');
+    roundDiv.querySelectorAll('.tiger-list').forEach(list => {
+        list.innerHTML = '';
+        list.appendChild(createTigerInput());
+    });
+    roundDiv.querySelectorAll('input').forEach(el => el.disabled = false);
+
+    const saveBtn = roundDiv.querySelector('.save-round-btn');
+    if (saveBtn) saveBtn.classList.remove('hidden');
+    const modifyBtn = roundDiv.querySelector('.modify-round-btn');
+    if (modifyBtn) modifyBtn.classList.add('hidden');
+
+    const resultDiv = roundDiv.querySelector('.round-result');
+    if (resultDiv) resultDiv.classList.add('hidden');
+
+    triggerSync();
+}
+
+// Single Round Detail Modal (Shows Tiger Count and Formula: ((本人虎数*3-其他人虎数之和)*单位))
+function openSingleRoundModal(roundId, roundDiv) {
+    const modal = document.getElementById('singleRoundModal');
+    const modalTitle = document.getElementById('singleRoundModalTitle');
+    const modalBody = document.getElementById('singleRoundModalBody');
+    if (!modal || !modalBody) return;
+    
+    modalTitle.innerText = i18n[currentLang].singleModalTitle.replace('{n}', roundId);
+    
+    const unitInput = roundDiv.querySelector('.round-unit');
+    const unit = parseFloat(unitInput.value) || 0.5;
+    
+    const tigersMap = {};
+    const roundAliases = {};
+    directions.forEach(dir => {
+        const row = roundDiv.querySelector(`.row-${dir}`);
+        const aliasInp = row.querySelector('.player-alias');
+        const aliasVal = (aliasInp && aliasInp.value && aliasInp.value.trim()) ? aliasInp.value.trim() : (aliases[dir] || dir);
+        roundAliases[dir] = aliasVal;
+
+        const inputs = row.querySelectorAll('.tiger-input');
+        const vals = [];
+        inputs.forEach(input => {
+            if (input.value !== '') vals.push(parseFloat(input.value) || 0);
+        });
+        tigersMap[dir] = vals;
+    });
+
+    const engine = window.ScoringEngine || { calculateRoundDetails };
+    const res = engine.calculateRoundDetails(tigersMap, unit, directions, roundAliases);
+
+    let html = '';
+    res.details.forEach(item => {
+        const colorClass = item.money >= 0 ? 'positive' : 'negative';
+        const sign = item.money > 0 ? '+' : '';
+        const dirName = i18n[currentLang][item.dir === '东' ? 'east' : item.dir === '南' ? 'south' : item.dir === '西' ? 'west' : 'north'];
+        
+        html += `
+            <div class="single-calc-card row-${item.dir}">
+                <div class="calc-card-top">
+                    <div class="calc-player-name">
+                        <span>${item.alias} (${dirName})</span>
+                        <span class="calc-tigers-tag">🐅 ${i18n[currentLang].tigersTag.replace('{count}', item.tigers)}</span>
+                    </div>
+                    <div class="calc-money-tag score-val ${colorClass}">
+                        ${sign}${item.money} 元
+                    </div>
+                </div>
+                <div class="calc-formula-box">
+                    <div class="calc-formula-title">${i18n[currentLang].calcProcess}:</div>
+                    <div>${i18n[currentLang].formulaDesc}</div>
+                    <div style="color:#2C3E50; font-weight:bold; margin-top:3px;">
+                        = ((${item.tigers} × 3 - ${item.othersSum}) × ${unit}) = ${sign}${item.money} 元
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    modalBody.innerHTML = html;
+    modal.classList.remove('hidden');
+}
+
+// --- Grand Total Leaderboard Modal (Money vs Tigers Option, Grouped by Alias) ---
+let currentGrandTab = 'money'; // 'money' or 'tigers'
+
+function openGrandTotalModal(tab = currentGrandTab) {
+    currentGrandTab = tab;
+    const modal = document.getElementById('grandTotalModal');
+    const list = document.getElementById('grandTotalList');
+    const subtitle = document.getElementById('grandTotalSubtitle');
+    if (!modal || !list) return;
+
+    const state = getGameState();
+    const engine = window.ScoringEngine || { calculateGrandTotal };
+    const grand = engine.calculateGrandTotal(state.rounds, directions, aliases);
+
+    subtitle.innerText = i18n[currentLang].roundsPlayed.replace('{n}', grand.settledRoundsCount);
+
+    const tabMoneyBtn = document.getElementById('tabMoneyBtn');
+    const tabTigersBtn = document.getElementById('tabTigersBtn');
+
+    if (currentGrandTab === 'money') {
+        tabMoneyBtn.classList.add('active');
+        tabTigersBtn.classList.remove('active');
+        renderGrandMoneyList(grand.byMoney);
+    } else {
+        tabMoneyBtn.classList.remove('active');
+        tabTigersBtn.classList.add('active');
+        renderGrandTigersList(grand.byTigers);
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function renderGrandMoneyList(rankedPlayers) {
+    const list = document.getElementById('grandTotalList');
+    let html = '';
+    rankedPlayers.forEach((p, idx) => {
+        const rank = idx + 1;
+        const colorClass = p.totalMoney >= 0 ? 'positive' : 'negative';
+        const sign = p.totalMoney > 0 ? '+' : '';
+        const winnerBadge = p.isBigWinnerMoney ? `<span class="winner-crown">👑</span><span style="color:#F39C12; font-size:12px; font-weight:800;">${i18n[currentLang].bigWinner}</span>` : '';
+        const itemClass = p.isBigWinnerMoney ? 'leaderboard-item is-winner' : 'leaderboard-item';
+
+        const seatsText = p.dirsPlayed && p.dirsPlayed.length > 0 
+            ? `${i18n[currentLang].seatsPlayed}: ${p.dirsPlayed.map(d => i18n[currentLang][d === '东' ? 'east' : d === '南' ? 'south' : d === '西' ? 'west' : 'north']).join('、')}`
+            : '';
+        const playedText = i18n[currentLang].playedAndWon.replace('{played}', p.roundsPlayed).replace('{won}', p.roundsWon);
+
+        html += `
+            <div class="${itemClass}">
+                <div class="leader-rank rank-${rank}">${rank}</div>
+                <div class="leader-info">
+                    <div class="leader-name-row">
+                        <span class="leader-name">${p.alias}</span>
+                        ${winnerBadge}
+                    </div>
+                    <div class="leader-sub">${playedText} ${seatsText ? ' | ' + seatsText : ''}</div>
+                </div>
+                <div class="leader-score score-val ${colorClass}">
+                    ${sign}${p.totalMoney} 元
+                </div>
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+function renderGrandTigersList(rankedPlayers) {
+    const list = document.getElementById('grandTotalList');
+    let html = '';
+    rankedPlayers.forEach((p, idx) => {
+        const rank = idx + 1;
+        const colorClass = p.totalNetTigers >= 0 ? 'positive' : 'negative';
+        const sign = p.totalNetTigers > 0 ? '+' : '';
+        const winnerBadge = p.isBigWinnerTigers ? `<span class="winner-crown">🐅</span><span style="color:#E67E22; font-size:12px; font-weight:800;">${i18n[currentLang].tigerKing}</span>` : '';
+        const itemClass = p.isBigWinnerTigers ? 'leaderboard-item is-winner' : 'leaderboard-item';
+
+        const seatsText = p.dirsPlayed && p.dirsPlayed.length > 0 
+            ? `${i18n[currentLang].seatsPlayed}: ${p.dirsPlayed.map(d => i18n[currentLang][d === '东' ? 'east' : d === '南' ? 'south' : d === '西' ? 'west' : 'north']).join('、')}`
+            : '';
+        const tigerStats = i18n[currentLang].rawTigersSummary.replace('{raw}', p.totalRawTigers).replace('{net}', (p.totalNetTigers > 0 ? '+' : '') + p.totalNetTigers);
+
+        html += `
+            <div class="${itemClass}">
+                <div class="leader-rank rank-${rank}">${rank}</div>
+                <div class="leader-info">
+                    <div class="leader-name-row">
+                        <span class="leader-name">${p.alias}</span>
+                        ${winnerBadge}
+                    </div>
+                    <div class="leader-sub">${tigerStats} ${seatsText ? ' | ' + seatsText : ''}</div>
+                </div>
+                <div class="leader-score score-val ${colorClass}">
+                    ${sign}${p.totalNetTigers} 虎
+                </div>
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
+
+// Modal tab listeners
+const tabMoneyBtn = document.getElementById('tabMoneyBtn');
+if (tabMoneyBtn) {
+    tabMoneyBtn.addEventListener('click', () => openGrandTotalModal('money'));
+}
+const tabTigersBtn = document.getElementById('tabTigersBtn');
+if (tabTigersBtn) {
+    tabTigersBtn.addEventListener('click', () => openGrandTotalModal('tigers'));
+}
+
+// Close modal listeners
+const closeSingleModalBtn = document.getElementById('closeSingleModalBtn');
+if (closeSingleModalBtn) {
+    closeSingleModalBtn.addEventListener('click', () => {
+        document.getElementById('singleRoundModal').classList.add('hidden');
+    });
+}
+const confirmSingleModalBtn = document.getElementById('confirmSingleModalBtn');
+if (confirmSingleModalBtn) {
+    confirmSingleModalBtn.addEventListener('click', () => {
+        document.getElementById('singleRoundModal').classList.add('hidden');
+    });
+}
+const closeGrandModalBtn = document.getElementById('closeGrandModalBtn');
+if (closeGrandModalBtn) {
+    closeGrandModalBtn.addEventListener('click', () => {
+        document.getElementById('grandTotalModal').classList.add('hidden');
+    });
+}
+const confirmGrandModalBtn = document.getElementById('confirmGrandModalBtn');
+if (confirmGrandModalBtn) {
+    confirmGrandModalBtn.addEventListener('click', () => {
+        document.getElementById('grandTotalModal').classList.add('hidden');
+    });
+}
+
+// Top button listeners
 startGameBtn.addEventListener('click', () => {
     createGameRound(true);
     triggerSync();
 });
 
-const clearAllBtn = document.getElementById('clearAllBtn');
+// Grand End Game button with double confirmation (Bug 7)
+if (endSessionBtn) {
+    endSessionBtn.addEventListener('click', () => {
+        if (endSessionBtn.dataset.confirm === "true") {
+            endSessionBtn.dataset.confirm = "false";
+            endSessionBtn.innerHTML = i18n[currentLang].endSession;
+            endSessionBtn.classList.remove('confirming');
+            
+            const state = getGameState();
+            const settled = state.rounds.filter(r => r.isSaved || r.isEnded);
+            if (settled.length === 0) {
+                alert(i18n[currentLang].noRoundsAlert);
+                return;
+            }
+            openGrandTotalModal();
+        } else {
+            endSessionBtn.dataset.confirm = "true";
+            endSessionBtn.innerHTML = i18n[currentLang].confirmEndSession;
+            endSessionBtn.classList.add('confirming');
+            
+            setTimeout(() => {
+                if (endSessionBtn.dataset.confirm === "true") {
+                    endSessionBtn.dataset.confirm = "false";
+                    endSessionBtn.innerHTML = i18n[currentLang].endSession;
+                    endSessionBtn.classList.remove('confirming');
+                }
+            }, 3000);
+        }
+    });
+}
+
 if (clearAllBtn) {
     clearAllBtn.addEventListener('click', () => {
         if (clearAllBtn.dataset.confirm === "true") {
@@ -573,6 +850,10 @@ async function checkRoom() {
     const path = window.location.pathname;
     if (path.startsWith('/mj/')) {
         currentRoomCode = path.substring(4);
+        if (!currentRoomCode || currentRoomCode.trim() === '') {
+            window.location.replace('/');
+            return;
+        }
     } else {
         return;
     }
@@ -619,10 +900,10 @@ window.setPassword = async function() {
     } else {
         alert(i18n[currentLang].pwdFailedAlert + data.error);
     }
-}
+};
 
 async function loadRoomData() {
-    let url = '/api/room?code=' + currentRoomCode;
+    let url = '/api/room?code=' + encodeURIComponent(currentRoomCode);
     let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
     if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
 
@@ -645,7 +926,7 @@ async function loadRoomData() {
     }
 
     if (data.success) {
-        if (data.room && data.room.password) {
+        if (data.room && (data.room.hasPassword || data.room.password)) {
             const pwdContainer = document.getElementById('pwdContainer');
             if(pwdContainer) pwdContainer.innerHTML = `<span id="lockedStatusSpan" style="color:#2ecc71;font-weight:bold;">${i18n[currentLang].lockedStatus}</span>`;
         }
@@ -665,7 +946,7 @@ window.unlockRoom = async function() {
     if(!p) return;
     
     try {
-        const res = await fetch(`/api/room?code=${currentRoomCode}&pwd=${encodeURIComponent(p)}`);
+        const res = await fetch(`/api/room?code=${encodeURIComponent(currentRoomCode)}&pwd=${encodeURIComponent(p)}`);
         const data = await res.json();
         if (data.error === 'Incorrect password') {
             document.getElementById('unlockError').innerText = i18n[currentLang].wrongPwd;
@@ -678,11 +959,40 @@ window.unlockRoom = async function() {
     } catch(e) {
         document.getElementById('unlockError').innerText = i18n[currentLang].networkError;
     }
+};
+
+// Clipboard copy with fallback (Bug 9)
+function copyLink() {
+    const text = window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert(i18n[currentLang].linkCopied);
+        }).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
 }
 
-function copyLink() {
-    navigator.clipboard.writeText(window.location.href);
-    alert(i18n[currentLang].linkCopied);
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            alert(i18n[currentLang].linkCopied);
+        } else {
+            prompt(i18n[currentLang].shareLink, text);
+        }
+    } catch (err) {
+        prompt(i18n[currentLang].shareLink, text);
+    }
+    document.body.removeChild(ta);
 }
 
 // --- CHINESE IME & USER ACTIVITY GUARDS ---
@@ -737,7 +1047,6 @@ document.addEventListener('change', (e) => {
 });
 
 // --- STATE SYNC LOGIC ---
-
 let isSyncing = false;
 let syncDebounceTimer = null;
 
@@ -748,27 +1057,32 @@ function triggerSync() {
     }, 250);
 }
 
+// Serialization (Supports isSaved, per-round aliases, and empty tiger inputs)
 function getGameState() {
     const rounds = [];
     document.querySelectorAll('.game-round').forEach(roundDiv => {
+        const isSaved = roundDiv.classList.contains('is-saved');
         const roundState = {
             unit: parseFloat(roundDiv.querySelector('.round-unit').value) || 0.5,
             players: {},
-            isEnded: !roundDiv.querySelector('.end-game-btn') || roundDiv.querySelector('.end-game-btn').classList.contains('hidden')
+            isSaved: isSaved,
+            isEnded: isSaved // Compatibility with previous records
         };
         
         roundDiv.querySelectorAll('.player-row').forEach(row => {
             const dir = row.dataset.dir;
             const aliasInput = row.querySelector('.player-alias');
-            if (aliasInput && aliasInput.value) {
-                aliases[dir] = aliasInput.value;
-            }
+            const rowAlias = (aliasInput && aliasInput.value && aliasInput.value.trim()) ? aliasInput.value.trim() : (aliases[dir] || dir);
+            
+            // Update global aliases cache for next round creation
+            aliases[dir] = rowAlias;
+
             const tigers = [];
             row.querySelectorAll('.tiger-input').forEach(input => {
-                if (input.value !== '') tigers.push(parseFloat(input.value));
+                tigers.push(input.value === '' ? '' : parseFloat(input.value));
             });
             roundState.players[dir] = {
-                alias: aliasInput ? aliasInput.value : (aliases[dir] || ''),
+                alias: rowAlias,
                 tigers: tigers
             };
         });
@@ -777,6 +1091,7 @@ function getGameState() {
     return { aliases: aliases, rounds: rounds };
 }
 
+// Deserialization (Restores saved state, locked inputs, and custom aliases per round)
 async function applyGameState(state) {
     let roundsToApply = [];
     if (Array.isArray(state)) {
@@ -825,30 +1140,37 @@ async function applyGameState(state) {
                 } else {
                     tigers.forEach(val => {
                         const input = createTigerInput();
-                        input.value = val;
+                        input.value = (val === '' || val === null || val === undefined) ? '' : val;
                         tigerList.appendChild(input);
                     });
                 }
             }
         });
         
-        if (roundState.isEnded) {
-            const endBtn = roundDiv.querySelector('.end-game-btn');
-            if (endBtn) calculateRoundScore(roundDiv, endBtn);
+        // If round was saved or ended, apply save & lock styling
+        if (roundState.isSaved || roundState.isEnded) {
+            saveRound(roundDiv, false);
         }
     });
 
     document.getElementById('startGameBtn').innerHTML = roundCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
 }
 
+// Push state to server with password (Bug 3 Fix)
 async function pushStateToServer() {
     if (isSyncing || !currentRoomCode) return;
     const state = getGameState();
+    const roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
     try {
         await fetch('/api/game', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'save_state', roomCode: currentRoomCode, state: state })
+            body: JSON.stringify({
+                action: 'save_state',
+                roomCode: currentRoomCode,
+                state: state,
+                password: roomPwd
+            })
         });
     } catch(e) {
         console.error('Push state failed:', e);
@@ -863,7 +1185,7 @@ setInterval(async () => {
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     
     try {
-        let url = '/api/room?code=' + currentRoomCode;
+        let url = '/api/room?code=' + encodeURIComponent(currentRoomCode);
         let roomPwd = localStorage.getItem('room_pwd_' + currentRoomCode) || '';
         if (roomPwd) url += '&pwd=' + encodeURIComponent(roomPwd);
         
@@ -884,21 +1206,3 @@ setInterval(async () => {
 // Initialize everything
 initDogs();
 checkRoom();
-
-function calculateScores(tigers, unit, dirs = ['东', '西', '南', '北']) {
-    let scores = {};
-    dirs.forEach(dir => {
-        let score = (tigers[dir] || 0) * 3;
-        dirs.forEach(otherDir => {
-            if (dir !== otherDir) {
-                score -= (tigers[otherDir] || 0);
-            }
-        });
-        scores[dir] = Math.round(score * unit * 100) / 100;
-    });
-    return scores;
-}
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { calculateScores };
-}
