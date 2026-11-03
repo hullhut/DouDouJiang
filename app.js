@@ -1,6 +1,5 @@
 const gameRoundsContainer = document.getElementById('gameRoundsContainer');
 const startGameBtn = document.getElementById('startGameBtn');
-const endSessionBtn = document.getElementById('endSessionBtn');
 const viewGrandBtn = document.getElementById('viewGrandBtn');
 const clearAllBtn = document.getElementById('clearAllBtn');
 const langToggle = document.getElementById('langToggle');
@@ -13,12 +12,13 @@ const i18n = {
         title: "Mahjong Score Tracker",
         docTitle: "🐶 🀄 Mahjong Score Tracker 🐕",
         startGame: "Start Game ▶",
-        startAnother: "Start Next Game ▶",
-        endGame: "End Game 🏆",
-        confirmEndGame: "Sure to End Game?",
+        startAnother: "➕ Next Game ▶",
+        endGame: "🏁 End Game 🏆",
+        confirmEndGame: "Confirm End Game {n}?",
+        gameEndedBadge: "Game Settled ✅",
         viewGrand: "Leaderboard 👑",
         clearAll: "Clear All",
-        confirmClearAll: "Sure to Clear?",
+        confirmClearAll: "Sure to Clear All?",
         gameTitle: "Game {n}",
         statusInProgress: "In Progress",
         statusEnded: "Settled",
@@ -26,13 +26,13 @@ const i18n = {
         handPlaceholder: "H{n}",
         aliasPlaceholder: "Player Alias",
         scorePlaceholder: "Score",
-        rowTotalTigers: "Game: {n} Tigers",
+        rowTotalTigers: "{n} Tigers",
         unitText: "Unit (Yuan/Tiger)",
         saveGame: "💾 Save Records",
         modifyGame: "✏️ Edit Records",
         clearGame: "🔄 Reset Game",
         confirmClearGame: "Sure to Reset?",
-        viewGameResults: "📊 View Game Results",
+        viewGameResults: "📊 View Results & Rank",
         modalTitle: "🀄 Settlement & Leaderboard",
         tabCurrentGame: "🀄 Current Game Results",
         tabGrandTotal: "🏆 Grand Total Leaderboard",
@@ -48,8 +48,8 @@ const i18n = {
         seatsPlayed: "Seats",
         rawTigersSummary: "Tigers: {raw} | Net: {net}",
         closeModal: "Close",
-        startNextGame: "Start Next Game ▶",
-        noGamesAlert: "No games played yet! Please start a game first.",
+        startNextGame: "➕ Next Game ▶",
+        noGamesAlert: "No games recorded yet! Please start a game first.",
         east: "East",
         south: "South",
         west: "West",
@@ -73,12 +73,13 @@ const i18n = {
         title: "麻将计分器",
         docTitle: "🐶 🀄 麻将计分器 🐕",
         startGame: "开始游戏 ▶",
-        startAnother: "开始下一局 ▶",
-        endGame: "结束本局 🏆",
-        confirmEndGame: "确认结束本局？",
+        startAnother: "➕ 开始下一局 ▶",
+        endGame: "🏁 结束本局 🏆",
+        confirmEndGame: "确认结束第 {n} 局？",
+        gameEndedBadge: "局已结束 ✅",
         viewGrand: "全场总榜 👑",
         clearAll: "全部清空",
-        confirmClearAll: "确认全清？",
+        confirmClearAll: "确认清空全部对局？",
         gameTitle: "第 {n} 局",
         statusInProgress: "进行中",
         statusEnded: "已结束",
@@ -86,7 +87,7 @@ const i18n = {
         handPlaceholder: "把{n}",
         aliasPlaceholder: "玩家昵称",
         scorePlaceholder: "虎数",
-        rowTotalTigers: "本局: {n} 虎",
+        rowTotalTigers: "共 {n} 虎",
         unitText: "计分单位 (元/虎)",
         saveGame: "💾 保存记录",
         modifyGame: "✏️ 修改记录",
@@ -108,7 +109,7 @@ const i18n = {
         seatsPlayed: "曾坐",
         rawTigersSummary: "总抓虎: {raw} | 净胜虎: {net}",
         closeModal: "确定",
-        startNextGame: "开始下一局 ▶",
+        startNextGame: "➕ 开始下一局 ▶",
         noGamesAlert: "暂无已完成的对局，请先记录！",
         east: "东",
         south: "南",
@@ -168,7 +169,7 @@ function toggleLanguage() {
     // Update header banner image according to language
     const headerBannerImg = document.getElementById('headerBannerImg');
     if (headerBannerImg) {
-        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=31' : '/images/header-zh.png?v=31';
+        headerBannerImg.src = currentLang === 'en' ? '/images/header-en.png?v=32' : '/images/header-zh.png?v=32';
         headerBannerImg.alt = currentLang === 'en' ? 'Mahjong Scorer' : '麻将计分器';
     }
 
@@ -177,9 +178,6 @@ function toggleLanguage() {
     document.title = i18n[currentLang].docTitle;
     startGameBtn.innerHTML = gameCount > 0 ? i18n[currentLang].startAnother : i18n[currentLang].startGame;
     
-    if (endSessionBtn) {
-        endSessionBtn.innerHTML = endSessionBtn.dataset.confirm === "true" ? i18n[currentLang].confirmEndGame : i18n[currentLang].endGame;
-    }
     if (viewGrandBtn) {
         viewGrandBtn.innerHTML = i18n[currentLang].viewGrand;
     }
@@ -221,9 +219,9 @@ function toggleLanguage() {
         const titleSpan = gameDiv.querySelector('.round-header-title');
         if (titleSpan) titleSpan.innerText = i18n[currentLang].gameTitle.replace('{n}', gameId);
         
+        const isEnded = gameDiv.classList.contains('is-ended');
         const statusBadge = gameDiv.querySelector('.game-status-badge');
         if (statusBadge) {
-            const isEnded = gameDiv.classList.contains('is-ended');
             statusBadge.innerText = isEnded ? i18n[currentLang].statusEnded : i18n[currentLang].statusInProgress;
         }
 
@@ -249,6 +247,17 @@ function toggleLanguage() {
         
         const modifyBtn = gameDiv.querySelector('.modify-round-btn');
         if (modifyBtn) modifyBtn.innerHTML = i18n[currentLang].modifyGame;
+
+        const endBtn = gameDiv.querySelector('.end-game-btn');
+        if (endBtn) {
+            if (isEnded) {
+                endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
+            } else if (endBtn.dataset.confirm === "true") {
+                endBtn.innerHTML = i18n[currentLang].confirmEndGame.replace('{n}', gameId);
+            } else {
+                endBtn.innerHTML = i18n[currentLang].endGame;
+            }
+        }
 
         const viewResultsBtn = gameDiv.querySelector('.view-game-results-btn');
         if (viewResultsBtn) viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
@@ -307,7 +316,7 @@ function createTigerInput(handIndex = 1) {
     return input;
 }
 
-// Update the real-time tiger sum at the end of each player's row
+// Update the real-time tiger sum at the end of each player's row: "共 X 虎"
 function updateRowTotalTigers(row) {
     if (!row) return;
     let sum = 0;
@@ -316,20 +325,17 @@ function updateRowTotalTigers(row) {
             sum += parseFloat(input.value) || 0;
         }
     });
-    // Format sum: integer if whole number, otherwise up to 1 decimal place
     const formattedSum = Math.round(sum * 10) / 10;
     
     let totalPill = row.querySelector('.row-total-tigers');
     if (!totalPill) {
         totalPill = document.createElement('div');
         totalPill.className = 'row-total-tigers';
-        totalPill.title = '本局累计抓虎数';
+        totalPill.title = '累计抓虎数';
         row.appendChild(totalPill);
     }
     totalPill.innerHTML = `
-        <span class="total-tigers-label">${i18n[currentLang].rowTotalTigers.split(':')[0]}:</span>
-        <span class="total-tigers-num">${formattedSum}</span>
-        <span class="total-tigers-unit">虎</span>
+        <span class="total-tigers-num">${i18n[currentLang].rowTotalTigers.replace('{n}', formattedSum)}</span>
     `;
 }
 
@@ -440,21 +446,19 @@ function createGameRound(autoScroll = true) {
         
         row.appendChild(playerInfo);
 
-        // 行末：实时总虎数标签
+        // 行末：实时总虎数标签 (共 X 虎)
         const totalPill = document.createElement('div');
         totalPill.className = 'row-total-tigers';
-        totalPill.title = '本局累计抓虎数';
+        totalPill.title = '累计抓虎数';
         totalPill.innerHTML = `
-            <span class="total-tigers-label">${i18n[currentLang].rowTotalTigers.split(':')[0]}:</span>
-            <span class="total-tigers-num">0</span>
-            <span class="total-tigers-unit">虎</span>
+            <span class="total-tigers-num">${i18n[currentLang].rowTotalTigers.replace('{n}', 0)}</span>
         `;
         row.appendChild(totalPill);
 
         gameDiv.appendChild(row);
     });
 
-    // 底部控制区（计分单位 + 保存记录 / 修改记录 / 重置本局）
+    // 底部控制区（计分单位 + 两行操作按钮）
     const footer = document.createElement('div');
     footer.className = 'footer-controls';
     
@@ -474,6 +478,10 @@ function createGameRound(autoScroll = true) {
     unitInp.addEventListener('change', triggerSync);
     footer.appendChild(unitDiv);
 
+    // 操作第 1 行：数据记录管理
+    const actionsRow1 = document.createElement('div');
+    actionsRow1.className = 'footer-actions-row1';
+
     // 【💾 保存记录】按钮
     const saveBtn = document.createElement('button');
     saveBtn.className = 'save-round-btn';
@@ -481,6 +489,7 @@ function createGameRound(autoScroll = true) {
     saveBtn.onclick = () => {
         saveGameRecords(gameDiv);
     };
+    actionsRow1.appendChild(saveBtn);
 
     // 【✏️ 修改记录】按钮 (保存后解锁用)
     const modifyBtn = document.createElement('button');
@@ -489,14 +498,7 @@ function createGameRound(autoScroll = true) {
     modifyBtn.onclick = () => {
         unlockGameForEdit(gameDiv);
     };
-
-    // 【📊 查看本局结算与排行】按钮 (结算后可重复查看)
-    const viewResultsBtn = document.createElement('button');
-    viewResultsBtn.className = 'view-game-results-btn hidden';
-    viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
-    viewResultsBtn.onclick = () => {
-        openSettlementModal(gameId, 'current');
-    };
+    actionsRow1.appendChild(modifyBtn);
 
     // 【🔄 重置本局】按钮 (防误触二次确认)
     const clearBtn = document.createElement('button');
@@ -523,13 +525,56 @@ function createGameRound(autoScroll = true) {
             }, 3000);
         }
     };
-    
+    actionsRow1.appendChild(clearBtn);
+
+    // 操作第 2 行：结算与排行（严格位于保存记录的下一行，每局独立控制）
+    const actionsRow2 = document.createElement('div');
+    actionsRow2.className = 'footer-actions-row2';
+
+    // 【🏁 结束本局 🏆】按钮 (仅控制当前这一局！)
+    const endGameBtn = document.createElement('button');
+    endGameBtn.className = 'end-game-btn';
+    endGameBtn.dataset.confirm = "false";
+    endGameBtn.innerHTML = i18n[currentLang].endGame;
+    endGameBtn.onclick = () => {
+        if (gameDiv.classList.contains('is-ended')) {
+            openSettlementModal(gameId, 'current');
+            return;
+        }
+
+        if (endGameBtn.dataset.confirm === "true") {
+            endGameBtn.dataset.confirm = "false";
+            endGameBtn.classList.remove('confirming');
+            endSpecificGame(gameDiv);
+        } else {
+            endGameBtn.dataset.confirm = "true";
+            endGameBtn.classList.add('confirming');
+            endGameBtn.innerHTML = i18n[currentLang].confirmEndGame.replace('{n}', gameId);
+
+            setTimeout(() => {
+                if (endGameBtn.dataset.confirm === "true") {
+                    endGameBtn.dataset.confirm = "false";
+                    endGameBtn.classList.remove('confirming');
+                    endGameBtn.innerHTML = i18n[currentLang].endGame;
+                }
+            }, 3500);
+        }
+    };
+    actionsRow2.appendChild(endGameBtn);
+
+    // 【📊 查看本局结算与排行】按钮 (每局永久常驻可见！)
+    const viewResultsBtn = document.createElement('button');
+    viewResultsBtn.className = 'view-game-results-btn';
+    viewResultsBtn.innerHTML = i18n[currentLang].viewGameResults;
+    viewResultsBtn.onclick = () => {
+        openSettlementModal(gameId, 'current');
+    };
+    actionsRow2.appendChild(viewResultsBtn);
+
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'footer-actions';
-    actionsDiv.appendChild(saveBtn);
-    actionsDiv.appendChild(modifyBtn);
-    actionsDiv.appendChild(viewResultsBtn);
-    actionsDiv.appendChild(clearBtn);
+    actionsDiv.appendChild(actionsRow1);
+    actionsDiv.appendChild(actionsRow2);
 
     footer.appendChild(actionsDiv);
     gameDiv.appendChild(footer);
@@ -568,15 +613,19 @@ function saveGameRecords(gameDiv) {
  */
 function unlockGameForEdit(gameDiv) {
     if (gameDiv.classList.contains('is-ended')) {
-        // 如果本局已结束，恢复为进行中状态
+        // 如果本局已结束，恢复为进行中状态，重新允许结算
         gameDiv.classList.remove('is-ended');
         const badge = gameDiv.querySelector('.game-status-badge');
         if (badge) {
             badge.className = 'game-status-badge in-progress';
             badge.innerText = i18n[currentLang].statusInProgress;
         }
-        const viewBtn = gameDiv.querySelector('.view-game-results-btn');
-        if (viewBtn) viewBtn.classList.add('hidden');
+        const endBtn = gameDiv.querySelector('.end-game-btn');
+        if (endBtn) {
+            endBtn.className = 'end-game-btn';
+            endBtn.dataset.confirm = "false";
+            endBtn.innerHTML = i18n[currentLang].endGame;
+        }
     }
 
     gameDiv.classList.remove('is-saved');
@@ -603,6 +652,13 @@ function resetGameRecords(gameDiv) {
         badge.innerText = i18n[currentLang].statusInProgress;
     }
 
+    const endBtn = gameDiv.querySelector('.end-game-btn');
+    if (endBtn) {
+        endBtn.className = 'end-game-btn';
+        endBtn.dataset.confirm = "false";
+        endBtn.innerHTML = i18n[currentLang].endGame;
+    }
+
     gameDiv.querySelectorAll('.player-row').forEach(row => {
         const list = row.querySelector('.tiger-list');
         if (list) {
@@ -618,56 +674,35 @@ function resetGameRecords(gameDiv) {
     if (saveBtn) saveBtn.classList.remove('hidden');
     const modifyBtn = gameDiv.querySelector('.modify-round-btn');
     if (modifyBtn) modifyBtn.classList.add('hidden');
-    const viewBtn = gameDiv.querySelector('.view-game-results-btn');
-    if (viewBtn) viewBtn.classList.add('hidden');
 
     triggerSync();
 }
 
 /**
- * 结束当前局：打完两三圈后正式结算！
- * 1. 锁定当轮输入，标记本局已结束；
- * 2. 计算本局每人总得分与公式明细；
- * 3. 生成当局排行榜 (1~4名)；
- * 4. 汇总全场总游戏排行榜 (以别名唯一归集)；
- * 5. 弹出综合结算弹窗。
+ * 结束指定的某单一局游戏（单局完全闭环，只影响当前局）
  */
-function endCurrentGame() {
-    // 找到最后一局进行中的对局
-    const allGames = document.querySelectorAll('.game-round');
-    if (allGames.length === 0) {
-        alert(i18n[currentLang].noGamesAlert);
-        return;
-    }
+function endSpecificGame(gameDiv) {
+    const gameId = gameDiv.dataset.game || gameDiv.id.replace('round-', '').replace('game-', '');
 
-    let targetGame = null;
-    for (let i = allGames.length - 1; i >= 0; i--) {
-        if (!allGames[i].classList.contains('is-ended')) {
-            targetGame = allGames[i];
-            break;
-        }
-    }
-    // 如果全都已结束，则取最后一局
-    if (!targetGame) {
-        targetGame = allGames[allGames.length - 1];
-    }
+    // 1. 锁定本局并标记为已结束
+    gameDiv.classList.add('is-ended');
+    saveGameRecords(gameDiv);
 
-    const gameId = targetGame.dataset.game || targetGame.id.replace('round-', '').replace('game-', '');
-
-    // 锁定本局并标记为已结束
-    targetGame.classList.add('is-ended');
-    saveGameRecords(targetGame);
-
-    const badge = targetGame.querySelector('.game-status-badge');
+    // 2. 状态徽章变为已结束
+    const badge = gameDiv.querySelector('.game-status-badge');
     if (badge) {
         badge.className = 'game-status-badge ended';
         badge.innerText = i18n[currentLang].statusEnded;
     }
 
-    const viewBtn = targetGame.querySelector('.view-game-results-btn');
-    if (viewBtn) viewBtn.classList.remove('hidden');
+    // 3. 结束按钮更新为已结束标识
+    const endBtn = gameDiv.querySelector('.end-game-btn');
+    if (endBtn) {
+        endBtn.className = 'end-game-btn ended';
+        endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
+    }
 
-    // 打开综合结算与排行榜大弹窗
+    // 4. 打开结算弹窗，展示本局计算明细与排行榜
     openSettlementModal(gameId, 'current');
 
     triggerSync();
@@ -1001,34 +1036,10 @@ if (modalStartNextGameBtn) {
     });
 }
 
-// --- Top Action Buttons Wiring ---
+// --- Top Action Buttons Wiring (Pure Global Controls) ---
 startGameBtn.addEventListener('click', () => {
     createGameRound(true);
 });
-
-// 【结束本局 🏆】按钮带二次防误触确认机制
-if (endSessionBtn) {
-    endSessionBtn.addEventListener('click', () => {
-        if (endSessionBtn.dataset.confirm === "true") {
-            endSessionBtn.dataset.confirm = "false";
-            endSessionBtn.innerHTML = i18n[currentLang].endGame;
-            endSessionBtn.classList.remove('confirming');
-            endCurrentGame();
-        } else {
-            endSessionBtn.dataset.confirm = "true";
-            endSessionBtn.innerHTML = i18n[currentLang].confirmEndGame;
-            endSessionBtn.classList.add('confirming');
-            
-            setTimeout(() => {
-                if (endSessionBtn.dataset.confirm === "true") {
-                    endSessionBtn.dataset.confirm = "false";
-                    endSessionBtn.innerHTML = i18n[currentLang].endGame;
-                    endSessionBtn.classList.remove('confirming');
-                }
-            }, 3500);
-        }
-    });
-}
 
 // 【全场总榜 👑】按钮
 if (viewGrandBtn) {
@@ -1393,8 +1404,11 @@ async function applyGameState(state) {
                 badge.className = 'game-status-badge ended';
                 badge.innerText = i18n[currentLang].statusEnded;
             }
-            const viewBtn = gameDiv.querySelector('.view-game-results-btn');
-            if (viewBtn) viewBtn.classList.remove('hidden');
+            const endBtn = gameDiv.querySelector('.end-game-btn');
+            if (endBtn) {
+                endBtn.className = 'end-game-btn ended';
+                endBtn.innerHTML = i18n[currentLang].gameEndedBadge;
+            }
         }
 
         if (rState.isSaved || rState.isEnded) {

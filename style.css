@@ -657,16 +657,24 @@ h1 {
 /* Action buttons: 100% CENTERED! */
 .footer-actions {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
     width: 100%;
-    flex-wrap: wrap;
+    align-items: center;
 }
 
-.save-round-btn, .end-game-btn, .clear-round-btn, .modify-round-btn {
-    padding: 8px 18px;
-    font-size: 15px;
+.footer-actions-row1, .footer-actions-row2 {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.save-round-btn, .end-game-btn, .clear-round-btn, .modify-round-btn, .view-game-results-btn {
+    padding: 7px 16px;
+    font-size: 14px;
     font-weight: 900;
     border-radius: 25px;
     border: 2px solid #FFF;
@@ -692,14 +700,14 @@ h1 {
     box-shadow: 0 2px 0px #1E8449;
 }
 
-.end-game-btn {
-    background: linear-gradient(180deg, #FF6B6B 0%, #E74C3C 100%);
-    box-shadow: 0 4px 0px #C0392B, 0 4px 6px rgba(0,0,0,0.15);
+.modify-round-btn {
+    background: linear-gradient(180deg, #4FACFE 0%, #00F2FE 100%);
+    box-shadow: 0 4px 0px #0084E6, 0 4px 6px rgba(0,0,0,0.15);
     color: white;
 }
-.end-game-btn:active {
+.modify-round-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0px #C0392B;
+    box-shadow: 0 2px 0px #0084E6;
 }
 
 .clear-round-btn {
@@ -712,14 +720,34 @@ h1 {
     box-shadow: 0 2px 0px #D35400;
 }
 
-.modify-round-btn {
-    background: linear-gradient(180deg, #4FACFE 0%, #00F2FE 100%);
-    box-shadow: 0 4px 0px #0084E6, 0 4px 6px rgba(0,0,0,0.15);
+/* Operation Row 2: 结束本局 🏆 & 查看结算与排行 */
+.end-game-btn {
+    background: linear-gradient(180deg, #E67E22 0%, #D35400 100%);
+    box-shadow: 0 4px 0px #BA4A00, 0 4px 6px rgba(0,0,0,0.15);
     color: white;
 }
-.modify-round-btn:active {
+.end-game-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0px #0084E6;
+    box-shadow: 0 2px 0px #BA4A00;
+}
+.end-game-btn.confirming {
+    background: linear-gradient(180deg, #E74C3C 0%, #C0392B 100%);
+    box-shadow: 0 4px 0px #922B21;
+}
+.end-game-btn.ended {
+    background: linear-gradient(180deg, #27AE60 0%, #1E8449 100%);
+    box-shadow: 0 4px 0px #145A32;
+    cursor: default;
+}
+
+.view-game-results-btn {
+    background: linear-gradient(180deg, #3498DB 0%, #2980B9 100%);
+    box-shadow: 0 4px 0 #1F618D, 0 4px 6px rgba(0,0,0,0.15);
+    color: white;
+}
+.view-game-results-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1F618D;
 }
 
 .round-result {

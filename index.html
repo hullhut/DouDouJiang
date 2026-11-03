@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🐶 🀄 豆豆酱麻将计分器 🐕</title>
-    <link rel="stylesheet" href="/style.css?v=31">
+    <link rel="stylesheet" href="/style.css?v=32">
 </head>
 <body>
     <div class="app-container">
@@ -21,7 +21,7 @@
         <!-- Header Banner Container (Dual Language Flanking Dogs & Mahjong Rack) -->
         <header class="header-banner-container" id="headerBanner">
             <div class="banner-wrapper" id="bannerWrapper">
-                <img src="/images/header-zh.png?v=31" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
+                <img src="/images/header-zh.png?v=32" class="header-theme-banner" alt="麻将计分器" id="headerBannerImg">
                 <!-- Interactive Hotspots for Poodle, Fluffy Pup and Title -->
                 <div class="pet-hotspot hotspot-left-poodle" id="hotspotLeftPoodle" title="泰迪贵宾"></div>
                 <div class="pet-hotspot hotspot-right-fluffy" id="hotspotRightFluffy" title="花色小狗"></div>
@@ -30,13 +30,10 @@
             <h1 id="mainTitle" class="sr-only" data-i18n="title">麻将计分器</h1>
         </header>
 
-        <!-- Top Main Action Buttons -->
+        <!-- Top Main Action Buttons (Pure Global Actions) -->
         <div class="action-buttons header-buttons">
             <button id="startGameBtn" class="primary-btn" data-i18n="startGame">
                 开始游戏 ▶
-            </button>
-            <button id="endSessionBtn" class="end-session-btn" data-i18n="endGame" data-confirm="false">
-                结束本局 🏆
             </button>
             <button id="viewGrandBtn" class="view-grand-btn" data-i18n="viewGrand">
                 全场总榜 👑
@@ -100,13 +97,13 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="modal-action-btn secondary" id="modalStartNextGameBtn">开始下一局 ▶</button>
+                <button class="modal-action-btn secondary" id="modalStartNextGameBtn">➕ 开始下一局 ▶</button>
                 <button class="modal-action-btn" id="confirmSettlementModalBtn">确定</button>
             </div>
         </div>
     </div>
 
-    <script src="/scoring.js?v=31"></script>
-    <script src="/app.js?v=31"></script>
+    <script src="/scoring.js?v=32"></script>
+    <script src="/app.js?v=32"></script>
 </body>
 </html>
